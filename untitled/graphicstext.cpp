@@ -1,5 +1,5 @@
 #include "graphicstext.h"
-
+/*
 GraphicsText::GraphicsText(QGraphicsItem *parent, QGraphicsScene *scene):QGraphicsTextItem(parent,scene)
 {
     this->setFlag(QGraphicsItem::ItemIsMovable,true);
@@ -19,3 +19,4 @@ QVariant GraphicsText::itemChange(GraphicsItemChange change, const QVariant &val
         this->line->setLine(QLineF(this->pos(),this->line->line().p2()));
     return QGraphicsItem::itemChange(change, value);
 }
+*/

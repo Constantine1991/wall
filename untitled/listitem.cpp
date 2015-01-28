@@ -1,5 +1,5 @@
 #include "listitem.h"
-
+/*
 ListItem::ListItem()
 {
 }
@@ -145,4 +145,4 @@ int ListItem::CountItem()
 bool ListItem::isEmpty()
 {
     return this->TableItem.isEmpty();
-}
+}*/

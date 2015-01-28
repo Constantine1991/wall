@@ -37,6 +37,21 @@ void GroupItem::setPos(QPointF point)
             pillar1->setPos(point.x()-20,point.y());
             pillar2->setPos(point.x()+20,point.y());
             wicket->setPosition(QPointF(pillar1->centre().x()+pillar1->boundingRect().width()/2,pillar1->centre().y()));
+            break;
+        }
+    }
+}
+
+void GroupItem::itemMoveScene(QPointF point)
+{
+    switch(this->type)
+    {
+        case GroupItem::ITEM_WICKET:{
+            if(this->group.at(0)->isSelected())
+                this->setPos(QPointF(point.x()+20,point.y()));
+            if(this->group.at(1)->isSelected())
+                this->setPos(QPointF(point.x()-20,point.y()));
+            break;
         }
     }
 }

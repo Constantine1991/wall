@@ -12,7 +12,7 @@
 class GraphicsWicketItem: public QGraphicsLineItem
 {
 public:
-    enum {TYPE=UserType + 3};
+    enum {Type=UserType + 3};
     GraphicsWicketItem(QGraphicsItem *parent=0,QGraphicsScene *scene=0);
     ~GraphicsWicketItem();
     int type() const{

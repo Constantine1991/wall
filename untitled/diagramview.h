@@ -33,6 +33,7 @@ class DiagramView:public QGraphicsView
 Q_OBJECT
 private:
     QGraphicsScene *pDiagramScene;
+    GroupItem *group;
     //ListItem itemScene;
     TYPEITEM typeITEM;
     int currentIdItem;
@@ -86,6 +87,8 @@ public:
 public slots:
     void closeProperties(TYPEITEM itemType, bool all);
     void component(TYPEITEM typeItem,int width);
+signals:
+    void itemMoveScene(QPointF point);
 protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);

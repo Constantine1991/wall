@@ -99,7 +99,8 @@ void DiagramView::AppendItem(TYPEITEM typeItem, QPointF point)
             return;
         }
         case ITEM_WICKET:{
-            GroupItem *group=new GroupItem();
+            group=new GroupItem();
+            connect(this,SIGNAL(itemMoveScene(QPointF)),group,SLOT(itemMoveScene(QPointF)));
             group->createGroup(GroupItem::ITEM_WICKET,this->MenuItem,this->pDiagramScene);
             group->setPos(point);
             return;
@@ -190,6 +191,8 @@ void DiagramView::Delete_Item()
     {
         foreach(QGraphicsItem *parentItem,this->pDiagramScene->selectedItems())
         {
+            if(parentItem->type()==GraphicsWicketItem::Type)
+                delete this->group;
             foreach(QGraphicsItem *childItem,parentItem->childItems())
                 this->pDiagramScene->removeItem(childItem);
             this->pDiagramScene->removeItem(parentItem);
@@ -957,6 +960,7 @@ void DiagramView::mousePressEvent(QMouseEvent *event)
 
 void DiagramView::mouseMoveEvent(QMouseEvent *event)
 {
+    this->itemMoveScene(this->mapToScene(event->pos()));
     if(this->typeITEM==ITEM_WALL)
         if(this->lineWall!=NULL)
             this->lineWall->setLine(QLineF(this->lineWall->line().p1(),this->mapToScene(event->pos())));

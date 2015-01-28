@@ -18,9 +18,9 @@ public:
     GroupItem(QObject *parent=0);
     void createGroup(TYPEGROUP type,QMenu *menu,QGraphicsScene *scene);
     void setPos(QPointF point);
-/*
+
 public slots:
-    void itemMoveScene(QPointF point);*/
+    void itemMoveScene(QPointF point);
 private:
     TYPEGROUP type;
     QList<QGraphicsItem*> group;
