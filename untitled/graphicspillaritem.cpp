@@ -1,7 +1,8 @@
 #include "graphicspillaritem.h"
 #include "QDebug"
 
-GraphicsPillarItem::GraphicsPillarItem(QMenu *menuItem, QGraphicsItem *parent, QGraphicsScene *scene):QGraphicsEllipseItem(parent, scene)
+GraphicsPillarItem::GraphicsPillarItem(QMenu *menuItem, QGraphicsItem *parent, QGraphicsScene *scene)
+    :QGraphicsEllipseItem(parent, scene)
 {
     this->itemText=new QGraphicsTextItem();
     this->itemText->setPos(0,0);

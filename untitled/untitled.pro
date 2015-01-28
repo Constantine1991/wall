@@ -30,9 +30,9 @@ SOURCES += \
     cryptxor.cpp \
     activationform.cpp \
     interval.cpp \
-    graphicswicketitem.cpp \
     typecomponent.cpp \
-    graphicswallitem.cpp
+    graphicswallitem.cpp \
+    graphicswicketitem.cpp
 
 HEADERS  += \
     settingswindow.h \
