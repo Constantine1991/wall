@@ -24,7 +24,7 @@ DiagramView::DiagramView(QWidget *parent):QGraphicsView(parent)
 
 DiagramView::~DiagramView()
 {
-    this->itemScene.RemoveAll();
+    //this->itemScene.RemoveAll();
 }
 /*-----------------------------------------private------------------------------------------*/
 
@@ -112,7 +112,7 @@ float DiagramView::distancePointToPoint(QPointF point1, QPointF point2)
 
 void DiagramView::RotateItem(QGraphicsItem *itemGraphics, int Angle)
 {
-    ITEM *item=this->itemScene.getItem(itemGraphics->data(1).toInt());
+    /*ITEM *item=this->itemScene.getItem(itemGraphics->data(1).toInt());
     int x=item->child.at(0)->itemChild->x();
     int y=item->child.at(0)->itemChild->y();
 
@@ -136,7 +136,7 @@ void DiagramView::RotateItem(QGraphicsItem *itemGraphics, int Angle)
         item->child.at(1)->itemChild->setRotation(a);
     }
     for(int i=0;i<item->child.count();i++)
-        this->changeLine(this->itemScene.getItem(item->child.at(i)->idChild),item->child.at(i)->itemChild);
+        this->changeLine(this->itemScene.getItem(item->child.at(i)->idChild),item->child.at(i)->itemChild);*/
 
 }
 
@@ -196,7 +196,7 @@ void DiagramView::Delete_Item()
 
 void DiagramView::setInterval(float interval, bool empty)
 {
-    if(empty || interval<this->itemSetting->maxWidthBrickR*10+350)
+   /* if(empty || interval<this->itemSetting->maxWidthBrickR*10+350)
     {
         this->deleteFilling();
         return;
@@ -224,7 +224,7 @@ void DiagramView::setInterval(float interval, bool empty)
     }
     this->deleteFilling();
     if(ObjectA!=NULL && ObjectB!=NULL)
-        this->Filling(ObjectA,ObjectB,interval);
+        this->Filling(ObjectA,ObjectB,interval);*/
 }
 
 void DiagramView::deleteFilling()
@@ -283,14 +283,14 @@ GraphicsWallItem *DiagramView::createWall(QPointF pointSceneA, QPointF pointScen
 
 void DiagramView::appendChildObject(QGraphicsItem *a, QGraphicsItem *b, QGraphicsItem *l)
 {
-    this->itemScene.AppendChild(a->data(1).toInt(),new CHILD(l->data(1).toInt(),true,l));
+ /*   this->itemScene.AppendChild(a->data(1).toInt(),new CHILD(l->data(1).toInt(),true,l));
     this->itemScene.AppendChild(b->data(1).toInt(),new CHILD(l->data(1).toInt(),true,l));
     this->itemScene.AppendChild(l->data(1).toInt(),new CHILD(a->data(1).toInt(),false,NULL));
-    this->itemScene.AppendChild(l->data(1).toInt(),new CHILD(b->data(1).toInt(),false,NULL));
+    this->itemScene.AppendChild(l->data(1).toInt(),new CHILD(b->data(1).toInt(),false,NULL));*/
 }
 
 void DiagramView::changeGroup(QGraphicsItem *itemA,QPointF point)
-{
+{/*
     int RotationItemA=itemA->rotation();
     this->RotateItem(itemA,-RotationItemA);
     ITEM *parentItem=this->itemScene.getItem(itemA->data(1).toInt());
@@ -299,11 +299,11 @@ void DiagramView::changeGroup(QGraphicsItem *itemA,QPointF point)
     itemA->setPos(parentItem->child.at(0)->itemChild->pos().x()+parentItem->child.at(0)->itemChild->boundingRect().width(),
                   parentItem->child.at(0)->itemChild->pos().y());
     parentItem->child.at(1)->itemChild->setPos(itemA->pos().x()+itemA->boundingRect().width(),itemA->pos().y());
-    this->RotateItem(itemA,RotationItemA);
+    this->RotateItem(itemA,RotationItemA);*/
 }
 
 void DiagramView::Filling(QGraphicsItem *a, QGraphicsItem *b,float interval)
-{
+{/*
     QPointF posA,posB,point;
     bool gate=false;
     posA=this->centerItem(a);
@@ -392,7 +392,7 @@ void DiagramView::Filling(QGraphicsItem *a, QGraphicsItem *b,float interval)
         this->pDiagramScene->clearSelection();
         b->setSelected(true);
         this->Delete_Item();
-    }
+    }*/
 }
 /*-----------------------------------------public-------------------------------------------*/
 
@@ -403,7 +403,7 @@ void DiagramView::setTypeItem(TYPEITEM type)
 
 void DiagramView::ClearScene()
 {
-    this->itemScene.RemoveAll();
+   // this->itemScene.RemoveAll();
     foreach(QGraphicsItem *item,this->pDiagramScene->items())
             delete item;
     this->pDiagramScene->clear();
@@ -633,7 +633,7 @@ void DiagramView::AppendBrickColorPazzle(QList<COLORBRICK*> *colorBrick,int coun
 }
 
 void DiagramView::PrintContract(bool girth,bool tray)
-{
+{/*
    Calculate calc(this->itemSetting);
    FENCE allFence;
    COLUMN allColumn;
@@ -855,7 +855,7 @@ void DiagramView::PrintContract(bool girth,bool tray)
                                      calc.GetCountCoverOnPallet(allFence.count_cover)+
                                      calc.GetCountBaseOnPallet(countBasePillar[0]+countBasePillar[1]+
                                                                countBasePillar[2]+countBasePillar[3]+
-                                                               countBasePillar[4])));
+                                                               countBasePillar[4])));*/
 }
 
 void DiagramView::setSettingItem(SETTINGS *itemSetting)
@@ -940,13 +940,13 @@ void DiagramView::mousePressEvent(QMouseEvent *event)
         this->lineFilling->setFlag(QGraphicsItem::ItemIsSelectable,true);
         this->pDiagramScene->addItem(this->lineFilling);
         this->pDiagramScene->clearSelection();
-    }
+    }/*
     if(this->typeITEM==ITEM_UNIVER)
     {
         TypeComponent *typeComponent=new TypeComponent(this);
         connect(typeComponent,SIGNAL(component(TYPEITEM,int)),this,SLOT(component(TYPEITEM,int)));
         typeComponent->show();
-    }
+    }*/
     QGraphicsView::mousePressEvent(event);
 }
 
@@ -970,13 +970,13 @@ void DiagramView::mouseReleaseEvent(QMouseEvent *event)
         this->lineWall->setLine(QLineF(this->lineWall->line().p1(),this->mapToScene(event->pos())));
         this->AppendItem(ITEM_WALL,QPointF(0,0));
     }
-    if(this->typeITEM==ITEM_FILLING)
+   /* if(this->typeITEM==ITEM_FILLING)
     {
         this->lineFilling->setLine(QLineF(this->lineFilling->line().p1(),this->mapToScene(event->pos())));
         Interval *setIntervalWindow=new Interval(this);
         connect(setIntervalWindow,SIGNAL(closeDialog(float,bool)),this,SLOT(setInterval(float,bool)));
         setIntervalWindow->show();
-    }
+    }*/
     this->typeITEM=ITEM_NONE;
     QApplication::restoreOverrideCursor();
     QGraphicsView::mouseReleaseEvent(event);

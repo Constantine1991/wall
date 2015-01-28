@@ -451,7 +451,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="res.qrc">
-    <normaloff>:/new/prefix1/1</normaloff>:/new/prefix1/1</iconset>
+    <normaloff>:/new/prefix1/logoImg.png</normaloff>:/new/prefix1/logoImg.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QVBoxLayout" name="verticalLayout_2">

@@ -1,6 +1,6 @@
 #include "activationform.h"
 #include "ui_activationform.h"
-
+/*
 ActivationForm::ActivationForm(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::ActivationForm)
@@ -59,4 +59,4 @@ void ActivationForm::on_pushButton_clicked()
     }else
         QMessageBox::about(this,QString::fromLocal8Bit("Проверка активационного ключа"),
                            QString::fromLocal8Bit("Неверный активационный ключ!"));
-}
+}*/

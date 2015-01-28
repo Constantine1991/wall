@@ -16,6 +16,6 @@ void GraphicsText::setLine(QGraphicsLineItem *line)
 QVariant GraphicsText::itemChange(GraphicsItemChange change, const QVariant &value)
 {
     if(change==QGraphicsItem::ItemPositionChange)
-        this->line->setLine(QLineF(this->mapToScene(this->pos()),this->mapToScene(this->parentItem()->pos())));
+        this->line->setLine(QLineF(this->pos(),this->line->line().p2()));
     return QGraphicsItem::itemChange(change, value);
 }

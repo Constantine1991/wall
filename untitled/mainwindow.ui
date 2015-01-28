@@ -430,7 +430,7 @@
   </property>
   <property name="windowIcon">
    <iconset resource="res.qrc">
-    <normaloff>:/new/prefix1/1</normaloff>:/new/prefix1/1</iconset>
+    <normaloff>:/new/prefix1/logoImg.png</normaloff>:/new/prefix1/logoImg.png</iconset>
   </property>
   <widget class="QWidget" name="centralWidget">
    <layout class="QHBoxLayout" name="horizontalLayout">
@@ -995,7 +995,7 @@
          <string/>
         </property>
         <property name="pixmap">
-         <pixmap resource="res.qrc">:/new/prefix1/1</pixmap>
+         <pixmap resource="res.qrc">:/new/prefix1/logoImg.png</pixmap>
         </property>
         <property name="scaledContents">
          <bool>true</bool>

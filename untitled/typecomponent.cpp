@@ -1,6 +1,6 @@
 #include "typecomponent.h"
 #include "ui_typecomponent.h"
-
+/*
 TypeComponent::TypeComponent(QWidget *parent) :
     QDialog(parent),
     ui(new Ui::TypeComponent)
@@ -31,3 +31,4 @@ void TypeComponent::on_pushButton_2_clicked()
 {
     this->close();
 }
+*/

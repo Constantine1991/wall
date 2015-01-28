@@ -11,7 +11,6 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = untitled
 TEMPLATE = app
 CONFIG	+= qaxcontainer
-RC_FILE = iconexe.rc
 
 SOURCES += \
     settingswindow.cpp \
@@ -70,5 +69,4 @@ FORMS    += \
 RESOURCES += \
     res.qrc
 
-OTHER_FILES += \
-    iconexe.rc
+OTHER_FILES +=
