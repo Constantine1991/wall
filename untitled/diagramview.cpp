@@ -99,6 +99,9 @@ void DiagramView::AppendItem(TYPEITEM typeItem, QPointF point)
             return;
         }
         case ITEM_WICKET:{
+            GroupItem *group=new GroupItem();
+            group->createGroup(GroupItem::ITEM_WICKET,this->MenuItem,this->pDiagramScene);
+            group->setPos(point);
             return;
         }
         default:return;
@@ -933,6 +936,8 @@ void DiagramView::mousePressEvent(QMouseEvent *event)
         this->pDiagramScene->addItem(this->lineWall);
         this->pDiagramScene->clearSelection();
     }
+    if(this->typeITEM==ITEM_WICKET)
+        this->AppendItem(ITEM_WICKET,this->mapToScene(event->pos()));
     if(this->typeITEM==ITEM_FILLING)
     {
         this->lineFilling=new QGraphicsLineItem(QLineF(this->mapToScene(event->pos()),this->mapToScene(event->pos())));

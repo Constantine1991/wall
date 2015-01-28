@@ -6,6 +6,8 @@
 #include <QGraphicsTextItem>
 #include <QLineF>
 #include <QPointF>
+#include <qmath.h>
+#include "propertiesitem.h"
 
 class GraphicsWicketItem: public QGraphicsLineItem
 {
@@ -21,6 +23,7 @@ public:
     void setText(QString text);
 private:
     QPointF rotatePoint(QPointF center, QPointF point,float angle);
+    QPointF centre();
     QGraphicsTextItem *text;
     int width;
     int rot;

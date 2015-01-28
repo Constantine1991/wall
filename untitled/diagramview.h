@@ -7,7 +7,7 @@
 #include <QAction>
 #include <QMouseEvent>
 #include <QKeyEvent>
-#include <math.h>
+#include <qmath.h>
 #include <QDir>
 #include <QPrinter>
 #include <QPrintDialog>
@@ -21,6 +21,7 @@
 #include "calculate.h"
 #include "excelexport.h"
 #include "interval.h"
+#include "groupitem.h"
 //---------WINDOW FORMS---------------//
 #include "propertiespillarwindow.h"
 #include "propertieswallwindow.h"

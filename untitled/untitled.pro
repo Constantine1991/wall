@@ -32,7 +32,8 @@ SOURCES += \
     interval.cpp \
     typecomponent.cpp \
     graphicswallitem.cpp \
-    graphicswicketitem.cpp
+    graphicswicketitem.cpp \
+    groupitem.cpp
 
 HEADERS  += \
     settingswindow.h \
@@ -54,7 +55,8 @@ HEADERS  += \
     activationform.h \
     interval.h \
     typecomponent.h \
-    graphicswicketitem.h
+    graphicswicketitem.h \
+    groupitem.h
 
 FORMS    += \
     settingswindow.ui \
