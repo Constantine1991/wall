@@ -29,6 +29,13 @@ void GraphicsWicketItem::setPosition(QPointF pos)
     this->text->setPos(this->centre());
 }
 
+void GraphicsWicketItem::setRotate(int angle)
+{
+    this->rot=130+angle;
+    this->text->setRotation(angle);
+    this->setPosition(this->line().p1());
+}
+
 QPointF GraphicsWicketItem::rotatePoint(QPointF center, QPointF point,float angle)
 {
     return QPoint(center.x()+(point.x()-center.x())*::cos(angle*PI/180)-(point.y()-center.y())*::sin(angle*PI/180),

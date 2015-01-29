@@ -198,7 +198,7 @@ void DiagramView::Delete_Item()
     {
         foreach(QGraphicsItem *parentItem,this->pDiagramScene->selectedItems())
         {
-            if(parentItem->type()==GraphicsWicketItem::Type)
+            if(parentItem->type()==GraphicsWicketItem::Type || parentItem->type()==GraphicsGate1Item::Type)
                 foreach(GroupItem *group,this->listGroup)
                     if(group->isWicket(parentItem))
                     {

@@ -21,10 +21,16 @@ public:
     void setPos(QPointF point);
     bool isWicket(QGraphicsItem *item);
 public slots:
+    void setRotate(int angle);
     void itemMoveScene(QPointF point);
 private:
+    void setBoundingLine(QLineF line);
+    QPointF rotatePoint(QPointF center, QPointF point,float angle);
+    QPointF centre();
     TYPEGROUP type;
     QList<QGraphicsItem*> group;
+    QLineF boundingLine;
+    int rotation;
 };
 
 #endif // GROUPITEM_H

@@ -2,6 +2,7 @@
 
 GroupItem::GroupItem(QObject *parent):QObject(parent)
 {
+    this->rotation=90;
 }
 
 void GroupItem::createGroup(TYPEGROUP type, QMenu *menu, QGraphicsScene *scene)
@@ -43,18 +44,29 @@ bool GroupItem::isWicket(QGraphicsItem *item)
     return false;
 }
 
+void GroupItem::setBoundingLine(QLineF line)
+{
+    this->boundingLine.setP1(line.p1());
+    this->boundingLine.setP2(line.p2());
+    QPointF centreLine=this->centre();
+    this->boundingLine.setP1(this->rotatePoint(centreLine,this->boundingLine.p1(),this->rotation));
+    this->boundingLine.setP2(this->rotatePoint(centreLine,this->boundingLine.p2(),this->rotation));
+}
+
 void GroupItem::setPos(QPointF point)
 {
     if(this->group.isEmpty())
         return;
+    this->setBoundingLine(QLineF(QPointF(point.x()-20,point.y()),
+                                 QPointF(point.x()+20,point.y())));
     switch(this->type)
     {
         case GroupItem::ITEM_WICKET:{
             GraphicsPillarItem *pillar1=qgraphicsitem_cast<GraphicsPillarItem*>(this->group.at(0));
             GraphicsPillarItem *pillar2=qgraphicsitem_cast<GraphicsPillarItem*>(this->group.at(1));
             GraphicsWicketItem *wicket=qgraphicsitem_cast<GraphicsWicketItem*>(this->group.at(2));
-            pillar1->setPos(point.x()-20,point.y());
-            pillar2->setPos(point.x()+20,point.y());
+            pillar1->setPos(this->boundingLine.p1());
+            pillar2->setPos(this->boundingLine.p2());
             wicket->setPosition(QPointF(pillar1->centre().x()+pillar1->boundingRect().width()/2,pillar1->centre().y()));
             break;
         }
@@ -62,13 +74,31 @@ void GroupItem::setPos(QPointF point)
             GraphicsPillarItem *pillar1=qgraphicsitem_cast<GraphicsPillarItem*>(this->group.at(0));
             GraphicsPillarItem *pillar2=qgraphicsitem_cast<GraphicsPillarItem*>(this->group.at(1));
             GraphicsGate1Item *gate1=qgraphicsitem_cast<GraphicsGate1Item*>(this->group.at(2));
-            pillar1->setPos(point.x()-20,point.y());
-            pillar2->setPos(point.x()+20,point.y());
+            pillar1->setPos(this->boundingLine.p1());
+            pillar2->setPos(this->boundingLine.p2());
             gate1->setPosition(QPointF(pillar1->centre().x()+pillar1->boundingRect().width()/2,pillar1->centre().y()),
                                QPointF(pillar2->centre().x()-pillar2->boundingRect().width()/2,pillar2->centre().y()));
             break;
         }
     }
+}
+
+void GroupItem::setRotate(int angle)
+{
+    /*this->rotation=angle;
+    GraphicsPillarItem *pillar1=qgraphicsitem_cast<GraphicsPillarItem*>(this->group.at(0));
+    GraphicsPillarItem *pillar2=qgraphicsitem_cast<GraphicsPillarItem*>(this->group.at(1));
+    pillar1->setPos(this->rotatePoint(this->centre(),pillar1->centre(),angle));
+    pillar1->setRotation(angle);
+    pillar2->setPos(this->rotatePoint(this->centre(),pillar2->centre(),angle));
+    pillar2->setRotation(angle);
+    switch(this->type)
+    {
+        case GroupItem::ITEM_WICKET:{
+            GraphicsWicketItem *wicket=qgraphicsitem_cast<GraphicsWicketItem*>(this->group.at(2));
+            wicket->setRotate(angle);
+        }
+    }*/
 }
 
 void GroupItem::itemMoveScene(QPointF point)
@@ -82,5 +112,24 @@ void GroupItem::itemMoveScene(QPointF point)
                 this->setPos(QPointF(point.x()-20,point.y()));
             break;
         }
+        case GroupItem::ITEM_GATE1:{
+            if(this->group.at(0)->isSelected())
+                this->setPos(QPointF(point.x()+20,point.y()));
+            if(this->group.at(1)->isSelected())
+                this->setPos(QPointF(point.x()-20,point.y()));
+            break;
+        }
     }
+}
+
+QPointF GroupItem::rotatePoint(QPointF center, QPointF point,float angle)
+{
+    return QPoint(center.x()+(point.x()-center.x())*::cos(angle*PI/180)-(point.y()-center.y())*::sin(angle*PI/180),
+                  center.y()+(point.y()-center.y())*::cos(angle*PI/180)+(point.x()-center.x())*::sin(angle*PI/180));
+}
+
+QPointF GroupItem::centre()
+{
+    return QPointF((this->boundingLine.p1().x()+this->boundingLine.p2().x())/2,
+                   (this->boundingLine.p1().y()+this->boundingLine.p2().y())/2);
 }

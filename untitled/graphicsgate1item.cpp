@@ -10,7 +10,7 @@ GraphicsGate1Item::GraphicsGate1Item(QGraphicsItem *parent,QGraphicsScene *scene
     this->setFlag(QGraphicsItem::ItemIsSelectable,true);
     this->childGate=new QGraphicsLineItem(this);
     this->childGate->setPen(QPen(Qt::black, 2, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
-    this->childGate->setFlag(QGraphicsItem::ItemIsSelectable,true);
+    this->childGate->setFlag(QGraphicsItem::ItemIsSelectable,false);
     this->text=new QGraphicsTextItem("5000",this);
 }
 

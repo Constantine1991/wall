@@ -17,7 +17,7 @@ public:
         return Type;
     }
     void setPosition(QPointF p1,QPointF p2);
-    void setRotate();
+    void setRotate(int angle);
     void setText(QString text);
 private:
     QPointF rotatePoint(QPointF center, QPointF point,float angle);
