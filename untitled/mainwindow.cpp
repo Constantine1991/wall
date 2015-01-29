@@ -108,7 +108,7 @@ void MainWindow::on_pushButton_2_clicked()
 
 void MainWindow::on_pushButton_3_clicked()
 {
-   ui->widget->setTypeItem(ITEM_UNIVER);
+   ui->widget->setTypeItem(ITEM_GATE_A);
 }
 
 void MainWindow::on_pushButton_4_clicked()

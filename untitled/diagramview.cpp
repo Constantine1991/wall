@@ -19,6 +19,7 @@ DiagramView::DiagramView(QWidget *parent):QGraphicsView(parent)
     this->pillarBottom=false;
     this->Fundament=false;
     this->Rigel=false;
+    this->mousePrees=false;
     this->centerOn(0,0);
 }
 
@@ -93,6 +94,11 @@ void DiagramView::AppendItem(TYPEITEM typeItem, QPointF point)
             return;
         }
         case ITEM_GATE_A:{
+            group=new GroupItem();
+            connect(this,SIGNAL(itemMoveScene(QPointF)),group,SLOT(itemMoveScene(QPointF)));
+            group->createGroup(GroupItem::ITEM_GATE1,this->MenuItem,this->pDiagramScene);
+            group->setPos(point);
+            this->listGroup.append(group);
             return;
         }
         case ITEM_GATE_B:{
@@ -103,6 +109,7 @@ void DiagramView::AppendItem(TYPEITEM typeItem, QPointF point)
             connect(this,SIGNAL(itemMoveScene(QPointF)),group,SLOT(itemMoveScene(QPointF)));
             group->createGroup(GroupItem::ITEM_WICKET,this->MenuItem,this->pDiagramScene);
             group->setPos(point);
+            this->listGroup.append(group);
             return;
         }
         default:return;
@@ -192,7 +199,13 @@ void DiagramView::Delete_Item()
         foreach(QGraphicsItem *parentItem,this->pDiagramScene->selectedItems())
         {
             if(parentItem->type()==GraphicsWicketItem::Type)
-                delete this->group;
+                foreach(GroupItem *group,this->listGroup)
+                    if(group->isWicket(parentItem))
+                    {
+                        this->listGroup.removeAt(this->listGroup.indexOf(group));
+                        delete group;
+                        break;
+                    }
             foreach(QGraphicsItem *childItem,parentItem->childItems())
                 this->pDiagramScene->removeItem(childItem);
             this->pDiagramScene->removeItem(parentItem);
@@ -928,6 +941,7 @@ void DiagramView::mousePressEvent(QMouseEvent *event)
 {
     if(event->button()!=Qt::LeftButton)
         return;
+    this->mousePrees=true;
     QApplication::setOverrideCursor(Qt::PointingHandCursor);
     if(this->typeITEM==ITEM_PILLAR)
         this->AppendItem(this->typeITEM,this->mapToScene(event->pos()));
@@ -941,6 +955,8 @@ void DiagramView::mousePressEvent(QMouseEvent *event)
     }
     if(this->typeITEM==ITEM_WICKET)
         this->AppendItem(ITEM_WICKET,this->mapToScene(event->pos()));
+    if(this->typeITEM==ITEM_GATE_A)
+        this->AppendItem(ITEM_GATE_A,this->mapToScene(event->pos()));
     if(this->typeITEM==ITEM_FILLING)
     {
         this->lineFilling=new QGraphicsLineItem(QLineF(this->mapToScene(event->pos()),this->mapToScene(event->pos())));
@@ -960,7 +976,8 @@ void DiagramView::mousePressEvent(QMouseEvent *event)
 
 void DiagramView::mouseMoveEvent(QMouseEvent *event)
 {
-    this->itemMoveScene(this->mapToScene(event->pos()));
+    if(this->mousePrees)
+        this->itemMoveScene(this->mapToScene(event->pos()));
     if(this->typeITEM==ITEM_WALL)
         if(this->lineWall!=NULL)
             this->lineWall->setLine(QLineF(this->lineWall->line().p1(),this->mapToScene(event->pos())));
@@ -974,6 +991,7 @@ void DiagramView::mouseReleaseEvent(QMouseEvent *event)
 {
     if(event->button()!=Qt::LeftButton)
         return;
+    this->mousePrees=false;
     if(this->typeITEM==ITEM_WALL)
     {
         this->lineWall->setLine(QLineF(this->lineWall->line().p1(),this->mapToScene(event->pos())));

@@ -34,9 +34,10 @@ Q_OBJECT
 private:
     QGraphicsScene *pDiagramScene;
     GroupItem *group;
-    //ListItem itemScene;
+    QList<GroupItem*> listGroup;
     TYPEITEM typeITEM;
     int currentIdItem;
+    bool mousePrees;
     QGraphicsItem *itemGraphicsChange;
     QGraphicsLineItem *lineWall;
     QGraphicsLineItem *lineFilling;

@@ -5,6 +5,7 @@
 #include <QMouseEvent>
 #include "graphicspillaritem.h"
 #include "graphicswicketitem.h"
+#include "graphicsgate1item.h"
 
 class GroupItem:public QObject
 {
@@ -18,7 +19,7 @@ public:
     GroupItem(QObject *parent=0);
     void createGroup(TYPEGROUP type,QMenu *menu,QGraphicsScene *scene);
     void setPos(QPointF point);
-
+    bool isWicket(QGraphicsItem *item);
 public slots:
     void itemMoveScene(QPointF point);
 private:

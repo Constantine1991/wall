@@ -17,6 +17,11 @@ GraphicsWicketItem::~GraphicsWicketItem()
 {
 }
 
+void GraphicsWicketItem::setText(QString text)
+{
+    this->text->setPlainText(text);
+}
+
 void GraphicsWicketItem::setPosition(QPointF pos)
 {
     QPointF p2=this->rotatePoint(pos,QPointF(pos.x()+this->width,pos.y()),this->rot);
