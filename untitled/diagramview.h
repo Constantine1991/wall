@@ -52,7 +52,7 @@ private:
     void AppendItem(TYPEITEM typeItem,QPointF point);
     float distancePointToPoint(QPointF point1,QPointF point2);
     void itemChangeScene(int idItem);
-    void RotateItem(QGraphicsItem *itemGraphics,int Angle);
+    void RotateItem(int Angle);
     void changeLine(ITEM *parentItem, QGraphicsItem *itemGraphics);
     QPointF centerItem(QGraphicsItem *itemGraphics);
     void AppendBrickColorPazzle(QList<COLORBRICK*> *colorBrick,int countColor,QString namedColor);

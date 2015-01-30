@@ -121,34 +121,14 @@ float DiagramView::distancePointToPoint(QPointF point1, QPointF point2)
     return ::sqrtf(::powf(point1.x()-point2.x(),2)+::powf(point1.y()-point2.y(),2));
 }
 
-void DiagramView::RotateItem(QGraphicsItem *itemGraphics, int Angle)
+void DiagramView::RotateItem(int Angle)
 {
-    /*ITEM *item=this->itemScene.getItem(itemGraphics->data(1).toInt());
-    int x=item->child.at(0)->itemChild->x();
-    int y=item->child.at(0)->itemChild->y();
-
-    item->child.at(0)->itemChild->setPos(x+(item->child.at(0)->itemChild->x()-x)*::cos(Angle*PI/180)-(item->child.at(0)->itemChild->y()-y)*::sin(Angle*PI/180),
-                                         y+(item->child.at(0)->itemChild->y()-y)*::cos(Angle*PI/180)+(item->child.at(0)->itemChild->x()-x)*::sin(Angle*PI/180));
-    item->child.at(0)->itemChild->setRotation(item->child.at(0)->itemChild->rotation()+Angle);
-    itemGraphics->setPos(x+(itemGraphics->x()-x)*::cos(Angle*PI/180)-(itemGraphics->y()-y)*::sin(Angle*PI/180),
-                         y+(itemGraphics->y()-y)*::cos(Angle*PI/180)+(itemGraphics->x()-x)*::sin(Angle*PI/180));
-    itemGraphics->setRotation(itemGraphics->rotation()+Angle);
-
-    item->child.at(1)->itemChild->setPos(x+(item->child.at(1)->itemChild->x()-x)*::cos(Angle*PI/180)-(item->child.at(1)->itemChild->y()-y)*::sin(Angle*PI/180),
-                                         y+(item->child.at(1)->itemChild->y()-y)*::cos(Angle*PI/180)+(item->child.at(1)->itemChild->x()-x)*::sin(Angle*PI/180));
-    item->child.at(1)->itemChild->setRotation(item->child.at(1)->itemChild->rotation()+Angle);
-    //--------------------------------------------------------------//
-
-    if(item->child.at(0)->itemChild->rotation()>=360)
-    {
-        int a=item->child.at(0)->itemChild->rotation()-360;
-        item->child.at(0)->itemChild->setRotation(a);
-        itemGraphics->setRotation(a);
-        item->child.at(1)->itemChild->setRotation(a);
-    }
-    for(int i=0;i<item->child.count();i++)
-        this->changeLine(this->itemScene.getItem(item->child.at(i)->idChild),item->child.at(i)->itemChild);*/
-
+    foreach(GroupItem* group,this->listGroup)
+        if(group->isWicket(this->pDiagramScene->selectedItems().at(0)))
+        {
+            group->setRotate(Angle);
+            break;
+        }
 }
 
 QPointF DiagramView::centerItem(QGraphicsItem *itemGraphics)
@@ -177,19 +157,19 @@ void DiagramView::changeLine(ITEM *parentItem,QGraphicsItem *itemGraphics)
 void DiagramView::RotateItem_45()
 {
     if(!this->pDiagramScene->selectedItems().isEmpty())
-        this->RotateItem(this->pDiagramScene->selectedItems().at(0),45);
+        this->RotateItem(45);
 }
 
 void DiagramView::RotateItem_90()
 {
     if(!this->pDiagramScene->selectedItems().isEmpty())
-        this->RotateItem(this->pDiagramScene->selectedItems().at(0),90);
+        this->RotateItem(90);
 }
 
 void DiagramView::RotateItem_180()
 {
     if(!this->pDiagramScene->selectedItems().isEmpty())
-        this->RotateItem(this->pDiagramScene->selectedItems().at(0),180);
+        this->RotateItem(180);
 }
 
 void DiagramView::Delete_Item()

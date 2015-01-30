@@ -2,7 +2,7 @@
 
 GroupItem::GroupItem(QObject *parent):QObject(parent)
 {
-    this->rotation=90;
+    this->rotation=0;
 }
 
 void GroupItem::createGroup(TYPEGROUP type, QMenu *menu, QGraphicsScene *scene)
@@ -13,7 +13,7 @@ void GroupItem::createGroup(TYPEGROUP type, QMenu *menu, QGraphicsScene *scene)
         case GroupItem::ITEM_WICKET:{
             GraphicsPillarItem *pillar1=new GraphicsPillarItem(menu);
             GraphicsPillarItem *pillar2=new GraphicsPillarItem(menu);
-            GraphicsWicketItem *wicket=new GraphicsWicketItem();
+            GraphicsWicketItem *wicket=new GraphicsWicketItem(menu);
             this->group.append(pillar1);
             this->group.append(pillar2);
             this->group.append(wicket);
@@ -25,7 +25,7 @@ void GroupItem::createGroup(TYPEGROUP type, QMenu *menu, QGraphicsScene *scene)
         case GroupItem::ITEM_GATE1:{
             GraphicsPillarItem *pillar1=new GraphicsPillarItem(menu);
             GraphicsPillarItem *pillar2=new GraphicsPillarItem(menu);
-            GraphicsGate1Item *gate1=new GraphicsGate1Item();
+            GraphicsGate1Item *gate1=new GraphicsGate1Item(menu);
             this->group.append(pillar1);
             this->group.append(pillar2);
             this->group.append(gate1);
@@ -67,7 +67,9 @@ void GroupItem::setPos(QPointF point)
             GraphicsWicketItem *wicket=qgraphicsitem_cast<GraphicsWicketItem*>(this->group.at(2));
             pillar1->setPos(this->boundingLine.p1());
             pillar2->setPos(this->boundingLine.p2());
-            wicket->setPosition(QPointF(pillar1->centre().x()+pillar1->boundingRect().width()/2,pillar1->centre().y()));
+            wicket->setPosition(this->rotatePoint(pillar1->centre(),
+                                                  QPointF(pillar1->centre().x()+pillar1->boundingRect().width()/2,
+                                                          pillar1->centre().y()),this->rotation));
             break;
         }
         case GroupItem::ITEM_GATE1:{
@@ -76,8 +78,13 @@ void GroupItem::setPos(QPointF point)
             GraphicsGate1Item *gate1=qgraphicsitem_cast<GraphicsGate1Item*>(this->group.at(2));
             pillar1->setPos(this->boundingLine.p1());
             pillar2->setPos(this->boundingLine.p2());
-            gate1->setPosition(QPointF(pillar1->centre().x()+pillar1->boundingRect().width()/2,pillar1->centre().y()),
-                               QPointF(pillar2->centre().x()-pillar2->boundingRect().width()/2,pillar2->centre().y()));
+            QPointF p1=this->rotatePoint(pillar1->centre(),
+                                         QPointF(pillar1->centre().x()+pillar1->boundingRect().width()/2,
+                                                 pillar1->centre().y()),this->rotation);
+            QPointF p2=this->rotatePoint(pillar2->centre(),
+                                         QPointF(pillar2->centre().x()-pillar2->boundingRect().width()/2,
+                                                 pillar2->centre().y()),this->rotation);
+            gate1->setPosition(p1,p2);
             break;
         }
     }
@@ -85,20 +92,31 @@ void GroupItem::setPos(QPointF point)
 
 void GroupItem::setRotate(int angle)
 {
-    /*this->rotation=angle;
+    this->rotation+=angle;
+    this->rotation=this->rotation>360?this->rotation-360:this->rotation;
     GraphicsPillarItem *pillar1=qgraphicsitem_cast<GraphicsPillarItem*>(this->group.at(0));
     GraphicsPillarItem *pillar2=qgraphicsitem_cast<GraphicsPillarItem*>(this->group.at(1));
-    pillar1->setPos(this->rotatePoint(this->centre(),pillar1->centre(),angle));
-    pillar1->setRotation(angle);
-    pillar2->setPos(this->rotatePoint(this->centre(),pillar2->centre(),angle));
-    pillar2->setRotation(angle);
+    QPointF centreLine=this->centre();
+    this->boundingLine.setP1(this->rotatePoint(centreLine,this->boundingLine.p1(),this->rotation));
+    this->boundingLine.setP2(this->rotatePoint(centreLine,this->boundingLine.p2(),this->rotation));
+    pillar1->setPos(this->rotatePoint(pillar1->centre(),pillar1->pos(),this->rotation));
+    pillar1->setRotation(this->rotation);
+    pillar2->setPos(this->rotatePoint(pillar2->centre(),pillar2->pos(),this->rotation));
+    pillar2->setRotation(this->rotation);
     switch(this->type)
     {
         case GroupItem::ITEM_WICKET:{
             GraphicsWicketItem *wicket=qgraphicsitem_cast<GraphicsWicketItem*>(this->group.at(2));
-            wicket->setRotate(angle);
+            wicket->setRotate(this->rotation);
+            break;
         }
-    }*/
+        case GroupItem::ITEM_GATE1:{
+            GraphicsGate1Item *gate1=qgraphicsitem_cast<GraphicsGate1Item*>(this->group.at(2));
+            gate1->setRotate(this->rotation);
+            break;
+        }
+    }
+    this->setPos(this->centre());
 }
 
 void GroupItem::itemMoveScene(QPointF point)
@@ -106,17 +124,13 @@ void GroupItem::itemMoveScene(QPointF point)
     switch(this->type)
     {
         case GroupItem::ITEM_WICKET:{
-            if(this->group.at(0)->isSelected())
-                this->setPos(QPointF(point.x()+20,point.y()));
-            if(this->group.at(1)->isSelected())
-                this->setPos(QPointF(point.x()-20,point.y()));
+            if(this->group.at(0)->isSelected()||this->group.at(1)->isSelected())
+                this->setPos(point);
             break;
         }
         case GroupItem::ITEM_GATE1:{
-            if(this->group.at(0)->isSelected())
-                this->setPos(QPointF(point.x()+20,point.y()));
-            if(this->group.at(1)->isSelected())
-                this->setPos(QPointF(point.x()-20,point.y()));
+        if(this->group.at(0)->isSelected()||this->group.at(1)->isSelected())
+            this->setPos(point);
             break;
         }
     }

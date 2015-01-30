@@ -20,8 +20,8 @@ public:
     void createGroup(TYPEGROUP type,QMenu *menu,QGraphicsScene *scene);
     void setPos(QPointF point);
     bool isWicket(QGraphicsItem *item);
-public slots:
     void setRotate(int angle);
+public slots:
     void itemMoveScene(QPointF point);
 private:
     void setBoundingLine(QLineF line);

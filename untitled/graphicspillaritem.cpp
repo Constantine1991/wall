@@ -43,7 +43,7 @@ void GraphicsPillarItem::addWall(GraphicsWallItem *lineWall, bool point)
 
 QVariant GraphicsPillarItem::itemChange(GraphicsItemChange change, const QVariant &value)
 {
-    if(change==QGraphicsItem::ItemPositionChange)
+    if(change==QGraphicsItem::ItemPositionChange || change==QGraphicsItem::ItemRotationChange)
     {
         foreach(GraphicsWallItem *changeline,this->listWall.keys())
         {
