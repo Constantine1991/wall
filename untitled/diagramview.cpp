@@ -102,6 +102,11 @@ void DiagramView::AppendItem(TYPEITEM typeItem, QPointF point)
             return;
         }
         case ITEM_GATE_B:{
+            group=new GroupItem();
+            connect(this,SIGNAL(itemMoveScene(QPointF)),group,SLOT(itemMoveScene(QPointF)));
+            group->createGroup(GroupItem::ITEM_GATE2,this->MenuItem,this->pDiagramScene);
+            group->setPos(point);
+            this->listGroup.append(group);
             return;
         }
         case ITEM_WICKET:{
@@ -178,7 +183,8 @@ void DiagramView::Delete_Item()
     {
         foreach(QGraphicsItem *parentItem,this->pDiagramScene->selectedItems())
         {
-            if(parentItem->type()==GraphicsWicketItem::Type || parentItem->type()==GraphicsGate1Item::Type)
+            if(parentItem->type()==GraphicsWicketItem::Type || parentItem->type()==GraphicsGate1Item::Type ||
+               parentItem->type()==GraphicsGate2Item::Type)
                 foreach(GroupItem *group,this->listGroup)
                     if(group->isWicket(parentItem))
                     {
@@ -937,6 +943,8 @@ void DiagramView::mousePressEvent(QMouseEvent *event)
         this->AppendItem(ITEM_WICKET,this->mapToScene(event->pos()));
     if(this->typeITEM==ITEM_GATE_A)
         this->AppendItem(ITEM_GATE_A,this->mapToScene(event->pos()));
+    if(this->typeITEM==ITEM_GATE_B)
+        this->AppendItem(ITEM_GATE_B,this->mapToScene(event->pos()));
     if(this->typeITEM==ITEM_FILLING)
     {
         this->lineFilling=new QGraphicsLineItem(QLineF(this->mapToScene(event->pos()),this->mapToScene(event->pos())));

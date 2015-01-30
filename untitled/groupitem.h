@@ -6,6 +6,7 @@
 #include "graphicspillaritem.h"
 #include "graphicswicketitem.h"
 #include "graphicsgate1item.h"
+#include "graphicsgate2item.h"
 
 class GroupItem:public QObject
 {

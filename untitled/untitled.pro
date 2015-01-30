@@ -34,7 +34,8 @@ SOURCES += \
     graphicswallitem.cpp \
     graphicswicketitem.cpp \
     groupitem.cpp \
-    graphicsgate1item.cpp
+    graphicsgate1item.cpp \
+    graphicsgate2item.cpp
 
 HEADERS  += \
     settingswindow.h \
@@ -58,7 +59,8 @@ HEADERS  += \
     typecomponent.h \
     graphicswicketitem.h \
     groupitem.h \
-    graphicsgate1item.h
+    graphicsgate1item.h \
+    graphicsgate2item.h
 
 FORMS    += \
     settingswindow.ui \

@@ -34,6 +34,18 @@ void GroupItem::createGroup(TYPEGROUP type, QMenu *menu, QGraphicsScene *scene)
             scene->addItem(gate1);
             break;
         }
+        case GroupItem::ITEM_GATE2:{
+            GraphicsPillarItem *pillar1=new GraphicsPillarItem(menu);
+            GraphicsPillarItem *pillar2=new GraphicsPillarItem(menu);
+            GraphicsGate2Item *gate2=new GraphicsGate2Item(menu);
+            this->group.append(pillar1);
+            this->group.append(pillar2);
+            this->group.append(gate2);
+            scene->addItem(pillar1);
+            scene->addItem(pillar2);
+            scene->addItem(gate2);
+            break;
+        }
     }
 }
 
@@ -57,13 +69,13 @@ void GroupItem::setPos(QPointF point)
 {
     if(this->group.isEmpty())
         return;
-    this->setBoundingLine(QLineF(QPointF(point.x()-20,point.y()),
-                                 QPointF(point.x()+20,point.y())));
+    GraphicsPillarItem *pillar1=qgraphicsitem_cast<GraphicsPillarItem*>(this->group.at(0));
+    GraphicsPillarItem *pillar2=qgraphicsitem_cast<GraphicsPillarItem*>(this->group.at(1));
     switch(this->type)
     {
         case GroupItem::ITEM_WICKET:{
-            GraphicsPillarItem *pillar1=qgraphicsitem_cast<GraphicsPillarItem*>(this->group.at(0));
-            GraphicsPillarItem *pillar2=qgraphicsitem_cast<GraphicsPillarItem*>(this->group.at(1));
+            this->setBoundingLine(QLineF(QPointF(point.x()-20,point.y()),
+                                         QPointF(point.x()+20,point.y())));
             GraphicsWicketItem *wicket=qgraphicsitem_cast<GraphicsWicketItem*>(this->group.at(2));
             pillar1->setPos(this->boundingLine.p1());
             pillar2->setPos(this->boundingLine.p2());
@@ -73,8 +85,8 @@ void GroupItem::setPos(QPointF point)
             break;
         }
         case GroupItem::ITEM_GATE1:{
-            GraphicsPillarItem *pillar1=qgraphicsitem_cast<GraphicsPillarItem*>(this->group.at(0));
-            GraphicsPillarItem *pillar2=qgraphicsitem_cast<GraphicsPillarItem*>(this->group.at(1));
+            this->setBoundingLine(QLineF(QPointF(point.x()-20,point.y()),
+                                         QPointF(point.x()+20,point.y())));
             GraphicsGate1Item *gate1=qgraphicsitem_cast<GraphicsGate1Item*>(this->group.at(2));
             pillar1->setPos(this->boundingLine.p1());
             pillar2->setPos(this->boundingLine.p2());
@@ -85,6 +97,21 @@ void GroupItem::setPos(QPointF point)
                                          QPointF(pillar2->centre().x()-pillar2->boundingRect().width()/2,
                                                  pillar2->centre().y()),this->rotation);
             gate1->setPosition(p1,p2);
+            break;
+        }
+        case GroupItem::ITEM_GATE2:{
+            this->setBoundingLine(QLineF(QPointF(point.x()-40,point.y()),
+                                         QPointF(point.x()+40,point.y())));
+            GraphicsGate2Item *gate2=qgraphicsitem_cast<GraphicsGate2Item*>(this->group.at(2));
+            pillar1->setPos(this->boundingLine.p1());
+            pillar2->setPos(this->boundingLine.p2());
+            QPointF p1=this->rotatePoint(pillar1->centre(),
+                                         QPointF(pillar1->centre().x()+pillar1->boundingRect().width()/2,
+                                                 pillar1->centre().y()),this->rotation);
+            QPointF p2=this->rotatePoint(pillar2->centre(),
+                                         QPointF(pillar2->centre().x()-pillar2->boundingRect().width()/2,
+                                                 pillar2->centre().y()),this->rotation);
+            gate2->setPosition(p1,p2);
             break;
         }
     }
@@ -115,6 +142,11 @@ void GroupItem::setRotate(int angle)
             gate1->setRotate(this->rotation);
             break;
         }
+        case GroupItem::ITEM_GATE2:{
+            GraphicsGate2Item *gate2=qgraphicsitem_cast<GraphicsGate2Item*>(this->group.at(2));
+            gate2->setRotate(this->rotation);
+            break;
+        }
     }
     this->setPos(this->centre());
 }
@@ -129,6 +161,11 @@ void GroupItem::itemMoveScene(QPointF point)
             break;
         }
         case GroupItem::ITEM_GATE1:{
+        if(this->group.at(0)->isSelected()||this->group.at(1)->isSelected())
+            this->setPos(point);
+            break;
+        }
+        case GroupItem::ITEM_GATE2:{
         if(this->group.at(0)->isSelected()||this->group.at(1)->isSelected())
             this->setPos(point);
             break;
