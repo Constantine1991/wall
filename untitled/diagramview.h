@@ -63,7 +63,8 @@ private:
     GraphicsWallItem *createWall(QPointF pointSceneA, QPointF pointSceneB);
     void appendChildObject(QGraphicsItem *a,QGraphicsItem *b,QGraphicsItem *l);
     void deleteFilling();
-    void changeGroup(QGraphicsItem *itemA, QPointF point);
+    void changeGroup(GroupItem *g1,GroupItem g2);
+    void collidingGroup();
 private slots:
     void RotateItem_45();
     void RotateItem_90();

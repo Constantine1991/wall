@@ -129,7 +129,7 @@ float DiagramView::distancePointToPoint(QPointF point1, QPointF point2)
 void DiagramView::RotateItem(int Angle)
 {
     foreach(GroupItem* group,this->listGroup)
-        if(group->isWicket(this->pDiagramScene->selectedItems().at(0)))
+        if(group->isItem(this->pDiagramScene->selectedItems().at(0)))
         {
             group->setRotate(Angle);
             break;
@@ -186,7 +186,7 @@ void DiagramView::Delete_Item()
             if(parentItem->type()==GraphicsWicketItem::Type || parentItem->type()==GraphicsGate1Item::Type ||
                parentItem->type()==GraphicsGate2Item::Type)
                 foreach(GroupItem *group,this->listGroup)
-                    if(group->isWicket(parentItem))
+                    if(group->isItem(parentItem))
                     {
                         this->listGroup.removeAt(this->listGroup.indexOf(group));
                         delete group;
@@ -294,17 +294,8 @@ void DiagramView::appendChildObject(QGraphicsItem *a, QGraphicsItem *b, QGraphic
     this->itemScene.AppendChild(l->data(1).toInt(),new CHILD(b->data(1).toInt(),false,NULL));*/
 }
 
-void DiagramView::changeGroup(QGraphicsItem *itemA,QPointF point)
-{/*
-    int RotationItemA=itemA->rotation();
-    this->RotateItem(itemA,-RotationItemA);
-    ITEM *parentItem=this->itemScene.getItem(itemA->data(1).toInt());
-    parentItem->child.at(0)->itemChild->setPos(QPoint(point.x()- parentItem->child.at(0)->itemChild->boundingRect().width()/2,
-                                                      point.y()- parentItem->child.at(0)->itemChild->boundingRect().height()/2));
-    itemA->setPos(parentItem->child.at(0)->itemChild->pos().x()+parentItem->child.at(0)->itemChild->boundingRect().width(),
-                  parentItem->child.at(0)->itemChild->pos().y());
-    parentItem->child.at(1)->itemChild->setPos(itemA->pos().x()+itemA->boundingRect().width(),itemA->pos().y());
-    this->RotateItem(itemA,RotationItemA);*/
+void DiagramView::changeGroup(GroupItem *g1, GroupItem g2)
+{
 }
 
 void DiagramView::Filling(QGraphicsItem *a, QGraphicsItem *b,float interval)
@@ -921,6 +912,44 @@ void DiagramView::closeProperties(TYPEITEM itemType,bool all)
 void DiagramView::component(TYPEITEM typeItem, int width)
 {
 }
+
+void DiagramView::collidingGroup()
+{
+    if(this->pDiagramScene->selectedItems().isEmpty())
+        return;
+    GroupItem *moveGroup;
+    foreach(GroupItem *group,this->listGroup)
+        if(group->isItem(this->pDiagramScene->selectedItems().at(0)))
+        {
+            moveGroup=group;
+            break;
+        }
+    if(group->isType()!=GroupItem::ITEM_GATE1 || group->isType()!=GroupItem::ITEM_GATE2 ||
+            group->isType()!=GroupItem::ITEM_WICKET)
+        return;
+    QList<QGraphicsItem*> colidingItemList=this->pDiagramScene->collidingItems(moveGroup->items().at(0));
+    colidingItemList.append(moveGroup->items().at(1));
+    GroupItem *colidingGroup=NULL;
+    bool findGroup=false;
+    foreach(GroupItem *group,this->listGroup)
+    {
+        if(moveGroup==group)
+            continue;
+        foreach(QGraphicsItem *colidingItem,colidingItemList)
+        {
+            if(colidingItem->type()!=GraphicsPillarItem::Type)
+                continue;
+            if(group->isItem(colidingItem))
+            {
+                colidingGroup=group;
+                findGroup=true;
+            }
+        }
+        if(findGroup)
+            break;
+    }
+    qDebug()<<findGroup;
+}
 /*----------------------------------------protected--------------------------------------------------------*/
 
 void DiagramView::mousePressEvent(QMouseEvent *event)
@@ -965,7 +994,10 @@ void DiagramView::mousePressEvent(QMouseEvent *event)
 void DiagramView::mouseMoveEvent(QMouseEvent *event)
 {
     if(this->mousePrees)
+    {
         this->itemMoveScene(this->mapToScene(event->pos()));
+        this->collidingGroup();
+    }
     if(this->typeITEM==ITEM_WALL)
         if(this->lineWall!=NULL)
             this->lineWall->setLine(QLineF(this->lineWall->line().p1(),this->mapToScene(event->pos())));

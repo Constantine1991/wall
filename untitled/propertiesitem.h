@@ -79,8 +79,8 @@ typedef struct _WALL{ //Стена
 typedef enum _TYPEITEM{ // Типы объектов
     ITEM_PILLAR      = 1, //Столб
     ITEM_WALL        = 2, //Стена
-    ITEM_GATE_A      = 3, //Ворота откатные
-    ITEM_GATE_B      = 4, //Ворота распашные
+    ITEM_GATE_A      = 3, //Ворота распашные
+    ITEM_GATE_B      = 4, //Ворота откатные
     ITEM_WICKET      = 5, //Калитка
     ITEM_TEXT        = 6,
     ITEM_FILLING     = 7,// Автоматическое заполнение

@@ -5,55 +5,76 @@ GroupItem::GroupItem(QObject *parent):QObject(parent)
     this->rotation=0;
 }
 
-void GroupItem::createGroup(TYPEGROUP type, QMenu *menu, QGraphicsScene *scene)
+QList<QGraphicsItem*> GroupItem::create(TYPEGROUP type, QMenu *menu)
 {
     this->type=type;
-    switch(type)
+    QList<QGraphicsItem*> result;
+    GraphicsPillarItem *pillar1=new GraphicsPillarItem(menu);
+    GraphicsPillarItem *pillar2=new GraphicsPillarItem(menu);
+    result.append(pillar1);
+    result.append(pillar2);
+    switch(this->type)
     {
         case GroupItem::ITEM_WICKET:{
-            GraphicsPillarItem *pillar1=new GraphicsPillarItem(menu);
-            GraphicsPillarItem *pillar2=new GraphicsPillarItem(menu);
             GraphicsWicketItem *wicket=new GraphicsWicketItem(menu);
-            this->group.append(pillar1);
-            this->group.append(pillar2);
-            this->group.append(wicket);
-            scene->addItem(pillar1);
-            scene->addItem(pillar2);
-            scene->addItem(wicket);
+            result.append(wicket);
             break;
         }
         case GroupItem::ITEM_GATE1:{
-            GraphicsPillarItem *pillar1=new GraphicsPillarItem(menu);
-            GraphicsPillarItem *pillar2=new GraphicsPillarItem(menu);
             GraphicsGate1Item *gate1=new GraphicsGate1Item(menu);
-            this->group.append(pillar1);
-            this->group.append(pillar2);
-            this->group.append(gate1);
-            scene->addItem(pillar1);
-            scene->addItem(pillar2);
-            scene->addItem(gate1);
+            result.append(gate1);
             break;
         }
         case GroupItem::ITEM_GATE2:{
-            GraphicsPillarItem *pillar1=new GraphicsPillarItem(menu);
-            GraphicsPillarItem *pillar2=new GraphicsPillarItem(menu);
-            GraphicsGate2Item *gate2=new GraphicsGate2Item(menu);
-            this->group.append(pillar1);
-            this->group.append(pillar2);
-            this->group.append(gate2);
-            scene->addItem(pillar1);
-            scene->addItem(pillar2);
-            scene->addItem(gate2);
-            break;
+           GraphicsGate2Item *gate2=new GraphicsGate2Item(menu);
+           result.append(gate2);
+           break;
         }
     }
+    return result;
 }
 
-bool GroupItem::isWicket(QGraphicsItem *item)
+void GroupItem::createGroup(TYPEGROUP type, QMenu *menu, QGraphicsScene *scene)
 {
-    if(item==this->group.at(2))
+    QList<QGraphicsItem*> newGroup=this->create(type,menu);
+    this->group.append(newGroup);
+    scene->addItem(newGroup.at(0));
+    scene->addItem(newGroup.at(1));
+    scene->addItem(newGroup.at(2));
+}
+
+void GroupItem::createGroup(GroupItem *g1, GroupItem *g2, QMenu *menu, QGraphicsScene *scene)
+{
+    if(g1->isType()==GroupItem::ITEM_WICKET && g2->isType()==GroupItem::ITEM_GATE1)
+    {
+        if(g1->items().at(0)->collidesWithItem(g2->items().at(1)))
+        {
+            this->type=GroupItem::ITEM_GATE1_WICKET;
+        }
+        if(g1->items().at(1)->collidesWithItem(g2->items().at(0)))
+        {
+            this->type=GroupItem::ITEM_WICKET_GATE1;
+        }
+    }
+
+}
+
+bool GroupItem::isItem(QGraphicsItem *item)
+{
+    foreach(QGraphicsItem *itemGroup,this->group)
+    if(item==itemGroup)
         return true;
     return false;
+}
+
+QList<QGraphicsItem*> GroupItem::items()
+{
+    return this->group;
+}
+
+GroupItem::TYPEGROUP GroupItem::isType()
+{
+    return this->type;
 }
 
 void GroupItem::setBoundingLine(QLineF line)
