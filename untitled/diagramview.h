@@ -64,7 +64,7 @@ private:
     void appendChildObject(QGraphicsItem *a,QGraphicsItem *b,QGraphicsItem *l);
     void deleteFilling();
     void changeGroup(GroupItem *g1,GroupItem g2);
-    void collidingGroup();
+    void collidingGroup(QPointF point);
 private slots:
     void RotateItem_45();
     void RotateItem_90();

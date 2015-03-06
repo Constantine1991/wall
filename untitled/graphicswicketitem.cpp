@@ -3,13 +3,14 @@
 GraphicsWicketItem::GraphicsWicketItem(QMenu *menuItem, QGraphicsItem *parent, QGraphicsScene *scene)
     :QGraphicsLineItem(parent,scene)
 {
+    this->widthWicket=0;
     this->width=50;
     this->rot=130;
     this->setPen(QPen(Qt::black, 2, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
     this->setFlag(QGraphicsItem::ItemIsSelectable,true);
     QPointF p2=this->rotatePoint(QPointF(0,0),QPointF(0,this->width),this->rot);
     this->setLine(QLineF(QPointF(0,0),p2));
-    this->text=new QGraphicsTextItem("5000",this);
+    this->text=new QGraphicsTextItem("0",this);
     this->text->setPos(50,0);
     this->menu=menuItem;
 }
@@ -21,7 +22,13 @@ GraphicsWicketItem::~GraphicsWicketItem()
 void GraphicsWicketItem::setText(QString text)
 {
     this->text->setPlainText(text);
+    this->widthWicket=text.toInt();
     this->updateText();
+}
+
+int GraphicsWicketItem::value()
+{
+    return this->widthWicket;
 }
 
 void GraphicsWicketItem::setPosition(QPointF pos)

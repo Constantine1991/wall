@@ -34,6 +34,12 @@ GraphicsPillarItem::~GraphicsPillarItem()
 void GraphicsPillarItem::setText(QString caption)
 {
     this->itemText->setPlainText(caption);
+    this->textPillar=caption;
+}
+
+QString GraphicsPillarItem::text()
+{
+    return this->textPillar;
 }
 
 void GraphicsPillarItem::addWall(GraphicsWallItem *lineWall, bool point)
@@ -251,6 +257,7 @@ void GraphicsPillarItem::setGraphicsPillarItem(GraphicsPillarItem *graphicsItem)
     this->setHeightSide(GraphicsPillarItem::SIDE_BACK,graphicsItem->heightSide(GraphicsPillarItem::SIDE_BACK));
     this->setHeightSide(GraphicsPillarItem::SIDE_LIFT,graphicsItem->heightSide(GraphicsPillarItem::SIDE_LIFT));
     this->setHeightSide(GraphicsPillarItem::SIDE_RIGHT,graphicsItem->heightSide(GraphicsPillarItem::SIDE_RIGHT));
+    this->setText(graphicsItem->text());
     this->setTop(graphicsItem->isTop());
     this->setPazzle(graphicsItem->isPazzle());
     if(this->isTop())

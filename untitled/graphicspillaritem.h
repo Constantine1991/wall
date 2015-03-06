@@ -38,6 +38,7 @@ public:
        }
        void addWall(GraphicsWallItem *lineWall,bool point);
        void setText(QString caption);
+       QString text();
        void setHeight(int height);
        void setHeightSide(SIDETYPE sideType,int height);
        void setHeightSide(int side,int height);
@@ -72,6 +73,7 @@ protected:
 private:
     QMenu *menuItem;
     QGraphicsTextItem *itemText;
+    QString textPillar;
     int heightPillar;
     bool topPillar;
     int heightSidePillar[4];

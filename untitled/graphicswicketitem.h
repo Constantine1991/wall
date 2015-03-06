@@ -23,6 +23,7 @@ public:
     void setPosition(QPointF pos);
     void setRotate(int angle);
     void setText(QString text);
+    int value();
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 private:
@@ -32,6 +33,7 @@ private:
     QGraphicsTextItem *text;
     QMenu *menu;
     int width;
+    int widthWicket;
     int rot;
 };
 

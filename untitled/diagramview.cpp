@@ -913,24 +913,23 @@ void DiagramView::component(TYPEITEM typeItem, int width)
 {
 }
 
-void DiagramView::collidingGroup()
+void DiagramView::collidingGroup(QPointF point)
 {
     if(this->pDiagramScene->selectedItems().isEmpty())
         return;
-    GroupItem *moveGroup;
+    GroupItem *moveGroup=new GroupItem();
+    QGraphicsItem *item=this->pDiagramScene->selectedItems().at(0);
     foreach(GroupItem *group,this->listGroup)
-        if(group->isItem(this->pDiagramScene->selectedItems().at(0)))
+        if(group->isItem(item))
         {
             moveGroup=group;
             break;
         }
-    if(group->isType()!=GroupItem::ITEM_GATE1 || group->isType()!=GroupItem::ITEM_GATE2 ||
-            group->isType()!=GroupItem::ITEM_WICKET)
+    if(moveGroup->isType()==GroupItem::ITEM_NONE)
         return;
     QList<QGraphicsItem*> colidingItemList=this->pDiagramScene->collidingItems(moveGroup->items().at(0));
-    colidingItemList.append(moveGroup->items().at(1));
-    GroupItem *colidingGroup=NULL;
-    bool findGroup=false;
+    colidingItemList.append(this->pDiagramScene->collidingItems(moveGroup->items().at(1)));
+    GroupItem *coliding=new GroupItem();
     foreach(GroupItem *group,this->listGroup)
     {
         if(moveGroup==group)
@@ -940,15 +939,26 @@ void DiagramView::collidingGroup()
             if(colidingItem->type()!=GraphicsPillarItem::Type)
                 continue;
             if(group->isItem(colidingItem))
-            {
-                colidingGroup=group;
-                findGroup=true;
-            }
+                coliding=group;
         }
-        if(findGroup)
+        if(coliding->isType()!=GroupItem::ITEM_NONE)
             break;
     }
-    qDebug()<<findGroup;
+    if(coliding->isType()==GroupItem::ITEM_NONE)
+        return;
+    group=new GroupItem();
+    connect(this,SIGNAL(itemMoveScene(QPointF)),group,SLOT(itemMoveScene(QPointF)));
+    group->createGroup(coliding,moveGroup,this->MenuItem,this->pDiagramScene);
+    group->setPos(point);
+    this->listGroup.append(group);
+    foreach(QGraphicsItem *item,moveGroup->items())
+        this->pDiagramScene->removeItem(item);
+    foreach(QGraphicsItem *item,coliding->items())
+        this->pDiagramScene->removeItem(item);
+    this->listGroup.removeAt(this->listGroup.indexOf(moveGroup));
+    delete moveGroup;
+    this->listGroup.removeAt(this->listGroup.indexOf(coliding));
+    delete coliding;
 }
 /*----------------------------------------protected--------------------------------------------------------*/
 
@@ -996,7 +1006,7 @@ void DiagramView::mouseMoveEvent(QMouseEvent *event)
     if(this->mousePrees)
     {
         this->itemMoveScene(this->mapToScene(event->pos()));
-        this->collidingGroup();
+        this->collidingGroup(this->mapToScene(event->pos()));
     }
     if(this->typeITEM==ITEM_WALL)
         if(this->lineWall!=NULL)
