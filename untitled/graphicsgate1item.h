@@ -21,6 +21,7 @@ public:
     void setPosition(QPointF p1,QPointF p2);
     void setRotate(int angle);
     void setText(QString text);
+    int value();
 protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 private:
@@ -31,6 +32,7 @@ private:
     QGraphicsLineItem *childGate;
     QMenu *menu;
     int width;
+    int widthGate;
     int rotP1;
     int rotP2;
 };

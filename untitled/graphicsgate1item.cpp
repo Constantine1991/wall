@@ -3,6 +3,7 @@
 GraphicsGate1Item::GraphicsGate1Item(QMenu *menu, QGraphicsItem *parent, QGraphicsScene *scene)
     :QGraphicsLineItem(parent,scene)
 {
+    this->widthGate=0;
     this->width=50;
     this->rotP1=130;
     this->rotP2=50;
@@ -11,7 +12,7 @@ GraphicsGate1Item::GraphicsGate1Item(QMenu *menu, QGraphicsItem *parent, QGraphi
     this->childGate=new QGraphicsLineItem(this);
     this->childGate->setPen(QPen(Qt::black, 2, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
     this->childGate->setFlag(QGraphicsItem::ItemIsSelectable,false);
-    this->text=new QGraphicsTextItem("5000",this);
+    this->text=new QGraphicsTextItem("0",this);
     this->menu=menu;
 }
 
@@ -22,7 +23,13 @@ GraphicsGate1Item::~GraphicsGate1Item()
 void GraphicsGate1Item::setText(QString text)
 {
     this->text->setPlainText(text);
+    this->widthGate=text.toInt();
     this->updateText();
+}
+
+int GraphicsGate1Item::value()
+{
+    return this->widthGate;
 }
 
 void GraphicsGate1Item::setPosition(QPointF p1, QPointF p2)
