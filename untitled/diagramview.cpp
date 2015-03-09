@@ -183,11 +183,20 @@ void DiagramView::Delete_Item()
     {
         foreach(QGraphicsItem *parentItem,this->pDiagramScene->selectedItems())
         {
-            if(parentItem->type()==GraphicsWicketItem::Type || parentItem->type()==GraphicsGate1Item::Type ||
-               parentItem->type()==GraphicsGate2Item::Type)
                 foreach(GroupItem *group,this->listGroup)
                     if(group->isItem(parentItem))
                     {
+                        if(parentItem->type()==GraphicsPillarItem::Type)
+                        {
+                            QList<QGraphicsItem*> item=group->items();
+                            if(item.count()==3)
+                                this->pDiagramScene->removeItem(item.at(2));
+                            if(item.count()==5)
+                            {
+                                this->pDiagramScene->removeItem(item.at(4));
+                                this->pDiagramScene->removeItem(item.at(3));
+                            }
+                        }
                         this->listGroup.removeAt(this->listGroup.indexOf(group));
                         delete group;
                         break;
@@ -946,19 +955,22 @@ void DiagramView::collidingGroup(QPointF point)
     }
     if(coliding->isType()==GroupItem::ITEM_NONE)
         return;
-    group=new GroupItem();
-    connect(this,SIGNAL(itemMoveScene(QPointF)),group,SLOT(itemMoveScene(QPointF)));
-    group->createGroup(coliding,moveGroup,this->MenuItem,this->pDiagramScene);
-    group->setPos(point);
-    this->listGroup.append(group);
-    foreach(QGraphicsItem *item,moveGroup->items())
-        this->pDiagramScene->removeItem(item);
-    foreach(QGraphicsItem *item,coliding->items())
-        this->pDiagramScene->removeItem(item);
-    this->listGroup.removeAt(this->listGroup.indexOf(moveGroup));
-    delete moveGroup;
-    this->listGroup.removeAt(this->listGroup.indexOf(coliding));
-    delete coliding;
+    if((int)coliding->isType()<3 && (int)moveGroup->isType()<3)
+    {
+        group=new GroupItem();
+        connect(this,SIGNAL(itemMoveScene(QPointF)),group,SLOT(itemMoveScene(QPointF)));
+        group->createGroup(coliding,moveGroup,this->MenuItem,this->pDiagramScene);
+        group->setPos(point);
+        this->listGroup.append(group);
+        foreach(QGraphicsItem *item,moveGroup->items())
+            this->pDiagramScene->removeItem(item);
+        foreach(QGraphicsItem *item,coliding->items())
+            this->pDiagramScene->removeItem(item);
+        this->listGroup.removeAt(this->listGroup.indexOf(moveGroup));
+        delete moveGroup;
+        this->listGroup.removeAt(this->listGroup.indexOf(coliding));
+        delete coliding;
+    }
 }
 /*----------------------------------------protected--------------------------------------------------------*/
 
