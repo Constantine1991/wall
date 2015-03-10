@@ -21,6 +21,7 @@ DiagramView::DiagramView(QWidget *parent):QGraphicsView(parent)
     this->Rigel=false;
     this->mousePrees=false;
     this->centerOn(0,0);
+    this->typeITEM=ITEM_NONE;
 }
 
 DiagramView::~DiagramView()
@@ -65,15 +66,15 @@ QGraphicsItem *DiagramView::itemToScene(TYPEITEM typeItem, QPointF point)
     return NULL;
 }
 
-void DiagramView::AppendItem(TYPEITEM typeItem, QPointF point)
+QGraphicsItem* DiagramView::AppendItem(TYPEITEM typeItem, QPointF point)
 {
     switch(typeItem)
     {
         case ITEM_PILLAR:{
-            GraphicsPillarItem *PillarItem=new GraphicsPillarItem(this->MenuItem,0,this->pDiagramScene);
+            GraphicsPillarItem *PillarItem=new GraphicsPillarItem(this->MenuItem);
             PillarItem->setPos(point);
             this->pDiagramScene->addItem(PillarItem);
-            return;
+            return PillarItem;
         }
         case ITEM_WALL:{
             GraphicsWallItem *wall=new GraphicsWallItem(this->MenuItem);
@@ -91,7 +92,7 @@ void DiagramView::AppendItem(TYPEITEM typeItem, QPointF point)
             this->pDiagramScene->removeItem(this->lineWall);
             delete this->lineWall;
             this->lineWall=NULL;
-            return;
+            return wall;
         }
         case ITEM_GATE_A:{
             group=new GroupItem();
@@ -99,7 +100,7 @@ void DiagramView::AppendItem(TYPEITEM typeItem, QPointF point)
             group->createGroup(GroupItem::ITEM_GATE1,this->MenuItem,this->pDiagramScene);
             group->setPos(point);
             this->listGroup.append(group);
-            return;
+            return NULL;
         }
         case ITEM_GATE_B:{
             group=new GroupItem();
@@ -107,7 +108,7 @@ void DiagramView::AppendItem(TYPEITEM typeItem, QPointF point)
             group->createGroup(GroupItem::ITEM_GATE2,this->MenuItem,this->pDiagramScene);
             group->setPos(point);
             this->listGroup.append(group);
-            return;
+            return NULL;
         }
         case ITEM_WICKET:{
             group=new GroupItem();
@@ -115,10 +116,19 @@ void DiagramView::AppendItem(TYPEITEM typeItem, QPointF point)
             group->createGroup(GroupItem::ITEM_WICKET,this->MenuItem,this->pDiagramScene);
             group->setPos(point);
             this->listGroup.append(group);
-            return;
+            return NULL;
         }
-        default:return;
+        default:return NULL;
     }
+}
+
+void DiagramView::AppendItem(GroupItem::TYPEGROUP typeGroup, QPointF point)
+{
+    group=new GroupItem();
+    connect(this,SIGNAL(itemMoveScene(QPointF)),group,SLOT(itemMoveScene(QPointF)));
+    group->createGroup(typeGroup,this->MenuItem,this->pDiagramScene);
+    group->setPos(point);
+    this->listGroup.append(group);
 }
 
 float DiagramView::distancePointToPoint(QPointF point1, QPointF point2)
@@ -408,7 +418,7 @@ void DiagramView::setTypeItem(TYPEITEM type)
 
 void DiagramView::ClearScene()
 {
-   // this->itemScene.RemoveAll();
+    this->listGroup.clear();
     foreach(QGraphicsItem *item,this->pDiagramScene->items())
             delete item;
     this->pDiagramScene->clear();
@@ -416,176 +426,146 @@ void DiagramView::ClearScene()
 
 void DiagramView::SaveDiagramScene(QString nameFile)
 {
-    /*QFile saveFile(nameFile);
+    QFile saveFile(nameFile);
     if(!saveFile.open(QIODevice::WriteOnly))
         return;
     QDataStream outFile(&saveFile);
-    outFile<<this->Rigel<<this->Fundament<<this->pillarBottom;
-    outFile<<this->itemScene.CountItem();
-    foreach(QGraphicsItem* graphicsItem,this->pDiagramScene->items())
+    outFile<<this->Fundament;
+    outFile<<this->pDiagramScene->items().count();
+    for(int i=this->pDiagramScene->items().count()-1;i>-1;i--)
     {
-        if(graphicsItem->data(1).toInt()==0)
-            continue;
-        ITEM *item=this->itemScene.getItem(graphicsItem->data(1).toInt());
-        outFile<<item->id<<item->type;
-        switch (item->type)
+        QGraphicsItem* graphicsItem=this->pDiagramScene->items().at(i);
+        switch(graphicsItem->type())
         {
-            case ITEM_PILLAR:{
-                outFile<<graphicsItem->x()<<graphicsItem->y()<<graphicsItem->rotation()<<item->pillar->height
-                      <<item->pillar->insert[0].insertTop<<item->pillar->insert[0].insertBottom
-                      <<item->pillar->insert[0].insertTop<<item->pillar->insert[1].insertBottom
-                      <<item->pillar->insert[0].insertTop<<item->pillar->insert[2].insertBottom
-                      <<item->pillar->insert[0].insertTop<<item->pillar->insert[3].insertBottom
-                      <<item->pillar->top<<item->pillar->colorTop.name()<<item->pillar->pazzle<<item->pillar->colorPazzle1.name()
-                      <<item->pillar->colorPazzle2.name()<<item->pillar->colorBlocks.count();
-                if(!item->pillar->colorBlocks.isEmpty())
-                    foreach(QColor color,item->pillar->colorBlocks)
-                        outFile<<color.name();
+            case GraphicsPillarItem::Type:{
+                GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(graphicsItem);
+                outFile<<pillar->type()<<pillar->pos().x()<<pillar->pos().y()<<pillar->rotation()
+                        <<pillar->height()<<pillar->heightSide(0)<<pillar->heightSide(1)
+                        <<pillar->heightSide(2)<<pillar->heightSide(3)
+                        <<pillar->isTop()<<pillar->topColor().caption<<pillar->topColor().color.name()
+                        <<pillar->isPazzle()<<pillar->colorPazzle(0).caption<<pillar->colorPazzle(0).color.name()
+                        <<pillar->colorPazzle(1).caption<<pillar->colorPazzle(1).color.name()
+                        <<pillar->countColorRow();
+                foreach(COLOR color,pillar->colorListRow())
+                    outFile<<color.caption<<color.color.name();
+                outFile<<(int)pillar->isBottomType();
                 break;
             }
-            case ITEM_WALL:{
+            case GraphicsWallItem::Type:{
                 GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(graphicsItem);
-                outFile<<wall->line().p1().x()<<wall->line().p1().y()<<wall->line().p2().x()<<wall->line().p2().y()
-                       <<item->wall->width<<item->wall->height<<item->wall->wallTop<<item->wall->colorTop.name()
-                       <<item->wall->pazzle<<item->wall->colorPazzle1.name()<<item->wall->colorPazzle2.name()<<item->wall->colorBlocks.count();
-                if(!item->wall->colorBlocks.isEmpty())
-                    foreach(QColor color,item->wall->colorBlocks)
-                        outFile<<color.name();
-                outFile<<item->wall->d<<item->wall->colorDicoreit.name();
+                outFile<<wall->type()<<wall->posP1().x()<<wall->posP1().y()
+                       <<wall->posP2().x()<<wall->posP2().y()<<wall->height()<<wall->width()
+                       <<wall->isTop()<<wall->colorTop().caption<<wall->colorTop().color.name()<<wall->isPazzle()
+                       <<wall->colorPazzle(0).caption<<wall->colorPazzle(0).color.name()
+                       <<wall->colorPazzle(1).caption<<wall->colorPazzle(1).color.name()
+                       <<wall->isDecoreid()<<wall->colorDecoreid().caption
+                       <<wall->colorDecoreid().color.name()<<wall->countColorRow();
+                foreach(COLOR color,wall->colorListRow())
+                    outFile<<color.caption<<color.color.name();
+                outFile<<wall->isGirthRail();
                 break;
             }
-            default:{
-                outFile<<graphicsItem->x()<<graphicsItem->y()<<graphicsItem->rotation();
-                break;
-            }
+            default:break;
         }
-        outFile<<item->child.count();
-        if(!item->child.isEmpty())
-            foreach(CHILD *child,item->child)
-                outFile<<child->idChild<<child->resize;
-    }*/
+    }
 }
 
 bool DiagramView::LoadDiagramScene(QString nameFile)
 {
-   /* this->ClearScene();
+    this->ClearScene();
     QFile loadFile(nameFile);
     if(!loadFile.open(QIODevice::ReadOnly))
         return false;
     Calculate calc(this->itemSetting);
     QDataStream inFile(&loadFile);
     int CountItem;
-    inFile>>this->Rigel>>this->Fundament>>this->pillarBottom;
+    inFile>>this->Fundament;
     inFile>>CountItem;
     for(int i=0;i<CountItem;i++)
     {
         int type;
-        int id;
-        inFile>>id>>type;
-        ITEM *item;
-        switch (type)
+        float x=0;
+        float y=0;
+        int buf=0;
+        QString caption;
+        QString colorName;
+        bool logic=false;
+        inFile>>type;
+        switch(type)
         {
-            case ITEM_PILLAR:{
-                GraphicsPillarItem *PillarItem=new GraphicsPillarItem(this->MenuItem);
-                this->itemScene.AppendItem(id,ITEM_PILLAR);
-                item=this->itemScene.getItem(id);
-                float x,y,r;
-                QString nameColorTop,nameColorPazzle1,nameColorPazzle2;
-                int countColorBrick;
-                inFile>>x>>y>>r>>item->pillar->height>>item->pillar->insert[0].insertTop>>item->pillar->insert[0].insertBottom
-                     >>item->pillar->insert[1].insertTop>>item->pillar->insert[1].insertBottom
-                     >>item->pillar->insert[2].insertTop>>item->pillar->insert[2].insertBottom
-                     >>item->pillar->insert[3].insertTop>>item->pillar->insert[3].insertBottom
-                     >>item->pillar->top>>nameColorTop>>item->pillar->pazzle>>nameColorPazzle1
-                     >>nameColorPazzle2>>countColorBrick;
-                item->pillar->colorTop.setNamedColor(nameColorTop);
-                item->pillar->colorPazzle1.setNamedColor(nameColorPazzle1);
-                item->pillar->colorPazzle2.setNamedColor(nameColorPazzle2);
-                for(int i=0;i<countColorBrick;i++)
+            case GraphicsPillarItem::Type:{
+                inFile>>x>>y;
+                GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(this->AppendItem(ITEM_PILLAR,QPointF(x,y)));
+                float angle=0;
+                inFile>>angle;
+                pillar->setRotation(angle);
+                inFile>>buf;
+                pillar->setHeight(buf);
+                inFile>>buf;
+                pillar->setHeightSide(0,buf);
+                inFile>>buf;
+                pillar->setHeightSide(1,buf);
+                inFile>>buf;
+                pillar->setHeightSide(2,buf);
+                inFile>>buf;
+                pillar->setHeightSide(3,buf);
+                inFile>>logic;
+                pillar->setTop(logic);
+                inFile>>caption>>colorName;
+                pillar->setTopColor(COLOR(QColor(colorName),caption));
+                inFile>>logic;
+                pillar->setPazzle(logic);
+                inFile>>caption>>colorName;
+                pillar->setColorPazzle(0,COLOR(QColor(colorName),caption));
+                inFile>>caption>>colorName;
+                pillar->setColorPazzle(1,COLOR(QColor(colorName),caption));
+                inFile>>buf;
+                for(int i=0;i<buf;i++)
                 {
-                    QString nameColorBrick;
-                    inFile>>nameColorBrick;
-                    item->pillar->colorBlocks.append(QColor(nameColorBrick));
+                    inFile>>caption>>colorName;
+                    pillar->addColorRow(COLOR(QColor(colorName),caption));
                 }
-                PillarItem->setPos(x,y);
-                PillarItem->rotate(r);
-                PillarItem->setData(1,QVariant(item->id));
-                this->pDiagramScene->addItem(PillarItem);
-                PillarItem->itemGraphicsText()->setPos(x-30,y);
-                this->pDiagramScene->addItem(PillarItem->itemGraphicsText());
-                PillarItem->itemGraphicsLine()->setLine(QLineF(PillarItem->itemGraphicsText()->pos(),PillarItem->pos()));
-                this->pDiagramScene->addItem(PillarItem->itemGraphicsLine());
-                int insert[]={item->pillar->insert[0].insertBottom,item->pillar->insert[0].insertTop,
-                             item->pillar->insert[1].insertBottom,item->pillar->insert[1].insertTop,
-                             item->pillar->insert[2].insertBottom,item->pillar->insert[2].insertTop,
-                             item->pillar->insert[3].insertBottom,item->pillar->insert[3].insertTop};
-                COLUMN p=calc.GetCountOnColumn(item->pillar->height,insert,4);
-                PillarItem->setText(QString(QString::number(p.count_brick_angle)+" | "+
+                inFile>>buf;
+                pillar->setBottomType(buf);
+                int insert[]={pillar->heightSide(0),0,
+                             pillar->heightSide(1),0,
+                              pillar->heightSide(2),0,
+                             pillar->heightSide(3),0};
+                COLUMN p=calc.GetCountOnColumn(pillar->height(),insert,4);
+                pillar->setText(QString(QString::number(p.count_brick_angle)+" | "+
                                                 QString::number(p.count_brick_angle_1+p.count_brick_angle_2+p.count_brick_angle_3+p.count_brick_angle_4)));
                 break;
             }
-            case ITEM_WALL:{
-                GraphicsWallItem *WallItem=new GraphicsWallItem(this->MenuItem);
-                this->itemScene.AppendItem(id,ITEM_WALL);
-                item=this->itemScene.getItem(id);
-                QString nameColorTop,nameColorPazzle1,nameColorPazzle2,nameColorDecoreit;
-                int countColorBrick;
-                float x1,y1,x2,y2;
-                inFile>>x1>>y1>>x2>>y2>>item->wall->width>>item->wall->height>>item->wall->wallTop>>nameColorTop
-                      >>item->wall->pazzle>>nameColorPazzle1>>nameColorPazzle2>>countColorBrick;
-                item->wall->colorTop.setNamedColor(nameColorTop);
-                item->wall->colorPazzle1.setNamedColor(nameColorPazzle1);
-                item->wall->colorPazzle2.setNamedColor(nameColorPazzle2);
-                for(int i=0;i<countColorBrick;i++)
+            case GraphicsWallItem::Type:{
+                this->lineWall=new QGraphicsLineItem();
+                QLineF line;
+                inFile>>x>>y;   line.setP1(QPointF(x,y));
+                inFile>>x>>y;   line.setP2(QPointF(x,y));
+                this->lineWall=new QGraphicsLineItem(line);
+                GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(this->AppendItem(ITEM_WALL,QPointF(0,0)));
+                inFile>>buf;    wall->setHeight(buf);
+                inFile>>buf;    wall->setWidth(buf);
+                inFile>>logic;  wall->setTop(logic);
+                inFile>>caption>>colorName; wall->setColorTop(COLOR(QColor(colorName),caption));
+                inFile>>logic;  wall->setPazzle(logic);
+                inFile>>caption>>colorName; wall->setColorPazzle(0,COLOR(QColor(colorName),caption));
+                inFile>>caption>>colorName; wall->setColorPazzle(1,COLOR(QColor(colorName),caption));
+                inFile>>buf;  wall->setDecoreid(buf);
+                inFile>>caption>>colorName; wall->setColorDecoreid(COLOR(QColor(colorName),caption));
+                inFile>>buf;
+                for(int i=0;i<buf;i++)
                 {
-                    QString nameColorBrick;
-                    inFile>>nameColorBrick;
-                    item->wall->colorBlocks.append(QColor(nameColorBrick));
+                    inFile>>caption>>colorName;
+                    wall->addColorRow(COLOR(QColor(colorName),caption));
                 }
-                inFile>>item->wall->d>>nameColorDecoreit;
-                item->wall->colorDicoreit.setNamedColor(nameColorDecoreit);
-                WallItem->setLine(x1,y1,x2,y2);
-                WallItem->setData(1,QVariant(item->id));
-                this->pDiagramScene->addItem(WallItem);
-                WallItem->itemGraphicsText()->setPos(WallItem->centre().x()-30,WallItem->centre().y()-30);
-                this->pDiagramScene->addItem(WallItem->itemGraphicsText());
-                WallItem->itemGraphicsLine()->setLine(QLineF(WallItem->itemGraphicsText()->pos(),WallItem->centre()));
-                this->pDiagramScene->addItem(WallItem->itemGraphicsLine());
-                FENCE f=calc.GetCountOnFence(item->wall->width,item->wall->height,false);
-                WallItem->setText(QString(QString::number(f.count_brick)+" | "+QString::number(f.count_brick_dob)));
-                break;
-            }
-            case ITEM_GATE_A:{
-
-                break;
-            }
-            case ITEM_GATE_B:{
-
-                break;
-            }
-            case ITEM_WICKET:{
+                inFile>>logic;  wall->setGirthRail(logic);
+                FENCE f=calc.GetCountOnFence(wall->width(),wall->height(),false);
+                wall->setText(QString(QString::number(f.count_brick)+" | "+QString::number(f.count_brick_dob)));
                 break;
             }
             default:break;
         }
-        int countChild;
-        inFile>>countChild;
-        for(int i=0;i<countChild;i++)
-        {
-            int idChild;
-            bool resize;
-            inFile>>idChild>>resize;
-            item->child.append(new CHILD(idChild,resize,NULL));
-        }
     }
-    QList<ITEM*> listItem=this->itemScene.items();
-    foreach(QGraphicsItem *graphicsItem,this->pDiagramScene->items())
-        foreach(ITEM *item,listItem)
-            foreach(CHILD *childItem,item->child)
-                if(childItem->idChild==graphicsItem->data(1).toInt())
-                    childItem->itemChild=graphicsItem;
-    this->currentIdItem=listItem.first()->id;
-    this->currentIdItem++;*/
     return true;
 }
 
@@ -981,7 +961,7 @@ void DiagramView::mousePressEvent(QMouseEvent *event)
     this->mousePrees=true;
     QApplication::setOverrideCursor(Qt::PointingHandCursor);
     if(this->typeITEM==ITEM_PILLAR)
-        this->AppendItem(this->typeITEM,this->mapToScene(event->pos()));
+        this->AppendItem(ITEM_PILLAR,this->mapToScene(event->pos()));
     if(this->typeITEM==ITEM_WALL)
     {
         this->lineWall=new QGraphicsLineItem(QLineF(this->mapToScene(event->pos()),this->mapToScene(event->pos())));

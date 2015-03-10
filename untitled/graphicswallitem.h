@@ -21,6 +21,8 @@ public:
     void setText(QString caption);
     QPointF centre();
     void setLinePoint(QPointF p1,QPointF p2);
+    QPointF posP1();
+    QPointF posP2();
     void setHeight(int height);
     int height();
     void setWidth(int width);

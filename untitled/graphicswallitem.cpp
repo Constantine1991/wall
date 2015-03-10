@@ -27,6 +27,15 @@ void GraphicsWallItem::setLinePoint(QPointF p1, QPointF p2)
     this->updatePosText();
 }
 
+QPointF GraphicsWallItem::posP1()
+{
+    return this->line().p1();
+}
+
+QPointF GraphicsWallItem::posP2()
+{
+    return this->line().p2();
+}
 
 void GraphicsWallItem::updatePosText()
 {

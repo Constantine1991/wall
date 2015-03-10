@@ -121,6 +121,11 @@ void GroupItem::createGroup(TYPEGROUP type, QMenu *menu, QGraphicsScene *scene)
     scene->addItem(this->group.at(0));
     scene->addItem(this->group.at(1));
     scene->addItem(this->group.at(2));
+    if(this->group.count()==5)
+    {
+        scene->addItem(this->group.at(3));
+        scene->addItem(this->group.at(4));
+    }
 }
 
 void GroupItem::createGroup(GroupItem *g1, GroupItem *g2, QMenu *menu, QGraphicsScene *scene)
@@ -438,6 +443,11 @@ void GroupItem::setPos(QPointF point)
         default:break;
     }
 
+}
+
+QPointF GroupItem::pos()
+{
+    return this->centre();
 }
 
 void GroupItem::setType(GroupItem::TYPEGROUP type)

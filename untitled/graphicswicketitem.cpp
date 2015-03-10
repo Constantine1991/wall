@@ -38,6 +38,16 @@ void GraphicsWicketItem::setPosition(QPointF pos)
     this->updateText();
 }
 
+QPointF GraphicsWicketItem::position()
+{
+    return this->line().p1();
+}
+
+float GraphicsWicketItem::rotationWicket()
+{
+    return this->rot-130;
+}
+
 void GraphicsWicketItem::setRotate(int angle)
 {
     this->rot=130+angle;

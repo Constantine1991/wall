@@ -31,6 +31,7 @@ public:
     void createGroup(TYPEGROUP type,QMenu *menu,QGraphicsScene *scene);
     void createGroup(GroupItem *g1,GroupItem *g2,QMenu *menu,QGraphicsScene *scene);
     void setPos(QPointF point);
+    QPointF pos();
     void setType(TYPEGROUP type);
     bool isItem(QGraphicsItem *item);
     QList<QGraphicsItem*> items();

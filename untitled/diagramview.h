@@ -49,7 +49,8 @@ private:
     QAction *DeleteItem;
     void CreateMenuItem();
     QGraphicsItem *itemToScene(TYPEITEM typeItem,QPointF point);
-    void AppendItem(TYPEITEM typeItem,QPointF point);
+    void AppendItem(GroupItem::TYPEGROUP typeGroup, QPointF point);
+    QGraphicsItem *AppendItem(TYPEITEM typeItem,QPointF point);
     float distancePointToPoint(QPointF point1,QPointF point2);
     void itemChangeScene(int idItem);
     void RotateItem(int Angle);

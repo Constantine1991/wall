@@ -21,6 +21,8 @@ public:
         return Type;
     }
     void setPosition(QPointF pos);
+    QPointF position();
+    float rotationWicket();
     void setRotate(int angle);
     void setText(QString text);
     int value();
