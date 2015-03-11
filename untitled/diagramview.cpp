@@ -424,147 +424,330 @@ void DiagramView::ClearScene()
     this->pDiagramScene->clear();
 }
 
+void DiagramView::savePillar(QDomDocument *document,QDomElement *parent, GraphicsPillarItem *pillar)
+{
+    QDomElement object=document->createElement("Object");
+    object.setAttribute("type",pillar->type());
+    QDomElement point=document->createElement("Point");
+    point.setAttribute("x",pillar->pos().x());
+    point.setAttribute("y",pillar->pos().y());
+    object.appendChild(point);
+    QDomElement rotation=document->createElement("rotation");
+    rotation.setAttribute("value",pillar->rotation());
+    object.appendChild(rotation);
+    QDomElement height=document->createElement("HeightPillar");
+    height.setAttribute("value",pillar->height());
+    object.appendChild(height);
+    QDomElement heightSide=document->createElement("HeightSide");
+    for(int i=0;i<4;i++)
+    {
+        QDomElement side=document->createElement("side");
+        side.setAttribute("id",i);
+        side.setAttribute("value",pillar->heightSide(i));
+        heightSide.appendChild(side);
+    }
+    object.appendChild(heightSide);
+    QDomElement top=document->createElement("Top");
+    top.setAttribute("enable",pillar->isTop());
+    QDomElement color=document->createElement("color");
+    color.setAttribute("caption",pillar->topColor().caption);
+    color.setAttribute("name",pillar->topColor().color.name());
+    top.appendChild(color);
+    object.appendChild(top);
+    QDomElement pazzle=document->createElement("Pazzle");
+    pazzle.setAttribute("enable",pillar->isPazzle());
+    color=document->createElement("color");
+    color.setAttribute("id",0);
+    color.setAttribute("caption",pillar->colorPazzle(0).caption);
+    color.setAttribute("name",pillar->colorPazzle(0).color.name());
+    pazzle.appendChild(color);
+    color=document->createElement("color");
+    color.setAttribute("id",1);
+    color.setAttribute("caption",pillar->colorPazzle(1).caption);
+    color.setAttribute("name",pillar->colorPazzle(1).color.name());
+    pazzle.appendChild(color);
+    object.appendChild(pazzle);
+    QDomElement colorRow=document->createElement("ColorRow");
+    colorRow.setAttribute("empty",pillar->colorListRow().isEmpty());
+    foreach(COLOR c,pillar->colorListRow())
+    {
+        color=document->createElement("color");
+        color.setAttribute("caption",c.caption);
+        color.setAttribute("name",c.color.name());
+        colorRow.appendChild(color);
+    }
+    object.appendChild(colorRow);
+    QDomElement bottomType=document->createElement("Bottom");
+    bottomType.setAttribute("type",pillar->isBottomType());
+    object.appendChild(bottomType);
+    parent->appendChild(object);
+}
+
 void DiagramView::SaveDiagramScene(QString nameFile)
 {
-    QFile saveFile(nameFile);
-    if(!saveFile.open(QIODevice::WriteOnly))
-        return;
-    QDataStream outFile(&saveFile);
-    outFile<<this->Fundament;
-    outFile<<this->pDiagramScene->items().count();
+    QDomDocument document;
+    QDomElement root=document.createElement("data");
+    document.appendChild(root);
     for(int i=this->pDiagramScene->items().count()-1;i>-1;i--)
     {
         QGraphicsItem* graphicsItem=this->pDiagramScene->items().at(i);
-        switch(graphicsItem->type())
-        {
-            case GraphicsPillarItem::Type:{
-                GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(graphicsItem);
-                outFile<<pillar->type()<<pillar->pos().x()<<pillar->pos().y()<<pillar->rotation()
-                        <<pillar->height()<<pillar->heightSide(0)<<pillar->heightSide(1)
-                        <<pillar->heightSide(2)<<pillar->heightSide(3)
-                        <<pillar->isTop()<<pillar->topColor().caption<<pillar->topColor().color.name()
-                        <<pillar->isPazzle()<<pillar->colorPazzle(0).caption<<pillar->colorPazzle(0).color.name()
-                        <<pillar->colorPazzle(1).caption<<pillar->colorPazzle(1).color.name()
-                        <<pillar->countColorRow();
-                foreach(COLOR color,pillar->colorListRow())
-                    outFile<<color.caption<<color.color.name();
-                outFile<<(int)pillar->isBottomType();
+        bool saveItem=true;
+        foreach(GroupItem *group,this->listGroup)
+            if(group->isItem(graphicsItem))
+            {
+                saveItem=false;
                 break;
             }
-            case GraphicsWallItem::Type:{
-                GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(graphicsItem);
-                outFile<<wall->type()<<wall->posP1().x()<<wall->posP1().y()
-                       <<wall->posP2().x()<<wall->posP2().y()<<wall->height()<<wall->width()
-                       <<wall->isTop()<<wall->colorTop().caption<<wall->colorTop().color.name()<<wall->isPazzle()
-                       <<wall->colorPazzle(0).caption<<wall->colorPazzle(0).color.name()
-                       <<wall->colorPazzle(1).caption<<wall->colorPazzle(1).color.name()
-                       <<wall->isDecoreid()<<wall->colorDecoreid().caption
-                       <<wall->colorDecoreid().color.name()<<wall->countColorRow();
-                foreach(COLOR color,wall->colorListRow())
-                    outFile<<color.caption<<color.color.name();
-                outFile<<wall->isGirthRail();
-                break;
+        if(saveItem)
+            switch (graphicsItem->type())
+            {
+                case GraphicsPillarItem::Type:{
+                    GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(graphicsItem);
+                    this->savePillar(&document,&root,pillar);
+                    break;
+                }
+                case GraphicsWallItem::Type:{
+                    GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(graphicsItem);
+                    QDomElement object=document.createElement("Object");
+                    object.setAttribute("type",wall->type());
+                    QDomElement point=document.createElement("Point");
+                    point.setAttribute("x1",wall->posP1().x());
+                    point.setAttribute("y1",wall->posP1().y());
+                    point.setAttribute("x2",wall->posP2().x());
+                    point.setAttribute("y2",wall->posP2().y());
+                    object.appendChild(point);
+                    QDomElement height=document.createElement("Height");
+                    height.setAttribute("value",wall->height());
+                    object.appendChild(height);
+                    QDomElement width=document.createElement("Width");
+                    width.setAttribute("value",wall->width());
+                    object.appendChild(width);
+                    QDomElement top=document.createElement("Top");
+                    top.setAttribute("enable",wall->isTop());
+                    QDomElement color=document.createElement("color");
+                    color.setAttribute("caption",wall->colorTop().caption);
+                    color.setAttribute("name",wall->colorTop().color.name());
+                    top.appendChild(color);
+                    object.appendChild(top);
+                    QDomElement pazzle=document.createElement("Pazzle");
+                    pazzle.setAttribute("enable",wall->isPazzle());
+                    color=document.createElement("color");
+                    color.setAttribute("caption",wall->colorPazzle(0).caption);
+                    color.setAttribute("name",wall->colorPazzle(0).color.name());
+                    color.setAttribute("id",0);
+                    pazzle.appendChild(color);
+                    color=document.createElement("color");
+                    color.setAttribute("caption",wall->colorPazzle(1).caption);
+                    color.setAttribute("name",wall->colorPazzle(1).color.name());
+                    color.setAttribute("id",1);
+                    pazzle.appendChild(color);
+                    object.appendChild(pazzle);
+                    QDomElement colorRow=document.createElement("ColorRow");
+                    colorRow.setAttribute("empty",wall->colorListRow().isEmpty());
+                    foreach(COLOR c,wall->colorListRow())
+                    {
+                        color=document.createElement("color");
+                        color.setAttribute("caption",c.caption);
+                        color.setAttribute("name",c.color.name());
+                        colorRow.appendChild(color);
+                    }
+                    object.appendChild(colorRow);
+                    QDomElement decoreit=document.createElement("Decoreit");
+                    decoreit.setAttribute("enable",wall->isDecoreid());
+                    color=document.createElement("color");
+                    color.setAttribute("caption",wall->colorDecoreid().caption);
+                    color.setAttribute("name",wall->colorDecoreid().color.name());
+                    decoreit.appendChild(color);
+                    object.appendChild(decoreit);
+                    QDomElement girthRail=document.createElement("GirthRail");
+                    girthRail.setAttribute("enable",wall->isGirthRail());
+                    object.appendChild(girthRail);
+                    root.appendChild(object);
+                    break;
+                }
+                default:break;
             }
-            default:break;
-        }
     }
+
+    QFile saveFile(nameFile);
+    if(!saveFile.open(QIODevice::WriteOnly|QIODevice::Text))
+        return;
+    QTextStream outFile(&saveFile);
+    outFile<<document.toString();
+    saveFile.close();
+}
+
+void DiagramView::loadPillar(QXmlStreamReader *xml, GraphicsPillarItem *pillar)
+{
+    while(!(xml->isEndElement()&&xml->name()=="Object"))
+    {
+        if(xml->isStartElement())
+        {
+            if(xml->name()=="Point")
+                pillar->setPos(xml->attributes().value("x").toString().toFloat(),
+                               xml->attributes().value("y").toString().toFloat());
+            if(xml->name()=="rotation")
+                pillar->setRotation(xml->attributes().value("value").toString().toFloat());
+            if(xml->name()=="HeightPillar")
+                pillar->setHeight(xml->attributes().value("value").toString().toInt());
+            if(xml->name()=="HeightSide")
+                while(!(xml->isEndElement()&&xml->name()=="HeightSide"))
+                {
+                    if(xml->isStartElement()&&xml->name()=="side")
+                        pillar->setHeightSide(xml->attributes().value("id").toString().toInt(),
+                                              xml->attributes().value("value").toString().toInt());
+                    xml->readNext();
+                }
+            if(xml->name()=="Top")
+            {
+                pillar->setTop((bool)xml->attributes().value("enable").toString().toInt());
+                while(!(xml->isEndElement()&&xml->name()=="Top"))
+                {
+                    if(xml->isStartElement()&&xml->name()=="color")
+                        pillar->setTopColor(COLOR(QColor(xml->attributes().value("name").toString()),
+                                                         xml->attributes().value("caption").toString()));
+                    xml->readNext();
+                }
+            }
+            if(xml->name()=="Pazzle")
+            {
+                pillar->setPazzle((bool)xml->attributes().value("enable").toString().toInt());
+                while(!(xml->isEndElement()&&xml->name()=="Pazzle"))
+                {
+                    if(xml->isStartElement()&&xml->name()=="color")
+                        pillar->setColorPazzle(xml->attributes().value("id").toString().toInt(),
+                                              COLOR(QColor(xml->attributes().value("name").toString()),
+                                                           xml->attributes().value("caption").toString()));
+                    xml->readNext();
+                }
+            }
+            if(xml->name()=="ColorRow")
+            {
+                bool empty=(bool)xml->attributes().value("empty").toString().toInt();
+                if(!empty)
+                    while(!(xml->isEndElement()&&xml->name()=="ColorRow"))
+                    {
+                        if(xml->isStartElement()&&xml->name()=="color")
+                            pillar->addColorRow(COLOR(QColor(xml->attributes().value("name").toString()),
+                                                      xml->attributes().value("caption").toString()));
+                        xml->readNext();
+                    }
+            }
+            if(xml->name()=="Bottom")
+                pillar->setBottomType(xml->attributes().value("type").toString().toInt());
+        }
+        xml->readNext();
+    }
+    int insert[]={pillar->heightSide(0),0,pillar->heightSide(1),0,pillar->heightSide(2),0,
+                  pillar->heightSide(3),0};
+    Calculate calc(this->itemSetting);
+    COLUMN p=calc.GetCountOnColumn(pillar->height(),insert,4);
+    pillar->setText(QString(QString::number(p.count_brick_angle)+" | "+
+                            QString::number(p.count_brick_angle_1+p.count_brick_angle_2+
+                                            p.count_brick_angle_3+p.count_brick_angle_4)));
 }
 
 bool DiagramView::LoadDiagramScene(QString nameFile)
 {
     this->ClearScene();
     QFile loadFile(nameFile);
-    if(!loadFile.open(QIODevice::ReadOnly))
+    if(!loadFile.open(QIODevice::ReadOnly|QIODevice::Text))
         return false;
     Calculate calc(this->itemSetting);
-    QDataStream inFile(&loadFile);
-    int CountItem;
-    inFile>>this->Fundament;
-    inFile>>CountItem;
-    for(int i=0;i<CountItem;i++)
+    QTextStream inFile(&loadFile);
+    QString dataFile=inFile.readAll();
+    QXmlStreamReader xml(dataFile);
+    while(!xml.atEnd())
     {
-        int type;
-        float x=0;
-        float y=0;
-        int buf=0;
-        QString caption;
-        QString colorName;
-        bool logic=false;
-        inFile>>type;
-        switch(type)
+        if(xml.isStartElement())
         {
-            case GraphicsPillarItem::Type:{
-                inFile>>x>>y;
-                GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(this->AppendItem(ITEM_PILLAR,QPointF(x,y)));
-                float angle=0;
-                inFile>>angle;
-                pillar->setRotation(angle);
-                inFile>>buf;
-                pillar->setHeight(buf);
-                inFile>>buf;
-                pillar->setHeightSide(0,buf);
-                inFile>>buf;
-                pillar->setHeightSide(1,buf);
-                inFile>>buf;
-                pillar->setHeightSide(2,buf);
-                inFile>>buf;
-                pillar->setHeightSide(3,buf);
-                inFile>>logic;
-                pillar->setTop(logic);
-                inFile>>caption>>colorName;
-                pillar->setTopColor(COLOR(QColor(colorName),caption));
-                inFile>>logic;
-                pillar->setPazzle(logic);
-                inFile>>caption>>colorName;
-                pillar->setColorPazzle(0,COLOR(QColor(colorName),caption));
-                inFile>>caption>>colorName;
-                pillar->setColorPazzle(1,COLOR(QColor(colorName),caption));
-                inFile>>buf;
-                for(int i=0;i<buf;i++)
+            if(xml.name()=="Object")
+            {
+                switch (xml.attributes().value("type").toString().toInt())
                 {
-                    inFile>>caption>>colorName;
-                    pillar->addColorRow(COLOR(QColor(colorName),caption));
+                    case GraphicsPillarItem::Type:{
+                        GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(this->AppendItem(ITEM_PILLAR,QPointF(0,0)));
+                        this->loadPillar(&xml,pillar);
+                        break;
+                    }
+                    case GraphicsWallItem::Type:{
+                        GraphicsWallItem *wall;
+                        while(!(xml.isEndElement()&&xml.name()=="Object"))
+                        {
+                            if(xml.isStartElement())
+                            {
+                                if(xml.name()=="Point")
+                                {
+                                    this->lineWall=new QGraphicsLineItem(xml.attributes().value("x1").toString().toFloat(),
+                                                                         xml.attributes().value("y1").toString().toFloat(),
+                                                                         xml.attributes().value("x2").toString().toFloat(),
+                                                                         xml.attributes().value("y2").toString().toFloat());
+                                    wall=qgraphicsitem_cast<GraphicsWallItem*>(this->AppendItem(ITEM_WALL,QPointF(0,0)));
+                                }
+                                if(xml.name()=="Height")
+                                    wall->setHeight(xml.attributes().value("value").toString().toInt());
+                                if(xml.name()=="Width")
+                                    wall->setWidth(xml.attributes().value("value").toString().toInt());
+                                if(xml.name()=="Top")
+                                {
+                                    wall->setTop((bool)xml.attributes().value("enable").toString().toInt());
+                                    while(!(xml.isEndElement()&&xml.name()=="Top"))
+                                    {
+                                        if(xml.isStartElement()&&xml.name()=="color")
+                                            wall->setColorTop(COLOR(QColor(xml.attributes().value("name").toString()),
+                                                                    xml.attributes().value("caption").toString()));
+                                        xml.readNext();
+                                    }
+                                }
+                                if(xml.name()=="Pazzle")
+                                {
+                                    wall->setPazzle((bool)xml.attributes().value("enable").toString().toInt());
+                                    while(!(xml.isEndElement()&&xml.name()=="Pazzle"))
+                                    {
+                                        if(xml.isStartElement()&&xml.name()=="color")
+                                            wall->setColorPazzle(xml.attributes().value("id").toString().toInt(),
+                                                                 COLOR(QColor(xml.attributes().value("name").toString()),
+                                                                       xml.attributes().value("caption").toString()));
+                                        xml.readNext();
+                                    }
+                                }
+                                if(xml.name()=="ColorRow")
+                                {
+                                    bool empty=(bool)xml.attributes().value("empty").toString().toInt();
+                                    if(!empty)
+                                        while(!(xml.isEndElement()&&xml.name()=="ColorRow"))
+                                        {
+                                            if(xml.isStartElement()&&xml.name()=="color")
+                                                wall->addColorRow(COLOR(QColor(xml.attributes().value("name").toString()),
+                                                                        xml.attributes().value("caption").toString()));
+                                            xml.readNext();
+                                        }
+                                }
+                                if(xml.name()=="Decoreit")
+                                {
+                                    wall->setDecoreid(xml.attributes().value("enable").toString().toInt());
+                                    while(!(xml.isEndElement()&&xml.name()=="Decoreit"))
+                                    {
+                                        if(xml.isStartElement()&&xml.name()=="color")
+                                            wall->setColorDecoreid(COLOR(QColor(xml.attributes().value("name").toString()),
+                                                                         xml.attributes().value("caption").toString()));
+                                        xml.readNext();
+                                    }
+                                }
+                                if(xml.name()=="GirthRail")
+                                    wall->setGirthRail((bool)xml.attributes().value("enable").toString().toInt());
+                            }
+                            xml.readNext();
+                        }
+                        FENCE f=calc.GetCountOnFence(wall->width(),wall->height(),false);
+                        wall->setText(QString(QString::number(f.count_brick)+" | "+QString::number(f.count_brick_dob)));
+                        break;
+                    }
+                default:break;
                 }
-                inFile>>buf;
-                pillar->setBottomType(buf);
-                int insert[]={pillar->heightSide(0),0,
-                             pillar->heightSide(1),0,
-                              pillar->heightSide(2),0,
-                             pillar->heightSide(3),0};
-                COLUMN p=calc.GetCountOnColumn(pillar->height(),insert,4);
-                pillar->setText(QString(QString::number(p.count_brick_angle)+" | "+
-                                                QString::number(p.count_brick_angle_1+p.count_brick_angle_2+p.count_brick_angle_3+p.count_brick_angle_4)));
-                break;
             }
-            case GraphicsWallItem::Type:{
-                this->lineWall=new QGraphicsLineItem();
-                QLineF line;
-                inFile>>x>>y;   line.setP1(QPointF(x,y));
-                inFile>>x>>y;   line.setP2(QPointF(x,y));
-                this->lineWall=new QGraphicsLineItem(line);
-                GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(this->AppendItem(ITEM_WALL,QPointF(0,0)));
-                inFile>>buf;    wall->setHeight(buf);
-                inFile>>buf;    wall->setWidth(buf);
-                inFile>>logic;  wall->setTop(logic);
-                inFile>>caption>>colorName; wall->setColorTop(COLOR(QColor(colorName),caption));
-                inFile>>logic;  wall->setPazzle(logic);
-                inFile>>caption>>colorName; wall->setColorPazzle(0,COLOR(QColor(colorName),caption));
-                inFile>>caption>>colorName; wall->setColorPazzle(1,COLOR(QColor(colorName),caption));
-                inFile>>buf;  wall->setDecoreid(buf);
-                inFile>>caption>>colorName; wall->setColorDecoreid(COLOR(QColor(colorName),caption));
-                inFile>>buf;
-                for(int i=0;i<buf;i++)
-                {
-                    inFile>>caption>>colorName;
-                    wall->addColorRow(COLOR(QColor(colorName),caption));
-                }
-                inFile>>logic;  wall->setGirthRail(logic);
-                FENCE f=calc.GetCountOnFence(wall->width(),wall->height(),false);
-                wall->setText(QString(QString::number(f.count_brick)+" | "+QString::number(f.count_brick_dob)));
-                break;
-            }
-            default:break;
         }
+        xml.readNext();
     }
     return true;
 }

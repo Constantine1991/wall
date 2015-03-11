@@ -282,12 +282,13 @@ void PropertiesWallWindow::saveSetting()
     if(ui->radioButton_2->isChecked())
     {
         this->wall->setDecoreid(2);
-        this->wall->setColorDecoreid(*this->itemSetting->color.at(ui->comboBox_2->currentIndex()));
+        this->wall->setColorDecoreid(*this->itemSetting->color.at(ui->comboBox_6->currentIndex()));
+        qDebug()<<this->itemSetting->color.at(ui->comboBox_6->currentIndex())->caption;
     }
     if(ui->radioButton_3->isChecked())
     {
         this->wall->setDecoreid(3);
-        this->wall->setColorDecoreid(*this->itemSetting->color.at(ui->comboBox_3->currentIndex()));
+        this->wall->setColorDecoreid(*this->itemSetting->color.at(ui->comboBox_7->currentIndex()));
     }
     emit this->closeProperties(ITEM_WALL,ui->checkBox_2->isChecked());
 }

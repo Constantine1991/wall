@@ -13,6 +13,9 @@
 #include <QPrintDialog>
 #include <qmath.h>
 #include <QFileDialog>
+#include <QDomDocument>
+#include <QDomElement>
+#include <QXmlStreamReader>
 //----------------------//
 #include "listitem.h"
 #include "graphicspillaritem.h"
@@ -66,6 +69,8 @@ private:
     void deleteFilling();
     void changeGroup(GroupItem *g1,GroupItem g2);
     void collidingGroup(QPointF point);
+    void savePillar(QDomDocument *document, QDomElement *parent, GraphicsPillarItem *pillar);
+    void loadPillar(QXmlStreamReader *xml,GraphicsPillarItem *pillar);
 private slots:
     void RotateItem_45();
     void RotateItem_90();
