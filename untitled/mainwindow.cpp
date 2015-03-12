@@ -223,7 +223,7 @@ void MainWindow::on_action_4_activated()//Печать предпросмотр диаграммы
 
 void MainWindow::on_action_5_activated()
 {
-    ui->widget->PrintContract(true,true);
+    ui->widget->PrintContract();
 }
 
 void MainWindow::closeEvent(QCloseEvent *event)

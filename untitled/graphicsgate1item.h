@@ -19,7 +19,10 @@ public:
         return Type;
     }
     void setPosition(QPointF p1,QPointF p2);
+    QPointF posP1();
+    QPointF posP2();
     void setRotate(int angle);
+    int rotationGate();
     void setText(QString text);
     int value();
 protected:

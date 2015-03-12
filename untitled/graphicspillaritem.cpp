@@ -253,10 +253,6 @@ QMenu *GraphicsPillarItem::menuitem()
 void GraphicsPillarItem::setGraphicsPillarItem(GraphicsPillarItem *graphicsItem)
 {
     this->setHeight(graphicsItem->height());
-    this->setHeightSide(GraphicsPillarItem::SIDE_FRONT,graphicsItem->heightSide(GraphicsPillarItem::SIDE_FRONT));
-    this->setHeightSide(GraphicsPillarItem::SIDE_BACK,graphicsItem->heightSide(GraphicsPillarItem::SIDE_BACK));
-    this->setHeightSide(GraphicsPillarItem::SIDE_LIFT,graphicsItem->heightSide(GraphicsPillarItem::SIDE_LIFT));
-    this->setHeightSide(GraphicsPillarItem::SIDE_RIGHT,graphicsItem->heightSide(GraphicsPillarItem::SIDE_RIGHT));
     this->setText(graphicsItem->text());
     this->setTop(graphicsItem->isTop());
     this->setPazzle(graphicsItem->isPazzle());
@@ -268,5 +264,4 @@ void GraphicsPillarItem::setGraphicsPillarItem(GraphicsPillarItem *graphicsItem)
         this->setColorPazzle(1,graphicsItem->colorPazzle(1));
     }
     else this->setColorRow(graphicsItem->colorListRow());
-    this->setBottomType(graphicsItem->isBottomType());
 }

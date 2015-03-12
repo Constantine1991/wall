@@ -36,6 +36,7 @@ public:
     bool isItem(QGraphicsItem *item);
     QList<QGraphicsItem*> items();
     void setRotate(int angle);
+    int rot();
     TYPEGROUP isType();
 public slots:
     void itemMoveScene(QPointF point);

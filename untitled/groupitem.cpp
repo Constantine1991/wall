@@ -580,6 +580,11 @@ void GroupItem::setRotate(int angle)
     this->setPos(this->centre());
 }
 
+int GroupItem::rot()
+{
+    return this->rotation;
+}
+
 void GroupItem::itemMoveScene(QPointF point)
 {
     if(this->type==GroupItem::ITEM_WICKET || this->type==GroupItem::ITEM_GATE1 || this->type==GroupItem::ITEM_GATE2)

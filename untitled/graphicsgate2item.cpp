@@ -50,6 +50,16 @@ void GraphicsGate2Item::setPosition(QPointF p1, QPointF p2)
     this->topLine->setLine(QLineF(p1TopLine,p2TopLine));
 }
 
+QPointF GraphicsGate2Item::posP1()
+{
+    return this->line().p1();
+}
+
+QPointF GraphicsGate2Item::posP2()
+{
+    return this->line().p2();
+}
+
 void GraphicsGate2Item::setRotate(int angle)
 {
     this->rotP1=angle;
@@ -58,6 +68,11 @@ void GraphicsGate2Item::setRotate(int angle)
     this->rotP3=270+angle;
     this->rotP3=this->rotP3>360?this->rotP3-360:this->rotP3;
     this->setPosition(this->line().p1(),this->mirrorLine->line().p1());
+}
+
+int GraphicsGate2Item::rotationGate()
+{
+    return this->rotP1;
 }
 
 void GraphicsGate2Item::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)

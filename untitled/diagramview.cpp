@@ -488,9 +488,8 @@ void DiagramView::SaveDiagramScene(QString nameFile)
     QDomDocument document;
     QDomElement root=document.createElement("data");
     document.appendChild(root);
-    for(int i=this->pDiagramScene->items().count()-1;i>-1;i--)
+    foreach(QGraphicsItem* graphicsItem,this->pDiagramScene->items())
     {
-        QGraphicsItem* graphicsItem=this->pDiagramScene->items().at(i);
         bool saveItem=true;
         foreach(GroupItem *group,this->listGroup)
             if(group->isItem(graphicsItem))
@@ -498,77 +497,132 @@ void DiagramView::SaveDiagramScene(QString nameFile)
                 saveItem=false;
                 break;
             }
-        if(saveItem)
-            switch (graphicsItem->type())
+        if(saveItem && graphicsItem->type()==GraphicsPillarItem::Type)
+        {
+            GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(graphicsItem);
+            this->savePillar(&document,&root,pillar);
+        }
+    }
+    foreach(GroupItem *group,this->listGroup)
+    {
+        QDomElement groupObject=document.createElement("GroupObject");
+        groupObject.setAttribute("type",(int)group->isType());
+        groupObject.setAttribute("x",group->pos().x());
+        groupObject.setAttribute("y",group->pos().y());
+        groupObject.setAttribute("rotation",group->rot());
+        foreach(QGraphicsItem *item,group->items())
+        {
+            switch(item->type())
             {
                 case GraphicsPillarItem::Type:{
-                    GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(graphicsItem);
-                    this->savePillar(&document,&root,pillar);
+                    GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(item);
+                    this->savePillar(&document,&groupObject,pillar);
                     break;
                 }
-                case GraphicsWallItem::Type:{
-                    GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(graphicsItem);
+                case GraphicsWicketItem::Type:{
+                    GraphicsWicketItem *graphicObject=qgraphicsitem_cast<GraphicsWicketItem*>(item);
                     QDomElement object=document.createElement("Object");
-                    object.setAttribute("type",wall->type());
-                    QDomElement point=document.createElement("Point");
-                    point.setAttribute("x1",wall->posP1().x());
-                    point.setAttribute("y1",wall->posP1().y());
-                    point.setAttribute("x2",wall->posP2().x());
-                    point.setAttribute("y2",wall->posP2().y());
-                    object.appendChild(point);
-                    QDomElement height=document.createElement("Height");
-                    height.setAttribute("value",wall->height());
-                    object.appendChild(height);
+                    object.setAttribute("type",graphicObject->type());;
                     QDomElement width=document.createElement("Width");
-                    width.setAttribute("value",wall->width());
+                    width.setAttribute("value",graphicObject->value());
                     object.appendChild(width);
-                    QDomElement top=document.createElement("Top");
-                    top.setAttribute("enable",wall->isTop());
-                    QDomElement color=document.createElement("color");
-                    color.setAttribute("caption",wall->colorTop().caption);
-                    color.setAttribute("name",wall->colorTop().color.name());
-                    top.appendChild(color);
-                    object.appendChild(top);
-                    QDomElement pazzle=document.createElement("Pazzle");
-                    pazzle.setAttribute("enable",wall->isPazzle());
-                    color=document.createElement("color");
-                    color.setAttribute("caption",wall->colorPazzle(0).caption);
-                    color.setAttribute("name",wall->colorPazzle(0).color.name());
-                    color.setAttribute("id",0);
-                    pazzle.appendChild(color);
-                    color=document.createElement("color");
-                    color.setAttribute("caption",wall->colorPazzle(1).caption);
-                    color.setAttribute("name",wall->colorPazzle(1).color.name());
-                    color.setAttribute("id",1);
-                    pazzle.appendChild(color);
-                    object.appendChild(pazzle);
-                    QDomElement colorRow=document.createElement("ColorRow");
-                    colorRow.setAttribute("empty",wall->colorListRow().isEmpty());
-                    foreach(COLOR c,wall->colorListRow())
-                    {
-                        color=document.createElement("color");
-                        color.setAttribute("caption",c.caption);
-                        color.setAttribute("name",c.color.name());
-                        colorRow.appendChild(color);
-                    }
-                    object.appendChild(colorRow);
-                    QDomElement decoreit=document.createElement("Decoreit");
-                    decoreit.setAttribute("enable",wall->isDecoreid());
-                    color=document.createElement("color");
-                    color.setAttribute("caption",wall->colorDecoreid().caption);
-                    color.setAttribute("name",wall->colorDecoreid().color.name());
-                    decoreit.appendChild(color);
-                    object.appendChild(decoreit);
-                    QDomElement girthRail=document.createElement("GirthRail");
-                    girthRail.setAttribute("enable",wall->isGirthRail());
-                    object.appendChild(girthRail);
-                    root.appendChild(object);
+                    groupObject.appendChild(object);
+                    break;
+                }
+                case GraphicsGate1Item::Type:{
+                    GraphicsGate1Item *graphicObject=qgraphicsitem_cast<GraphicsGate1Item*>(item);
+                    QDomElement object=document.createElement("Object");
+                    object.setAttribute("type",graphicObject->type());
+                    QDomElement width=document.createElement("Width");
+                    width.setAttribute("value",graphicObject->value());
+                    object.appendChild(width);
+                    groupObject.appendChild(object);
+                    break;
+                }
+                case GraphicsGate2Item::Type:{
+                    GraphicsGate2Item *graphicObject=qgraphicsitem_cast<GraphicsGate2Item*>(item);
+                    QDomElement object=document.createElement("Object");
+                    object.setAttribute("type",graphicObject->type());
+                    QDomElement width=document.createElement("Width");
+                    width.setAttribute("value",graphicObject->value());
+                    object.appendChild(width);
+                    groupObject.appendChild(object);
                     break;
                 }
                 default:break;
             }
+        }
+        root.appendChild(groupObject);
     }
-
+    foreach(QGraphicsItem *graphicsItem,this->pDiagramScene->items())
+    {
+        bool saveItem=true;
+        foreach(GroupItem *group,this->listGroup)
+            if(group->isItem(graphicsItem))
+            {
+                saveItem=false;
+                break;
+            }
+        if(saveItem && graphicsItem->type()==GraphicsWallItem::Type)
+        {
+            GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(graphicsItem);
+            QDomElement object=document.createElement("Object");
+            object.setAttribute("type",wall->type());
+            QDomElement point=document.createElement("Point");
+            point.setAttribute("x1",wall->posP1().x());
+            point.setAttribute("y1",wall->posP1().y());
+            point.setAttribute("x2",wall->posP2().x());
+            point.setAttribute("y2",wall->posP2().y());
+            object.appendChild(point);
+            QDomElement height=document.createElement("Height");
+            height.setAttribute("value",wall->height());
+            object.appendChild(height);
+            QDomElement width=document.createElement("Width");
+            width.setAttribute("value",wall->width());
+            object.appendChild(width);
+            QDomElement top=document.createElement("Top");
+            top.setAttribute("enable",wall->isTop());
+            QDomElement color=document.createElement("color");
+            color.setAttribute("caption",wall->colorTop().caption);
+            color.setAttribute("name",wall->colorTop().color.name());
+            top.appendChild(color);
+            object.appendChild(top);
+            QDomElement pazzle=document.createElement("Pazzle");
+            pazzle.setAttribute("enable",wall->isPazzle());
+            color=document.createElement("color");
+            color.setAttribute("caption",wall->colorPazzle(0).caption);
+            color.setAttribute("name",wall->colorPazzle(0).color.name());
+            color.setAttribute("id",0);
+            pazzle.appendChild(color);
+            color=document.createElement("color");
+            color.setAttribute("caption",wall->colorPazzle(1).caption);
+            color.setAttribute("name",wall->colorPazzle(1).color.name());
+            color.setAttribute("id",1);
+            pazzle.appendChild(color);
+            object.appendChild(pazzle);
+            QDomElement colorRow=document.createElement("ColorRow");
+            colorRow.setAttribute("empty",wall->colorListRow().isEmpty());
+            foreach(COLOR c,wall->colorListRow())
+            {
+                color=document.createElement("color");
+                color.setAttribute("caption",c.caption);
+                color.setAttribute("name",c.color.name());
+                colorRow.appendChild(color);
+            }
+            object.appendChild(colorRow);
+            QDomElement decoreit=document.createElement("Decoreit");
+            decoreit.setAttribute("enable",wall->isDecoreid());
+            color=document.createElement("color");
+            color.setAttribute("caption",wall->colorDecoreid().caption);
+            color.setAttribute("name",wall->colorDecoreid().color.name());
+            decoreit.appendChild(color);
+            object.appendChild(decoreit);
+            QDomElement girthRail=document.createElement("GirthRail");
+            girthRail.setAttribute("enable",wall->isGirthRail());
+            object.appendChild(girthRail);
+            root.appendChild(object);
+        }
+    }
     QFile saveFile(nameFile);
     if(!saveFile.open(QIODevice::WriteOnly|QIODevice::Text))
         return;
@@ -746,6 +800,122 @@ bool DiagramView::LoadDiagramScene(QString nameFile)
                 default:break;
                 }
             }
+            if(xml.name()=="GroupObject")
+            {
+                this->group=new GroupItem();
+                connect(this,SIGNAL(itemMoveScene(QPointF)),group,SLOT(itemMoveScene(QPointF)));
+                float x=xml.attributes().value("x").toString().toFloat();
+                float y=xml.attributes().value("y").toString().toFloat();
+                int angle=xml.attributes().value("rot").toString().toInt();
+                int type=xml.attributes().value("type").toString().toInt();
+                switch(type)
+                {
+                    case GroupItem::ITEM_WICKET:{
+                        this->group->createGroup(GroupItem::ITEM_WICKET,this->MenuItem,this->pDiagramScene);
+                        break;
+                    }
+                    case GroupItem::ITEM_WICKET_WICKET:{
+                        this->group->createGroup(GroupItem::ITEM_WICKET_WICKET,this->MenuItem,this->pDiagramScene);
+                        break;
+                    }
+                    case GroupItem::ITEM_WICKET_GATE1:{
+                        this->group->createGroup(GroupItem::ITEM_WICKET_GATE1,this->MenuItem,this->pDiagramScene);
+                        break;
+                    }
+                    case GroupItem::ITEM_WICKET_GATE2:{
+                        this->group->createGroup(GroupItem::ITEM_WICKET_GATE2,this->MenuItem,this->pDiagramScene);
+                        break;
+                    }
+                    case GroupItem::ITEM_GATE1:{
+                        this->group->createGroup(GroupItem::ITEM_GATE1,this->MenuItem,this->pDiagramScene);
+                        break;
+                    }
+                    case GroupItem::ITEM_GATE1_GATE1:{
+                        this->group->createGroup(GroupItem::ITEM_GATE1_GATE1,this->MenuItem,this->pDiagramScene);
+                        break;
+                    }
+                    case GroupItem::ITEM_GATE1_GATE2:{
+                        this->group->createGroup(GroupItem::ITEM_GATE1_GATE2,this->MenuItem,this->pDiagramScene);
+                        break;
+                    }
+                    case GroupItem::ITEM_GATE1_WICKET:{
+                        this->group->createGroup(GroupItem::ITEM_GATE1_WICKET,this->MenuItem,this->pDiagramScene);
+                        break;
+                    }
+                    case GroupItem::ITEM_GATE2:{
+                        this->group->createGroup(GroupItem::ITEM_GATE2,this->MenuItem,this->pDiagramScene);
+                        break;
+                    }
+                    case GroupItem::ITEM_GATE2_GATE1:{
+                        this->group->createGroup(GroupItem::ITEM_GATE2_GATE1,this->MenuItem,this->pDiagramScene);
+                        break;
+                    }
+                    case GroupItem::ITEM_GATE2_GATE2:{
+                        this->group->createGroup(GroupItem::ITEM_GATE2_GATE2,this->MenuItem,this->pDiagramScene);
+                        break;
+                    }
+                    case GroupItem::ITEM_GATE2_WICKET:{
+                        this->group->createGroup(GroupItem::ITEM_GATE2_WICKET,this->MenuItem,this->pDiagramScene);
+                        break;
+                    }
+                    default:{
+                        delete this->group;
+                        this->group=NULL;
+                        break;
+                    }
+                }
+                int i=0;
+                while(!(xml.isEndElement()&&xml.name()=="GroupObject"))
+                {
+                    if(xml.isStartElement()&&xml.name()=="Object")
+                    {
+                        switch(xml.attributes().value("type").toString().toInt())
+                        {
+                            case GraphicsPillarItem::Type:{
+                                GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(this->group->items().at(i));
+                                this->loadPillar(&xml,pillar);
+                                break;
+                            }
+                            case GraphicsWicketItem::Type:{
+                                GraphicsWicketItem *groupObject=qgraphicsitem_cast<GraphicsWicketItem*>(this->group->items().at(i));
+                                while(!(xml.isEndElement()&&xml.name()=="Object"))
+                                {
+                                    if(xml.isStartElement()&&xml.name()=="Width")
+                                        groupObject->setText(xml.attributes().value("value").toString());
+                                    xml.readNext();
+                                }
+                                break;
+                            }
+                            case GraphicsGate1Item::Type:{
+                                GraphicsGate1Item *groupObject=qgraphicsitem_cast<GraphicsGate1Item*>(this->group->items().at(i));
+                                while(!(xml.isEndElement()&&xml.name()=="Object"))
+                                {
+                                    if(xml.isStartElement()&&xml.name()=="Width")
+                                        groupObject->setText(xml.attributes().value("value").toString());
+                                    xml.readNext();
+                                }
+                                break;
+                            }
+                            case GraphicsGate2Item::Type:{
+                                GraphicsGate2Item *groupObject=qgraphicsitem_cast<GraphicsGate2Item*>(this->group->items().at(i));
+                                while(!(xml.isEndElement()&&xml.name()=="Object"))
+                                {
+                                    if(xml.isStartElement()&&xml.name()=="Width")
+                                        groupObject->setText(xml.attributes().value("value").toString());
+                                    xml.readNext();
+                                }
+                                break;
+                            }
+                            default:break;
+                        }
+                        i++;
+                    }
+                    xml.readNext();
+                }
+                this->group->setPos(QPointF(x,y));
+                this->group->setRotate(angle);
+                this->listGroup.append(group);
+            }
         }
         xml.readNext();
     }
@@ -800,8 +970,8 @@ void DiagramView::AppendBrickColorPazzle(QList<COLORBRICK*> *colorBrick,int coun
             colorBrick->append(new COLORBRICK(countColor,namedColor));
 }
 
-void DiagramView::PrintContract(bool girth,bool tray)
-{/*
+void DiagramView::PrintContract()
+{
    Calculate calc(this->itemSetting);
    FENCE allFence;
    COLUMN allColumn;
@@ -818,84 +988,58 @@ void DiagramView::PrintContract(bool girth,bool tray)
    countBasePillar[4]=0;
    foreach(QGraphicsItem *itemGraphics,this->pDiagramScene->items())
    {
-       if(itemGraphics->data(1).toInt()==0)
-           continue;
-       ITEM *item=this->itemScene.getItem(itemGraphics->data(1).toInt());
-       switch(item->type)
+       switch(itemGraphics->type())
        {
-            case ITEM_WALL:{
-                FENCE tmpFence=calc.GetCountOnFence(item->wall->width,item->wall->height,true);
+            case GraphicsWallItem::Type:{
+                GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(itemGraphics);
+                FENCE tmpFence=calc.GetCountOnFence(wall->width(),wall->height(),true);
                 allFence.count_brick+=tmpFence.count_brick;
                 allFence.count_brick_dob+=tmpFence.count_brick_dob;
-                if(item->wall->wallTop)
+                if(wall->isTop())
+                {
                     allFence.count_cover+=tmpFence.count_cover;
+                    this->AppendBrickColorPazzle(&colorBrick[2],tmpFence.count_cover,
+                                                 wall->colorTop().caption);
+                }
                 if(tmpFence.count_brick==0)
                     break;
-                foreach(COLOR *color,this->itemSetting->color)
-                    if(color->color==item->wall->colorTop)
-                    {
-                        this->AppendBrickColorPazzle(&colorBrick[2],tmpFence.count_cover,
-                                                     color->caption);
-                        break;
-                    }
-                if(girth)
+                if(wall->isGirthRail())
                 {
-                    countGirthRail[0]=item->wall->width<=this->itemSetting->minWidthGirth?countGirthRail[0]+1:
+                    countGirthRail[0]=wall->width()<=this->itemSetting->minWidthGirth?countGirthRail[0]+1:
                                                                                           countGirthRail[0];
-                    countGirthRail[1]=item->wall->width>this->itemSetting->minWidthGirth?countGirthRail[1]+1:
+                    countGirthRail[1]=wall->width()>this->itemSetting->minWidthGirth?countGirthRail[1]+1:
                                                                                         countGirthRail[1];
                 }
-                if(item->wall->pazzle)
+                if(wall->isPazzle())
                 {
-                    COLORBRICKWALL colorBrickW=calc.colorBrickWall(item->wall->width,item->wall->height);
-                    foreach(COLOR *color,this->itemSetting->color)
-                    {
-                        if(color->color==item->wall->colorPazzle1)
-                        {
-                            this->AppendBrickColorPazzle(&colorBrick[0],colorBrickW.colorBrickBigWall.at(0),
-                                                         color->caption);
-                            this->AppendBrickColorPazzle(&colorBrick[1],colorBrickW.colorBrickSmallWall.at(0),
-                                                         color->caption);
-                        }
-                        if(color->color==item->wall->colorPazzle2)
-                        {
-                            this->AppendBrickColorPazzle(&colorBrick[0],colorBrickW.colorBrickBigWall.at(1),
-                                                         color->caption);
-                            this->AppendBrickColorPazzle(&colorBrick[1],colorBrickW.colorBrickSmallWall.at(1),
-                                                         color->caption);
-                        }
-                    }
+                    COLORBRICKWALL colorBrickW=calc.colorBrickWall(wall->width(),wall->height());
+                    this->AppendBrickColorPazzle(&colorBrick[0],colorBrickW.colorBrickBigWall.at(0),
+                                                 wall->colorPazzle(0).caption);
+                    this->AppendBrickColorPazzle(&colorBrick[1],colorBrickW.colorBrickSmallWall.at(0),
+                                                 wall->colorPazzle(0).caption);
+                    this->AppendBrickColorPazzle(&colorBrick[0],colorBrickW.colorBrickBigWall.at(1),
+                                                 wall->colorPazzle(1).caption);
+                    this->AppendBrickColorPazzle(&colorBrick[1],colorBrickW.colorBrickSmallWall.at(1),
+                                                 wall->colorPazzle(1).caption);
                 }else{
-                    COLORBRICKWALL colorBrickW=calc.colorListBrickWall(item->wall->width,item->wall->height);
-                    for(int i=0;i<item->wall->colorBlocks.count();i++)
+                    COLORBRICKWALL colorBrickW=calc.colorListBrickWall(wall->width(),wall->height());
+                    for(int i=0;i<wall->colorListRow().count();i++)
                     {
-                        foreach(COLOR * colorCaption,this->itemSetting->color)
-                            if(item->wall->colorBlocks.at(i)==colorCaption->color)
-                            {
-                                this->AppendBrickColorPazzle(&colorBrick[0],colorBrickW.colorBrickBigWall.at(i),
-                                                             colorCaption->caption);
-                                this->AppendBrickColorPazzle(&colorBrick[1],colorBrickW.colorBrickSmallWall.at(i),
-                                                             colorCaption->caption);
-                                break;
-                            }
+                        this->AppendBrickColorPazzle(&colorBrick[0],colorBrickW.colorBrickBigWall.at(i),
+                                                     wall->colorRow(i).caption);
+                        this->AppendBrickColorPazzle(&colorBrick[1],colorBrickW.colorBrickSmallWall.at(i),
+                                                     wall->colorRow(i).caption);
                     }
                 }
                 break;
             }
-            case ITEM_PILLAR:{
-                int side[]={item->pillar->insert[0].insertBottom,
-                            item->pillar->insert[1].insertBottom,
-                            item->pillar->insert[2].insertBottom,
-                            item->pillar->insert[3].insertBottom};
-                int insert[]={item->pillar->insert[0].insertBottom,
-                              item->pillar->insert[0].insertTop,
-                              item->pillar->insert[1].insertBottom,
-                              item->pillar->insert[1].insertTop,
-                              item->pillar->insert[2].insertBottom,
-                              item->pillar->insert[2].insertTop,
-                              item->pillar->insert[3].insertBottom,
-                              item->pillar->insert[3].insertTop};
-                COLUMN tmpColumn=calc.GetCountOnColumn(item->pillar->height,insert,4);
+            case GraphicsPillarItem::Type:{
+                GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(itemGraphics);
+                int side[]={pillar->heightSide(0),pillar->heightSide(1),pillar->heightSide(2),
+                            pillar->heightSide(3)};
+                int insert[]={pillar->heightSide(0),0,pillar->heightSide(1),0,pillar->heightSide(2),0,
+                              pillar->heightSide(3),0};
+                COLUMN tmpColumn=calc.GetCountOnColumn(pillar->height(),insert,4);
                 allColumn.count_brick_angle+=tmpColumn.count_brick_angle;
                 allColumn.count_brick_angle_1+=tmpColumn.count_brick_angle_1;
                 allColumn.count_brick_angle_2+=tmpColumn.count_brick_angle_2;
@@ -904,73 +1048,32 @@ void DiagramView::PrintContract(bool girth,bool tray)
                 if(tmpColumn.count_brick_angle+tmpColumn.count_brick_angle_1+tmpColumn.count_brick_angle_2+
                    tmpColumn.count_brick_angle_3+tmpColumn.count_brick_angle_4==0)
                     break;
-                if(tray)
-                {
-                    tmpColumn.count_brick_angle_1=item->pillar->insert[0].insertBottom>0?1:0;
-                    tmpColumn.count_brick_angle_2=item->pillar->insert[1].insertBottom>0?1:0;
-                    tmpColumn.count_brick_angle_3=item->pillar->insert[2].insertBottom>0?1:0;
-                    tmpColumn.count_brick_angle_4=item->pillar->insert[3].insertBottom>0?1:0;
-                    countBasePillar[0]=tmpColumn.count_brick_angle_1+tmpColumn.count_brick_angle_2+
-                                       tmpColumn.count_brick_angle_3+tmpColumn.count_brick_angle_4==0?
-                                       countBasePillar[0]+1:countBasePillar[0];
-                    countBasePillar[1]=tmpColumn.count_brick_angle_1+tmpColumn.count_brick_angle_2+
-                                       tmpColumn.count_brick_angle_3+tmpColumn.count_brick_angle_4==1?
-                                       countBasePillar[1]+1:countBasePillar[1];
-                    countBasePillar[4]=tmpColumn.count_brick_angle_1+tmpColumn.count_brick_angle_2+
-                                       tmpColumn.count_brick_angle_3+tmpColumn.count_brick_angle_4==3?
-                                       countBasePillar[4]+1:countBasePillar[4];
-                    if(tmpColumn.count_brick_angle_1+tmpColumn.count_brick_angle_2==2 ||
-                       tmpColumn.count_brick_angle_3+tmpColumn.count_brick_angle_4==2)
-                        countBasePillar[2]+=1;
-                    if(tmpColumn.count_brick_angle_1+tmpColumn.count_brick_angle_3==2 ||
-                       tmpColumn.count_brick_angle_2+tmpColumn.count_brick_angle_4==2 ||
-                       tmpColumn.count_brick_angle_1+tmpColumn.count_brick_angle_4==2 ||
-                       tmpColumn.count_brick_angle_2+tmpColumn.count_brick_angle_3==2)
-                        countBasePillar[3]+=1;
-                }
-                if(item->pillar->top)
+                if(pillar->isBottomType()!=GraphicsPillarItem::BOTTOM_NONE)
+                    countBasePillar[(int)pillar->isBottomType()]+=1;
+                if(pillar->isTop())
                 {
                     countTop+=1;
-                    foreach(COLOR *colorCaptionTop,this->itemSetting->color)
-                        if(colorCaptionTop->color==item->pillar->colorTop)
-                        {
-                            this->AppendBrickColorPazzle(&colorBrick[3],1,colorCaptionTop->caption);
-                            break;
-                        }
+                    this->AppendBrickColorPazzle(&colorBrick[3],1,pillar->topColor().caption);
                 }
-                if(item->pillar->pazzle)
+                if(pillar->isPazzle())
                 {
-                    COLORBRICKPILLAR colorBrickPillar=calc.colorBrickPillar(item->pillar->height,side);
-                    foreach(COLOR *colorCaption,this->itemSetting->color)
-                    {
-                        if(colorCaption->color==item->pillar->colorPazzle1)
-                        {
-                            this->AppendBrickColorPazzle(&colorBrick[4],colorBrickPillar.colorBrickBigWall.at(0),
-                                                         colorCaption->caption);
-                            this->AppendBrickColorPazzle(&colorBrick[5],colorBrickPillar.colorBrickSmallWall.at(0),
-                                                         colorCaption->caption);
-                        }
-                        if(colorCaption->color==item->pillar->colorPazzle2)
-                        {
-                            this->AppendBrickColorPazzle(&colorBrick[4],colorBrickPillar.colorBrickBigWall.at(1),
-                                                         colorCaption->caption);
-                            this->AppendBrickColorPazzle(&colorBrick[5],colorBrickPillar.colorBrickSmallWall.at(1),
-                                                         colorCaption->caption);
-                        }
-                    }
+                    COLORBRICKPILLAR colorBrickPillar=calc.colorBrickPillar(pillar->height(),side);
+                    this->AppendBrickColorPazzle(&colorBrick[4],colorBrickPillar.colorBrickBigWall.at(0),
+                                                 pillar->colorPazzle(0).caption);
+                    this->AppendBrickColorPazzle(&colorBrick[5],colorBrickPillar.colorBrickSmallWall.at(0),
+                                                 pillar->colorPazzle(0).caption);
+                    this->AppendBrickColorPazzle(&colorBrick[4],colorBrickPillar.colorBrickBigWall.at(1),
+                                                 pillar->colorPazzle(1).caption);
+                    this->AppendBrickColorPazzle(&colorBrick[5],colorBrickPillar.colorBrickSmallWall.at(1),
+                                                 pillar->colorPazzle(1).caption);
                 }else{
-                    COLORBRICKPILLAR colorBrickPillar=calc.colorListBrickPillar(item->pillar->height,side);
-                    for(int i=0;i<item->pillar->colorBlocks.count();i++)
+                    COLORBRICKPILLAR colorBrickPillar=calc.colorListBrickPillar(pillar->height(),side);
+                    for(int i=0;i<pillar->colorListRow().count();i++)
                     {
-                        foreach(COLOR *colorCaption,this->itemSetting->color)
-                            if(colorCaption->color==item->pillar->colorBlocks.at(i))
-                            {
-                                this->AppendBrickColorPazzle(&colorBrick[4],colorBrickPillar.colorBrickBigWall.at(i),
-                                                             colorCaption->caption);
-                                this->AppendBrickColorPazzle(&colorBrick[5],colorBrickPillar.colorBrickSmallWall.at(i),
-                                                             colorCaption->caption);
-                                break;
-                            }
+                        this->AppendBrickColorPazzle(&colorBrick[4],colorBrickPillar.colorBrickBigWall.at(i),
+                                                     pillar->colorRow(i).caption);
+                        this->AppendBrickColorPazzle(&colorBrick[5],colorBrickPillar.colorBrickSmallWall.at(i),
+                                                     pillar->colorRow(i).caption);
                     }
                 }
                 break;
@@ -1023,8 +1126,9 @@ void DiagramView::PrintContract(bool girth,bool tray)
                                      calc.GetCountCoverOnPallet(allFence.count_cover)+
                                      calc.GetCountBaseOnPallet(countBasePillar[0]+countBasePillar[1]+
                                                                countBasePillar[2]+countBasePillar[3]+
-                                                               countBasePillar[4])));*/
+                                                               countBasePillar[4])));
 }
+
 
 void DiagramView::setSettingItem(SETTINGS *itemSetting)
 {
@@ -1091,6 +1195,7 @@ void DiagramView::collidingGroup(QPointF point)
         return;
     GroupItem *moveGroup=new GroupItem();
     QGraphicsItem *item=this->pDiagramScene->selectedItems().at(0);
+    this->pDiagramScene->clearSelection();
     foreach(GroupItem *group,this->listGroup)
         if(group->isItem(item))
         {
@@ -1218,7 +1323,7 @@ void DiagramView::mouseDoubleClickEvent(QMouseEvent *event)
 {
     if(event->button()!=Qt::LeftButton)
         return;
-    QList<QGraphicsItem*>itemGraphics=this->pDiagramScene->selectedItems();//items(this->mapToScene(event->pos()));
+    QList<QGraphicsItem*>itemGraphics=this->pDiagramScene->items(this->mapToScene(event->pos()));
     if(!itemGraphics.isEmpty())
     {
         if(itemGraphics.at(0)->type()==GraphicsPillarItem::Type)
@@ -1227,7 +1332,8 @@ void DiagramView::mouseDoubleClickEvent(QMouseEvent *event)
             PillarWindow->heightBrick=this->itemSetting->heightBrickAngle;
             connect(PillarWindow,SIGNAL(closeProperties(TYPEITEM,bool)),this,SLOT(closeProperties(TYPEITEM,bool)));
             this->itemGraphicsChange=itemGraphics.at(0);
-            PillarWindow->SetPropertiesPillar(qgraphicsitem_cast<GraphicsPillarItem*>(this->itemGraphicsChange),this->itemSetting->color);
+            GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(this->itemGraphicsChange);
+            PillarWindow->SetPropertiesPillar(pillar,this->itemSetting->color);
             PillarWindow->show();
         }
         if(itemGraphics.at(0)->type()==GraphicsWallItem::Type)
@@ -1235,11 +1341,14 @@ void DiagramView::mouseDoubleClickEvent(QMouseEvent *event)
             this->itemGraphicsChange=itemGraphics.at(0);
             GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(this->itemGraphicsChange);
             QGraphicsItem *wallPillar=this->itemToScene(ITEM_PILLAR,wall->line().p1());
-            if(wallPillar!=NULL)
+            QGraphicsItem *wallPillar2=this->itemToScene(ITEM_PILLAR,wall->line().p2());
+            if(wallPillar!=NULL && wallPillar2!=NULL)
             {
 
                 GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(wallPillar);
-                if(pillar->height()>=this->itemSetting->heightBrickAngle)
+                GraphicsPillarItem *pillar2=qgraphicsitem_cast<GraphicsPillarItem*>(wallPillar2);
+                if((pillar->height()>=this->itemSetting->heightBrickAngle)&&
+                   (pillar2->height()>=this->itemSetting->heightBrickAngle))
                 {
                     PropertiesWallWindow *wallWindow=new PropertiesWallWindow(this);
                     connect(wallWindow,SIGNAL(closeProperties(TYPEITEM,bool)),this,SLOT(closeProperties(TYPEITEM,bool)));

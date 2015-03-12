@@ -201,12 +201,17 @@ void GraphicsWallItem::setGraphicsWallItem(GraphicsWallItem *wall)
     this->setHeight(wall->height());
     this->setWidth(wall->width());
     this->setTop(wall->isTop());
-    this->setColorTop(wall->colorTop());
+    if(this->isTop())
+        this->setColorTop(wall->colorTop());
     this->setPazzle(wall->isPazzle());
-    this->setColorPazzle(0,wall->colorPazzle(0));
-    this->setColorPazzle(1,wall->colorPazzle(1));
+    if(this->isPazzle())
+    {
+        this->setColorPazzle(0,wall->colorPazzle(0));
+        this->setColorPazzle(1,wall->colorPazzle(1));
+    }
     this->setColorRowList(wall->colorListRow());
     this->setDecoreid(wall->isDecoreid());
-    this->setColorDecoreid(wall->colorDecoreid());
+    if(this->isDecoreid()!=0)
+        this->setColorDecoreid(wall->colorDecoreid());
     this->setGirthRail(wall->isGirthRail());
 }

@@ -5,7 +5,7 @@ DiagramViewWall::DiagramViewWall(QWidget *parent):QGraphicsView(parent)
     this->GraphicsSceneWall=new QGraphicsScene(QRectF(0,0,600,400),parent);
     this->setScene(this->GraphicsSceneWall);
     this->row=0;
-    this->widthWall=0;
+    this->widthWall=10;
     this->heightWall=0;
     this->topWall=0;
     this->color1=QColor(Qt::white);
@@ -301,19 +301,28 @@ void DiagramViewWall::setHeightPillar(int height)
 void DiagramViewWall::setTopPillar(bool top, COLOR color)
 {
     this->topPillar=top;
-    this->colorTopPillar=color;
+    if(this->topPillar)
+        this->colorTopPillar=color;
+    else this->colorTopPillar=COLOR();
 }
 
 void DiagramViewWall::setPazzlePillar(bool pazzle, COLOR color1, COLOR color2)
 {
     this->pazzlePillar=pazzle;
-    this->colorPazzle1Pillar=color1;
-    this->colorPazzle2Pillar=color2;
+    if(this->pazzlePillar)
+    {
+        this->colorPazzle1Pillar=color1;
+        this->colorPazzle2Pillar=color2;
+    }else{
+        this->colorPazzle1Pillar=COLOR();
+        this->colorPazzle2Pillar=COLOR();
+    }
 }
 
 void DiagramViewWall::setColorListPillar(QList<COLOR> colorList)
 {
-    this->colorList=colorList;
+    if(!colorList.isEmpty())
+        this->colorList=colorList;
 }
 
 void DiagramViewWall::createPillar()
@@ -325,7 +334,6 @@ void DiagramViewWall::createPillar()
     int heightD=this->heightPillar-this->heightWall;
     int dy=y-this->heightWall+heightop-heightD;
     int x=90;
-    y-=15;
     int countD=qRound(this->widthWall/10);
     if(d1 && heightD!=0)
     {
@@ -395,11 +403,11 @@ void DiagramViewWall::createPillar()
         itemGraphicsBrickBig->setPen(QPen(Qt::black, 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
         if(i % 2 ==0)
         {
-            itemGraphicsBrickSmall->setRect(50,y,15,25);
-            itemGraphicsBrickBig->setRect(65,y,25,25);
+            itemGraphicsBrickSmall->setRect(50,y,15,10);
+            itemGraphicsBrickBig->setRect(65,y,25,10);
         }else{
-            itemGraphicsBrickBig->setRect(50,y,25,25);
-            itemGraphicsBrickSmall->setRect(75,y,15,25);
+            itemGraphicsBrickBig->setRect(50,y,25,10);
+            itemGraphicsBrickSmall->setRect(75,y,15,10);
         }
         if(!this->pazzlePillar)
         {
@@ -426,10 +434,11 @@ void DiagramViewWall::createPillar()
         }
         this->GraphicsSceneWall->addItem(itemGraphicsBrickSmall);
         this->GraphicsSceneWall->addItem(itemGraphicsBrickBig);
-        y-=25;
+        y-=10;
     }
     if(this->topPillar)
     {
+        y-=15;
         QPolygonF polygon;
         polygon<<QPointF(20.0f,0.0f)<<QPointF(0,20)<<QPointF(40,20);
         QGraphicsPolygonItem *itemTopGraphics=new QGraphicsPolygonItem(polygon);

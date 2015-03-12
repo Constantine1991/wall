@@ -22,6 +22,13 @@ void PropertiesPillarWindow::SetPropertiesPillar(GraphicsPillarItem *item, QList
     this->Pillar=item;
     this->listColor=listColor;
     ui->lineEdit->setText(QString::number(this->Pillar->height()));
+    if(this->Pillar->height()==0)
+    {
+        this->Pillar->setHeightSide(0,0);
+        this->Pillar->setHeightSide(1,0);
+        this->Pillar->setHeightSide(2,0);
+        this->Pillar->setHeightSide(3,0);
+    }
     ui->lineEdit_3->setText(QString::number(this->Pillar->heightSide(GraphicsPillarItem::SIDE_FRONT)));
     ui->checkBox->setChecked(this->Pillar->isTop());
     ui->comboBox_2->setEnabled(this->Pillar->isTop());
@@ -122,6 +129,7 @@ void PropertiesPillarWindow::on_comboBox_activated(int index)
 {
     this->Pillar->setHeightSide(this->lastIndexCheckBox,ui->lineEdit_3->text().toInt());
     ui->widget->setRenderingSide(index);
+    ui->lineEdit_3->clear();
     ui->lineEdit_3->setText(QString::number(this->Pillar->heightSide(index)));
     this->lastIndexCheckBox=index;
 
@@ -213,6 +221,9 @@ void PropertiesPillarWindow::saveSetting()
     {
         this->Pillar->setHeight(ui->lineEdit->text().toInt());
         this->Pillar->setHeightSide(ui->comboBox->currentIndex(),ui->lineEdit_3->text().toInt());
+        for(int i=0;i<4;i++)
+            if((this->Pillar->heightSide(i)>this->Pillar->height()|| (this->Pillar->heightSide(i)<0)))
+                this->Pillar->setHeightSide(i,0);
         this->Pillar->setTop(ui->checkBox->isChecked());
         this->Pillar->setTopColor(*this->listColor.at(ui->comboBox_2->currentIndex()));
         this->Pillar->setPazzle(ui->checkBox_5->isChecked());

@@ -43,7 +43,7 @@ QPointF GraphicsWicketItem::position()
     return this->line().p1();
 }
 
-float GraphicsWicketItem::rotationWicket()
+int GraphicsWicketItem::rotationWicket()
 {
     return this->rot-130;
 }

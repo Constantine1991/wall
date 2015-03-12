@@ -41,11 +41,26 @@ void GraphicsGate1Item::setPosition(QPointF p1, QPointF p2)
     this->childGate->setLine(QLineF(p2,point2));
 }
 
+QPointF GraphicsGate1Item::posP1()
+{
+    return this->line().p1();
+}
+
+QPointF GraphicsGate1Item::posP2()
+{
+    return this->line().p2();
+}
+
 void GraphicsGate1Item::setRotate(int angle)
 {
     this->rotP1=130+angle;
     this->rotP2=50+angle;
     this->setPosition(this->line().p1(),this->childGate->line().p1());
+}
+
+int GraphicsGate1Item::rotationGate()
+{
+    return this->rotP1-130;
 }
 
 void GraphicsGate1Item::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)

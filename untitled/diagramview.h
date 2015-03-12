@@ -85,7 +85,7 @@ public:
     void SaveDiagramScene(QString nameFile);
     bool LoadDiagramScene(QString nameFile);
     void PrintDiagram();
-    void PrintContract(bool girth, bool tray);
+    void PrintContract();
     void setSettingItem(SETTINGS *itemSetting);
     void SaveSettingItem();
     SETTINGS *LoadSettingItem();
