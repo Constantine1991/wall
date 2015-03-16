@@ -106,19 +106,28 @@ void MainWindow::on_pushButton_2_clicked()
     ui->widget->setTypeItem(ITEM_WALL);
 }
 
+void MainWindow::isTypeComponent(TYPEITEM type, int width)
+{
+    if(type==ITEM_NONE || width==0)
+        return;
+    ui->widget->setTypeItem(type,width);
+}
+
 void MainWindow::on_pushButton_3_clicked()
 {
-   ui->widget->setTypeItem(ITEM_GATE_A);
+    Component *c=new Component(this);
+    connect(c,SIGNAL(isTypeComponent(TYPEITEM,int)),this,SLOT(isTypeComponent(TYPEITEM,int)));
+    c->show();
 }
 
 void MainWindow::on_pushButton_4_clicked()
 {
-   ui->widget->setTypeItem(ITEM_GATE_B);
+
 }
 
 void MainWindow::on_pushButton_5_clicked()
 {
-   ui->widget->setTypeItem(ITEM_WICKET);
+
 }
 
 void MainWindow::on_action_6_activated()

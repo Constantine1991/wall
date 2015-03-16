@@ -113,7 +113,7 @@ QList<QGraphicsItem*> GroupItem::create(TYPEGROUP type, QMenu *menu)
     return result;
 }
 
-void GroupItem::createGroup(TYPEGROUP type, QMenu *menu, QGraphicsScene *scene)
+void GroupItem::createGroup(TYPEGROUP type,QMenu *menu, QGraphicsScene *scene)
 {
     QList<QGraphicsItem*> newGroup=this->create(type,menu);
     this->group.clear();
@@ -443,6 +443,18 @@ void GroupItem::setPos(QPointF point)
         default:break;
     }
 
+}
+
+void GroupItem::setPosItem(QPointF point, QGraphicsItem *item)
+{
+    if(this->type==GroupItem::ITEM_NONE)
+        return;
+    int at=this->group.indexOf(item);
+    at=at==0?1:-1;
+    if((int)this->type<3)
+        this->setBoundingLine(QLineF(point,QPointF(point.x()+80*at,point.y())));
+    else this->setBoundingLine(QLineF(point,QPointF(point.x()+160*at,point.y())));
+    this->setPos(this->centre());
 }
 
 QPointF GroupItem::pos()

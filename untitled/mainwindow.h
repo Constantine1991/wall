@@ -10,6 +10,7 @@
 #include "propertiespillarwindow.h"
 #include "settingswindow.h"
 #include "about.h"
+#include "component.h"
 
 namespace Ui {
 class MainWindow;
@@ -47,7 +48,7 @@ private slots:
     void on_action_8_activated();
 
     void on_pushButton_8_clicked();
-
+    void isTypeComponent(TYPEITEM type,int width);
 protected:
     void closeEvent(QCloseEvent *event);
 private:

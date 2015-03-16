@@ -29,13 +29,13 @@ SOURCES += \
     about.cpp \
     cryptxor.cpp \
     activationform.cpp \
-    interval.cpp \
-    typecomponent.cpp \
     graphicswallitem.cpp \
     graphicswicketitem.cpp \
     groupitem.cpp \
     graphicsgate1item.cpp \
-    graphicsgate2item.cpp
+    graphicsgate2item.cpp \
+    interval.cpp \
+    component.cpp
 
 HEADERS  += \
     settingswindow.h \
@@ -55,12 +55,12 @@ HEADERS  += \
     about.h \
     cryptxor.h \
     activationform.h \
-    interval.h \
-    typecomponent.h \
     graphicswicketitem.h \
     groupitem.h \
     graphicsgate1item.h \
-    graphicsgate2item.h
+    graphicsgate2item.h \
+    interval.h \
+    component.h
 
 FORMS    += \
     settingswindow.ui \
@@ -70,7 +70,7 @@ FORMS    += \
     about.ui \
     activationform.ui \
     interval.ui \
-    typecomponent.ui
+    component.ui
 
 RESOURCES += \
     res.qrc

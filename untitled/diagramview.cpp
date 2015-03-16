@@ -7,7 +7,7 @@
 
 DiagramView::DiagramView(QWidget *parent):QGraphicsView(parent)
 {
-
+    this->widthGroup=0;
     this->setMouseTracking(true);
     this->pDiagramScene=new QGraphicsScene(QRectF(0,0,8000,8000),parent);
     this->setScene(this->pDiagramScene);
@@ -99,6 +99,8 @@ QGraphicsItem* DiagramView::AppendItem(TYPEITEM typeItem, QPointF point)
             connect(this,SIGNAL(itemMoveScene(QPointF)),group,SLOT(itemMoveScene(QPointF)));
             group->createGroup(GroupItem::ITEM_GATE1,this->MenuItem,this->pDiagramScene);
             group->setPos(point);
+            GraphicsGate1Item *g=qgraphicsitem_cast<GraphicsGate1Item*>(group->items().at(2));
+            g->setText(QString::number(this->widthGroup));
             this->listGroup.append(group);
             return NULL;
         }
@@ -106,6 +108,8 @@ QGraphicsItem* DiagramView::AppendItem(TYPEITEM typeItem, QPointF point)
             group=new GroupItem();
             connect(this,SIGNAL(itemMoveScene(QPointF)),group,SLOT(itemMoveScene(QPointF)));
             group->createGroup(GroupItem::ITEM_GATE2,this->MenuItem,this->pDiagramScene);
+            GraphicsGate2Item *g=qgraphicsitem_cast<GraphicsGate2Item*>(group->items().at(2));
+            g->setText(QString::number(this->widthGroup));
             group->setPos(point);
             this->listGroup.append(group);
             return NULL;
@@ -114,6 +118,8 @@ QGraphicsItem* DiagramView::AppendItem(TYPEITEM typeItem, QPointF point)
             group=new GroupItem();
             connect(this,SIGNAL(itemMoveScene(QPointF)),group,SLOT(itemMoveScene(QPointF)));
             group->createGroup(GroupItem::ITEM_WICKET,this->MenuItem,this->pDiagramScene);
+            GraphicsWicketItem *w=qgraphicsitem_cast<GraphicsWicketItem*>(group->items().at(2));
+            w->setText(QString::number(this->widthGroup));
             group->setPos(point);
             this->listGroup.append(group);
             return NULL;
@@ -122,7 +128,7 @@ QGraphicsItem* DiagramView::AppendItem(TYPEITEM typeItem, QPointF point)
     }
 }
 
-void DiagramView::AppendItem(GroupItem::TYPEGROUP typeGroup, QPointF point)
+void DiagramView::AppendItem(GroupItem::TYPEGROUP typeGroup,QPointF point)
 {
     group=new GroupItem();
     connect(this,SIGNAL(itemMoveScene(QPointF)),group,SLOT(itemMoveScene(QPointF)));
@@ -151,20 +157,6 @@ QPointF DiagramView::centerItem(QGraphicsItem *itemGraphics)
     int x=itemGraphics->pos().x()+(itemGraphics->boundingRect().width()/2*TableAngle[0][(int)itemGraphics->rotation()/45]);
     int y=itemGraphics->pos().y()+(itemGraphics->boundingRect().height()/2*TableAngle[1][(int)itemGraphics->rotation()/45]);
     return QPointF(x,y);
-}
-
-void DiagramView::changeLine(ITEM *parentItem,QGraphicsItem *itemGraphics)
-{
-    foreach(CHILD *child,parentItem->child)
-        if(child->resize)
-        {
-            GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(child->itemChild);
-            if(this->distancePointToPoint(itemGraphics->pos(),wall->line().p1())<this->distancePointToPoint(itemGraphics->pos(),wall->line().p2()))
-                wall->setLine(QLineF(this->centerItem(itemGraphics), wall->line().p2()));
-            else
-                wall->setLine(QLineF(wall->line().p1(),this->centerItem(itemGraphics)));
-
-        }
 }
 
 //-----------------------------------SLOTS---------------------------------------------------//
@@ -220,35 +212,18 @@ void DiagramView::Delete_Item()
 
 void DiagramView::setInterval(float interval, bool empty)
 {
-   /* if(empty || interval<this->itemSetting->maxWidthBrickR*10+350)
-    {
-        this->deleteFilling();
-        return;
-    }
-    QList<QGraphicsItem*> items=this->pDiagramScene->collidingItems(this->lineFilling);
-    if(items.empty())
+    if(empty || interval<this->itemSetting->maxWidthBrickR+35)
     {
         this->deleteFilling();
         return;
     }
     QGraphicsItem *ObjectA,*ObjectB;
-    ObjectA=ObjectB=NULL;
-    foreach(QGraphicsItem *graphicsItem,items)
-    {
-        if(graphicsItem->data(1).toInt()==0)
-            continue;
-        if(this->itemScene.getItem(graphicsItem->data(1).toInt())->type==ITEM_PILLAR &&
-           this->coliding(graphicsItem,this->lineFilling->line().p1()))
-            ObjectA=graphicsItem;
-        if(this->itemScene.getItem(graphicsItem->data(1).toInt())->type==ITEM_PILLAR &&
-           this->coliding(graphicsItem,this->lineFilling->line().p2()))
-            ObjectB=graphicsItem;
-        if(ObjectA!=NULL && ObjectB!=NULL)
-            break;
-    }
+    ObjectA=this->itemToScene(ITEM_PILLAR,this->lineFilling->line().p1());
+    ObjectB=this->itemToScene(ITEM_PILLAR,this->lineFilling->line().p2());
     this->deleteFilling();
     if(ObjectA!=NULL && ObjectB!=NULL)
-        this->Filling(ObjectA,ObjectB,interval);*/
+        this->Filling(qgraphicsitem_cast<GraphicsPillarItem*>(ObjectA),
+                      qgraphicsitem_cast<GraphicsPillarItem*>(ObjectB),interval);
 }
 
 void DiagramView::deleteFilling()
@@ -274,146 +249,100 @@ QPointF DiagramView::rotatePoint(QPointF center, QPointF point,float angle)
                   center.y()+(point.y()-center.y())*::cos(angle*PI/180)+(point.x()-center.x())*::sin(angle*PI/180));
 }
 
-GraphicsPillarItem *DiagramView::createPillar(QPoint pointScene)
+void DiagramView::Filling(GraphicsPillarItem *a, GraphicsPillarItem *b,float interval)
 {
-    GraphicsPillarItem *PillarItem=new GraphicsPillarItem(this->MenuItem);
-    PillarItem->setPos(pointScene.x(),pointScene.y());
-    /*PillarItem->setData(1,QVariant(this->currentIdItem));
-    this->itemScene.AppendItem(this->currentIdItem,ITEM_PILLAR);
-    this->pDiagramScene->addItem(PillarItem);
-    PillarItem->itemGraphicsText()->setPos(pointScene.x()-30,pointScene.y());
-    this->pDiagramScene->addItem(PillarItem->itemGraphicsText());
-    PillarItem->itemGraphicsLine()->setLine(QLineF(PillarItem->itemGraphicsText()->pos(),PillarItem->pos()));
-    this->pDiagramScene->addItem(PillarItem->itemGraphicsLine());*/
-    this->currentIdItem++;
-    return PillarItem;
-}
-
-GraphicsWallItem *DiagramView::createWall(QPointF pointSceneA, QPointF pointSceneB)
-{
-    GraphicsWallItem *w=new GraphicsWallItem(this->MenuItem);
-    /*w->setLine(QLineF(pointSceneA.x(),pointSceneA.y(),pointSceneB.x(),pointSceneB.y()));
-    w->setData(1,QVariant(this->currentIdItem));
-    this->itemScene.AppendItem(this->currentIdItem,ITEM_WALL);
-    this->itemScene.getItem(this->currentIdItem)->wall->d=0;
-    this->pDiagramScene->addItem(WallItem);
-    this->currentIdItem++;
-    WallItem->itemGraphicsText()->setPos(WallItem->centre().x()-30,WallItem->centre().y()-30);
-    this->pDiagramScene->addItem(WallItem->itemGraphicsText());
-    WallItem->itemGraphicsLine()->setLine(QLineF(WallItem->itemGraphicsText()->pos(),WallItem->centre()));
-    this->pDiagramScene->addItem(WallItem->itemGraphicsLine());*/
-    return w;
-}
-
-void DiagramView::appendChildObject(QGraphicsItem *a, QGraphicsItem *b, QGraphicsItem *l)
-{
- /*   this->itemScene.AppendChild(a->data(1).toInt(),new CHILD(l->data(1).toInt(),true,l));
-    this->itemScene.AppendChild(b->data(1).toInt(),new CHILD(l->data(1).toInt(),true,l));
-    this->itemScene.AppendChild(l->data(1).toInt(),new CHILD(a->data(1).toInt(),false,NULL));
-    this->itemScene.AppendChild(l->data(1).toInt(),new CHILD(b->data(1).toInt(),false,NULL));*/
-}
-
-void DiagramView::changeGroup(GroupItem *g1, GroupItem g2)
-{
-}
-
-void DiagramView::Filling(QGraphicsItem *a, QGraphicsItem *b,float interval)
-{/*
     QPointF posA,posB,point;
-    bool gate=false;
-    posA=this->centerItem(a);
-    posB=this->centerItem(b);
+    posA=a->centre();
+    posB=b->centre();
+    GroupItem *groupItem=new GroupItem();
+    groupItem->setType(GroupItem::ITEM_NONE);
+    foreach(GroupItem *group,this->listGroup)
+        if(group->isItem(b))
+        {
+            groupItem=group;
+            break;
+        }
     float angle=::atan2(posA.y()-posB.y(),posA.x()-posB.x())/PI*180;
     angle=angle<0?angle+360:angle;
-    int countObject=qFloor(interval/(this->itemSetting->maxWidthGirth*10+350));
-    int intervalRest=interval-(this->itemSetting->maxWidthGirth*10+350)*countObject;
+    int countObject=qFloor(interval/(this->itemSetting->maxWidthGirth+35));
+    int residue=interval-(this->itemSetting->maxWidthGirth+35)*countObject;
     float distance=a->boundingRect().width()+50;
-    GraphicsPillarItem *pillar;
-    GraphicsWallItem *wall;
     for(int i=0;i<countObject-1;i++)
     {
         point=this->rotatePoint(posA,QPointF(posA.x()-(distance*(i+1)),posA.y()),angle);
-        pillar=this->createPillar(QPoint(point.x()-a->boundingRect().width()/2,
-                                                             point.y()-a->boundingRect().height()/2));
-        wall=this->createWall(this->centerItem(a),point);
-        this->itemScene.getItem(wall->data(1).toInt())->wall->width=this->itemSetting->maxWidthGirth;
-        this->appendChildObject(a,pillar,wall);
+        point.setX(point.x()-b->boundingRect().width()/2);
+        point.setY(point.y()-b->boundingRect().height()/2);
+        GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(this->AppendItem(ITEM_PILLAR,point));
+        this->lineWall=new QGraphicsLineItem(QLineF(a->centre(),pillar->centre()));
+        GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(this->AppendItem(ITEM_WALL,QPointF(0,0)));
+        wall->setGirthRail(true);
+        wall->setWidth(this->itemSetting->maxWidthGirth);
         a=pillar;
     }
-    if(intervalRest==0)
+    if(residue==0)
     {
         point=this->rotatePoint(posA,QPointF(posA.x()-distance*countObject,posA.y()),angle);
-        ITEM *logicItem=this->itemScene.getItem(b->data(1).toInt());
-        foreach(CHILD *child,logicItem->child)
-        {
-            if(this->itemScene.getItem(child->idChild)->type!=ITEM_PILLAR ||
-               this->itemScene.getItem(child->idChild)->type!=ITEM_WALL)
-            {
-                this->changeGroup(child->itemChild,point);
-                gate=true;
-                break;
-            }
-        }
-        if(!gate)
-            b->setPos(point.x()-b->boundingRect().width()/2,point.y()-b->boundingRect().height()/2);
-        wall=this->createWall(this->centerItem(a),point);
-        this->itemScene.getItem(wall->data(1).toInt())->wall->width=this->itemSetting->maxWidthGirth;
-        this->appendChildObject(a,b,wall);
+        point.setX(point.x()-b->boundingRect().width()/2);
+        point.setY(point.y()-b->boundingRect().height()/2);
+        b->setPos(point);
+        if(groupItem->isType()!=GroupItem::ITEM_NONE)
+            groupItem->setPosItem(b->centre(),b);
+        this->lineWall=new QGraphicsLineItem(QLineF(a->centre(),b->centre()));
+        GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(this->AppendItem(ITEM_WALL,QPointF(0,0)));
+        wall->setGirthRail(true);
+        wall->setWidth(this->itemSetting->maxWidthGirth);
         return;
     }
     if(countObject!=0)
     {
         point=this->rotatePoint(posA,QPointF(posA.x()-distance*countObject,posA.y()),angle);
-        pillar=this->createPillar(QPoint(point.x()-a->boundingRect().width()/2,
-                                                             point.y()-a->boundingRect().height()/2));
-        wall=this->createWall(this->centerItem(a),point);
-        this->itemScene.getItem(wall->data(1).toInt())->wall->width=this->itemSetting->maxWidthGirth;
-        this->appendChildObject(a,pillar,wall);
+        point.setX(point.x()-b->boundingRect().width()/2);
+        point.setY(point.y()-b->boundingRect().height()/2);
+        GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(this->AppendItem(ITEM_PILLAR,point));
+        this->lineWall=new QGraphicsLineItem(QLineF(a->centre(),pillar->centre()));
+        GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(this->AppendItem(ITEM_WALL,QPointF(0,0)));
+        wall->setGirthRail(true);
+        wall->setWidth(this->itemSetting->maxWidthGirth);
         a=pillar;
     }
     int grith=0;
-    if(intervalRest>this->itemSetting->minWidthBrickR*10+350)
+    if(residue>this->itemSetting->minWidthBrickR+35)
     {
-        for(int i=this->itemSetting->maxWidthBrickR*10+350;i<=this->itemSetting->maxWidthGirth*10+350;i+=150)
-            if(i>=intervalRest)
+        for(int i=this->itemSetting->maxWidthBrickR+35;i<=this->itemSetting->maxWidthGirth+35;i+=15)
+            if(i>=residue)
             {
                 grith=i;
                 break;
             }
     }else{
-        if(intervalRest>=qFloor(this->itemSetting->minWidthBrickR/2)*10)
-            grith=this->itemSetting->minWidthBrickR*10+350;
+        if(residue>=qFloor(this->itemSetting->minWidthBrickR/2))
+            grith=this->itemSetting->minWidthBrickR+35;
     }
     if(grith>0)
     {
         point=this->rotatePoint(posA,QPointF(posA.x()-distance*(countObject+1),posA.y()),angle);
-        ITEM *logicItem=this->itemScene.getItem(b->data(1).toInt());
-        foreach(CHILD *child,logicItem->child)
-        {
-            if(this->itemScene.getItem(child->idChild)->type!=ITEM_PILLAR ||
-               this->itemScene.getItem(child->idChild)->type!=ITEM_WALL)
-            {
-                this->changeGroup(child->itemChild,point);
-                gate=true;
-                break;
-            }
-        }
-        if(!gate)
-            b->setPos(point.x()-b->boundingRect().width()/2,point.y()-b->boundingRect().height()/2);
-        wall=this->createWall(this->centerItem(a),point);
-        this->itemScene.getItem(wall->data(1).toInt())->wall->width=(grith-350)/10;
-        this->appendChildObject(a,b,wall);
-    } else{
-        this->pDiagramScene->clearSelection();
-        b->setSelected(true);
-        this->Delete_Item();
-    }*/
+        point.setX(point.x()-b->boundingRect().width()/2);
+        point.setY(point.y()-b->boundingRect().height()/2);
+        b->setPos(point);
+        if(groupItem->isType()!=GroupItem::ITEM_NONE)
+            groupItem->setPosItem(b->centre(),b);
+        this->lineWall=new QGraphicsLineItem(QLineF(a->centre(),b->centre()));
+        GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(this->AppendItem(ITEM_WALL,QPointF(0,0)));
+        wall->setGirthRail(true);
+        wall->setWidth(grith-35);
+    }
 }
 /*-----------------------------------------public-------------------------------------------*/
 
 void DiagramView::setTypeItem(TYPEITEM type)
 {
     this->typeITEM=type;
+}
+
+void DiagramView::setTypeItem(TYPEITEM type, int interval)
+{
+    this->typeITEM=type;
+    this->widthGroup=interval;
 }
 
 void DiagramView::ClearScene()
@@ -488,6 +417,9 @@ void DiagramView::SaveDiagramScene(QString nameFile)
     QDomDocument document;
     QDomElement root=document.createElement("data");
     document.appendChild(root);
+    QDomElement f=document.createElement("Fundament");
+    f.setAttribute("value",this->Fundament);
+    root.appendChild(f);
     foreach(QGraphicsItem* graphicsItem,this->pDiagramScene->items())
     {
         bool saveItem=true;
@@ -715,6 +647,8 @@ bool DiagramView::LoadDiagramScene(QString nameFile)
     {
         if(xml.isStartElement())
         {
+            if(xml.name()=="Fundament")
+                this->Fundament=(bool)xml.attributes().value("value").toString().toInt();
             if(xml.name()=="Object")
             {
                 switch (xml.attributes().value("type").toString().toInt())
@@ -1185,10 +1119,6 @@ void DiagramView::closeProperties(TYPEITEM itemType,bool all)
     }
 }
 
-void DiagramView::component(TYPEITEM typeItem, int width)
-{
-}
-
 void DiagramView::collidingGroup(QPointF point)
 {
     if(this->pDiagramScene->selectedItems().isEmpty())
@@ -1271,13 +1201,7 @@ void DiagramView::mousePressEvent(QMouseEvent *event)
         this->lineFilling->setFlag(QGraphicsItem::ItemIsSelectable,true);
         this->pDiagramScene->addItem(this->lineFilling);
         this->pDiagramScene->clearSelection();
-    }/*
-    if(this->typeITEM==ITEM_UNIVER)
-    {
-        TypeComponent *typeComponent=new TypeComponent(this);
-        connect(typeComponent,SIGNAL(component(TYPEITEM,int)),this,SLOT(component(TYPEITEM,int)));
-        typeComponent->show();
-    }*/
+    }
     QGraphicsView::mousePressEvent(event);
 }
 
@@ -1307,13 +1231,13 @@ void DiagramView::mouseReleaseEvent(QMouseEvent *event)
         this->lineWall->setLine(QLineF(this->lineWall->line().p1(),this->mapToScene(event->pos())));
         this->AppendItem(ITEM_WALL,QPointF(0,0));
     }
-   /* if(this->typeITEM==ITEM_FILLING)
+    if(this->typeITEM==ITEM_FILLING)
     {
         this->lineFilling->setLine(QLineF(this->lineFilling->line().p1(),this->mapToScene(event->pos())));
         Interval *setIntervalWindow=new Interval(this);
-        connect(setIntervalWindow,SIGNAL(closeDialog(float,bool)),this,SLOT(setInterval(float,bool)));
+        connect(setIntervalWindow,SIGNAL(setInterval(float,bool)),this,SLOT(setInterval(float,bool)));
         setIntervalWindow->show();
-    }*/
+    }
     this->typeITEM=ITEM_NONE;
     QApplication::restoreOverrideCursor();
     QGraphicsView::mouseReleaseEvent(event);

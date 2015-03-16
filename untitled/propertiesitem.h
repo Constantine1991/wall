@@ -85,7 +85,6 @@ typedef enum _TYPEITEM{ // Типы объектов
     ITEM_TEXT        = 6,
     ITEM_FILLING     = 7,// Автоматическое заполнение
     ITEM_LINE        = 9,// Линейка
-    ITEM_UNIVER      = 10,
     ITEM_NONE        = 0
 }TYPEITEM;
 
