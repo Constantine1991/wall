@@ -4,6 +4,9 @@
 GraphicsPillarItem::GraphicsPillarItem(QMenu *menuItem, QGraphicsItem *parent, QGraphicsScene *scene)
     :QGraphicsEllipseItem(parent, scene)
 {
+    this->isBackUp=false;
+    this->mouseRelease=false;
+    this->enabledBackUp=false;
     this->itemText=new QGraphicsTextItem();
     this->itemText->setPos(0,0);
     this->setBrush(QBrush(Qt::white));
@@ -51,6 +54,12 @@ QVariant GraphicsPillarItem::itemChange(GraphicsItemChange change, const QVarian
 {
     if(change==QGraphicsItem::ItemPositionChange || change==QGraphicsItem::ItemRotationChange)
     {
+        if(this->mouseRelease && this->enabledBackUp && !this->isBackUp)
+        {
+            this->lastPos.append(this->pos());
+            qDebug()<<"append pos:"<<this->pos();
+            this->mouseRelease=false;
+        }
         foreach(GraphicsWallItem *changeline,this->listWall.keys())
         {
             if(this->listWall.value(changeline))
@@ -70,6 +79,14 @@ void GraphicsPillarItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
     this->menuItem->actions().at(2)->setVisible(false);
     this->menuItem->actions().at(3)->setVisible(false);
     this->menuItem->exec(event->screenPos());
+}
+
+void GraphicsPillarItem::mouseReleaseEvent(QGraphicsSceneMouseEvent *event)
+{
+    if(event->button()!=Qt::LeftButton)
+        return;
+    this->mouseRelease=true;
+    QGraphicsItem::mouseReleaseEvent(event);
 }
 
 void GraphicsPillarItem::setHeight(int height)
@@ -248,6 +265,39 @@ COLOR GraphicsPillarItem::colorPazzle(int number)
 QMenu *GraphicsPillarItem::menuitem()
 {
     return this->menuItem;
+}
+
+void GraphicsPillarItem::backUp()
+{
+    if(this->lastPos.isEmpty())
+        return;
+    this->isBackUp=true;
+    qDebug()<<"BackUp:"<<this->lastPos.last();
+    this->setPos(this->lastPos.last());
+    if(this->lastPos.count()>1)
+        this->lastPos.removeLast();
+    this->isBackUp=false;
+    foreach(GraphicsWallItem *changeline,this->listWall.keys())
+    {
+        if(this->listWall.value(changeline))
+            changeline->setLinePoint(this->centre(),changeline->line().p2());
+        else changeline->setLinePoint(changeline->line().p1(),this->centre());
+    }
+}
+
+void GraphicsPillarItem::setEnabledBackUp(bool value)
+{
+    this->enabledBackUp=value;
+}
+
+void GraphicsPillarItem::setPosition(QPointF pos)
+{
+    if(this->enabledBackUp)
+    {
+        this->lastPos.append(pos);
+        qDebug()<<"append pos:"<<pos;
+    }
+    this->setPos(pos);
 }
 
 void GraphicsPillarItem::setGraphicsPillarItem(GraphicsPillarItem *graphicsItem)

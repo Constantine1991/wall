@@ -5,6 +5,8 @@ GroupItem::GroupItem(QObject *parent):QObject(parent)
 {
     this->rotation=0;
     this->type=GroupItem::ITEM_NONE;
+    this->isMouseRelease=false;
+    this->isBackUp=false;
 }
 
 QList<QGraphicsItem*> GroupItem::create(TYPEGROUP type, QMenu *menu)
@@ -256,6 +258,17 @@ GroupItem::TYPEGROUP GroupItem::isType()
     return this->type;
 }
 
+void GroupItem::backUp()
+{
+    if(this->lastPos.isEmpty())
+        return;
+    this->isBackUp=true;
+    this->setPos(this->lastPos.last());
+    if(this->lastPos.count()>1)
+        this->lastPos.removeLast();
+    this->isBackUp=false;
+}
+
 void GroupItem::setBoundingLine(QLineF line)
 {
     this->boundingLine.setP1(line.p1());
@@ -312,6 +325,13 @@ void GroupItem::setPos(QPointF point)
 {
     if(this->group.isEmpty())
         return;
+    if(this->lastPos.isEmpty()&&!this->isBackUp)
+        this->lastPos.append(point);
+    if(this->isMouseRelease&&!this->isBackUp)
+    {
+        this->lastPos.append(point);
+        this->isMouseRelease=false;
+    }
     switch(this->type)
     {
         case ITEM_WICKET:{
@@ -442,7 +462,6 @@ void GroupItem::setPos(QPointF point)
         }
         default:break;
     }
-
 }
 
 void GroupItem::setPosItem(QPointF point, QGraphicsItem *item)
@@ -607,6 +626,11 @@ void GroupItem::itemMoveScene(QPointF point)
         }
     if(this->group.at(0)->isSelected()||this->group.at(1)->isSelected()||this->group.at(2)->isSelected())
         this->setPos(point);
+}
+
+void GroupItem::mouseRelease()
+{
+    this->isMouseRelease=true;
 }
 
 QPointF GroupItem::rotatePoint(QPointF center, QPointF point,float angle)

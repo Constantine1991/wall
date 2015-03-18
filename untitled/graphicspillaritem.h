@@ -67,9 +67,13 @@ public:
        bool isPazzle();
        COLOR colorPazzle(int number);
        QMenu *menuitem();
+       void backUp();
+       void setEnabledBackUp(bool value);
+       void setPosition(QPointF pos);
 protected:
     QVariant itemChange(GraphicsItemChange change, const QVariant &value);
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
+    void mouseReleaseEvent(QGraphicsSceneMouseEvent *event);
 private:
     QMenu *menuItem;
     QGraphicsTextItem *itemText;
@@ -83,6 +87,10 @@ private:
     COLOR colorPazzlePillar[2];
     BOTTOMTYPE bottomTypePillar;
     QHash<GraphicsWallItem*,bool> listWall;
+    QList<QPointF> lastPos;
+    bool mouseRelease;
+    bool enabledBackUp;
+    bool isBackUp;
 };
 
 #endif // GRAPHICSPILLARITEM_H

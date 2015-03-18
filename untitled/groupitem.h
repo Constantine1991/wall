@@ -39,8 +39,10 @@ public:
     void setRotate(int angle);
     int rot();
     TYPEGROUP isType();
+    void backUp();
 public slots:
     void itemMoveScene(QPointF point);
+    void mouseRelease();
 private:
     void setPos(GroupItem::TYPEGROUP typeItem,QGraphicsItem *p1, QGraphicsItem *p2, QGraphicsItem *c, QLineF line);
     QList<QGraphicsItem*> create(TYPEGROUP type,QMenu *menu);
@@ -51,6 +53,9 @@ private:
     QList<QGraphicsItem*> group;
     QLineF boundingLine;
     int rotation;
+    QList<QPointF> lastPos;
+    bool isMouseRelease;
+    bool isBackUp;
 };
 
 #endif // GROUPITEM_H

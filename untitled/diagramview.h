@@ -37,6 +37,7 @@ private:
     QGraphicsScene *pDiagramScene;
     GroupItem *group;
     QList<GroupItem*> listGroup;
+    QList<QGraphicsItem*> objectBackUp;
     TYPEITEM typeITEM;
     int currentIdItem;
     bool mousePrees;
@@ -66,6 +67,7 @@ private:
     void collidingGroup(QPointF point);
     void savePillar(QDomDocument *document, QDomElement *parent, GraphicsPillarItem *pillar);
     void loadPillar(QXmlStreamReader *xml,GraphicsPillarItem *pillar);
+    void setLastPosObject();
 private slots:
     void RotateItem_45();
     void RotateItem_90();
@@ -92,6 +94,7 @@ public slots:
     void closeProperties(TYPEITEM itemType, bool all);
 signals:
     void itemMoveScene(QPointF point);
+    void mouseRelease();
 protected:
     void mousePressEvent(QMouseEvent *event);
     void mouseReleaseEvent(QMouseEvent *event);

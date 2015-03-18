@@ -72,7 +72,9 @@ QGraphicsItem* DiagramView::AppendItem(TYPEITEM typeItem, QPointF point)
     {
         case ITEM_PILLAR:{
             GraphicsPillarItem *PillarItem=new GraphicsPillarItem(this->MenuItem);
-            PillarItem->setPos(point);
+            PillarItem->setEnabledBackUp(true);
+            PillarItem->setPosition(point);
+            this->objectBackUp.append(PillarItem);
             this->pDiagramScene->addItem(PillarItem);
             return PillarItem;
         }
@@ -97,8 +99,10 @@ QGraphicsItem* DiagramView::AppendItem(TYPEITEM typeItem, QPointF point)
         case ITEM_GATE_A:{
             group=new GroupItem();
             connect(this,SIGNAL(itemMoveScene(QPointF)),group,SLOT(itemMoveScene(QPointF)));
+            connect(this,SIGNAL(mouseRelease()),group,SLOT(mouseRelease()));
             group->createGroup(GroupItem::ITEM_GATE1,this->MenuItem,this->pDiagramScene);
             group->setPos(point);
+            this->objectBackUp.append(group->items().at(0));
             GraphicsGate1Item *g=qgraphicsitem_cast<GraphicsGate1Item*>(group->items().at(2));
             g->setText(QString::number(this->widthGroup));
             this->listGroup.append(group);
@@ -107,20 +111,24 @@ QGraphicsItem* DiagramView::AppendItem(TYPEITEM typeItem, QPointF point)
         case ITEM_GATE_B:{
             group=new GroupItem();
             connect(this,SIGNAL(itemMoveScene(QPointF)),group,SLOT(itemMoveScene(QPointF)));
+            connect(this,SIGNAL(mouseRelease()),group,SLOT(mouseRelease()));
             group->createGroup(GroupItem::ITEM_GATE2,this->MenuItem,this->pDiagramScene);
             GraphicsGate2Item *g=qgraphicsitem_cast<GraphicsGate2Item*>(group->items().at(2));
             g->setText(QString::number(this->widthGroup));
             group->setPos(point);
+            this->objectBackUp.append(group->items().at(0));
             this->listGroup.append(group);
             return NULL;
         }
         case ITEM_WICKET:{
             group=new GroupItem();
             connect(this,SIGNAL(itemMoveScene(QPointF)),group,SLOT(itemMoveScene(QPointF)));
+            connect(this,SIGNAL(mouseRelease()),group,SLOT(mouseRelease()));
             group->createGroup(GroupItem::ITEM_WICKET,this->MenuItem,this->pDiagramScene);
             GraphicsWicketItem *w=qgraphicsitem_cast<GraphicsWicketItem*>(group->items().at(2));
             w->setText(QString::number(this->widthGroup));
             group->setPos(point);
+            this->objectBackUp.append(group->items().at(0));
             this->listGroup.append(group);
             return NULL;
         }
@@ -132,6 +140,7 @@ void DiagramView::AppendItem(GroupItem::TYPEGROUP typeGroup,QPointF point)
 {
     group=new GroupItem();
     connect(this,SIGNAL(itemMoveScene(QPointF)),group,SLOT(itemMoveScene(QPointF)));
+    connect(this,SIGNAL(mouseRelease()),group,SLOT(mouseRelease()));
     group->createGroup(typeGroup,this->MenuItem,this->pDiagramScene);
     group->setPos(point);
     this->listGroup.append(group);
@@ -185,27 +194,41 @@ void DiagramView::Delete_Item()
     {
         foreach(QGraphicsItem *parentItem,this->pDiagramScene->selectedItems())
         {
-                foreach(GroupItem *group,this->listGroup)
-                    if(group->isItem(parentItem))
+            foreach(GroupItem *group,this->listGroup)
+                if(group->isItem(parentItem))
+                {
+                    if(parentItem->type()==GraphicsPillarItem::Type)
                     {
-                        if(parentItem->type()==GraphicsPillarItem::Type)
+                        QList<QGraphicsItem*> item=group->items();
+                        if(item.count()==3)
+                            this->pDiagramScene->removeItem(item.at(2));
+                        if(item.count()==5)
                         {
-                            QList<QGraphicsItem*> item=group->items();
-                            if(item.count()==3)
-                                this->pDiagramScene->removeItem(item.at(2));
-                            if(item.count()==5)
-                            {
-                                this->pDiagramScene->removeItem(item.at(4));
-                                this->pDiagramScene->removeItem(item.at(3));
-                            }
+                            this->pDiagramScene->removeItem(item.at(4));
+                            this->pDiagramScene->removeItem(item.at(3));
                         }
-                        this->listGroup.removeAt(this->listGroup.indexOf(group));
-                        delete group;
-                        break;
                     }
+                    this->listGroup.removeAt(this->listGroup.indexOf(group));
+                    delete group;
+                    break;
+                }
+            if(parentItem->type()==GraphicsPillarItem::Type)
+            {
+                while(true)
+                {
+                    int index=this->objectBackUp.indexOf(parentItem);
+                    if(index==-1)
+                        break;
+                    this->objectBackUp.removeAt(index);
+                }
+            }
             foreach(QGraphicsItem *childItem,parentItem->childItems())
+            {
                 this->pDiagramScene->removeItem(childItem);
+                delete childItem;
+            }
             this->pDiagramScene->removeItem(parentItem);
+            delete parentItem;
         }
     }
 }
@@ -1157,7 +1180,9 @@ void DiagramView::collidingGroup(QPointF point)
     {
         group=new GroupItem();
         connect(this,SIGNAL(itemMoveScene(QPointF)),group,SLOT(itemMoveScene(QPointF)));
+        connect(this,SIGNAL(mouseRelease()),group,SLOT(mouseRelease()));
         group->createGroup(coliding,moveGroup,this->MenuItem,this->pDiagramScene);
+        this->objectBackUp.append(group->items().at(0));
         group->setPos(point);
         this->listGroup.append(group);
         foreach(QGraphicsItem *item,moveGroup->items())
@@ -1165,8 +1190,20 @@ void DiagramView::collidingGroup(QPointF point)
         foreach(QGraphicsItem *item,coliding->items())
             this->pDiagramScene->removeItem(item);
         this->listGroup.removeAt(this->listGroup.indexOf(moveGroup));
-        delete moveGroup;
         this->listGroup.removeAt(this->listGroup.indexOf(coliding));
+        while(true)
+        {
+            int indexA=this->objectBackUp.indexOf(moveGroup->items().at(0));
+            if(indexA!=-1)
+                this->objectBackUp.removeAt(indexA);
+            int indexB=this->objectBackUp.indexOf(coliding->items().at(0));
+            if(indexB!=-1)
+                this->objectBackUp.removeAt(indexB);
+            if(indexA==-1 && indexB==-1)
+                break;
+
+        }
+        delete moveGroup;
         delete coliding;
     }
 }
@@ -1176,6 +1213,7 @@ void DiagramView::mousePressEvent(QMouseEvent *event)
 {
     if(event->button()!=Qt::LeftButton)
         return;
+
     this->mousePrees=true;
     QApplication::setOverrideCursor(Qt::PointingHandCursor);
     if(this->typeITEM==ITEM_PILLAR)
@@ -1209,7 +1247,7 @@ void DiagramView::mouseMoveEvent(QMouseEvent *event)
 {
     if(this->mousePrees)
     {
-        this->itemMoveScene(this->mapToScene(event->pos()));
+        emit this->itemMoveScene(this->mapToScene(event->pos()));
         this->collidingGroup(this->mapToScene(event->pos()));
     }
     if(this->typeITEM==ITEM_WALL)
@@ -1225,6 +1263,12 @@ void DiagramView::mouseReleaseEvent(QMouseEvent *event)
 {
     if(event->button()!=Qt::LeftButton)
         return;
+    if(!this->pDiagramScene->selectedItems().isEmpty())
+        if(this->pDiagramScene->selectedItems().at(0)->type()==GraphicsPillarItem::Type)
+        {
+            this->objectBackUp.append(this->pDiagramScene->selectedItems().at(0));
+        }
+    emit this->mouseRelease();
     this->mousePrees=false;
     if(this->typeITEM==ITEM_WALL)
     {
@@ -1294,6 +1338,29 @@ void DiagramView::keyPressEvent(QKeyEvent *event)
         if(event->modifiers()==Qt::ControlModifier)
             foreach(QGraphicsItem* graphicsItem,this->pDiagramScene->items())
                     graphicsItem->setSelected(true);
+    if(event->key()==Qt::Key_Z)
+        if(event->modifiers()==Qt::ControlModifier)
+            this->setLastPosObject();
     QGraphicsView::keyPressEvent(event);
 }
 
+
+void DiagramView::setLastPosObject()
+{
+    if(this->objectBackUp.isEmpty())
+        return;
+    bool itemGroup=false;
+    foreach(GroupItem *group,this->listGroup)
+        if(group->isItem(this->objectBackUp.last()))
+        {
+            group->backUp();
+            itemGroup=true;
+            break;
+        }
+    if(!itemGroup)
+    {
+        GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(this->objectBackUp.last());
+        pillar->backUp();
+    }
+    this->objectBackUp.removeLast();
+}
