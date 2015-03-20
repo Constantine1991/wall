@@ -14,6 +14,8 @@ DiagramView::DiagramView(QWidget *parent):QGraphicsView(parent)
     this->currentIdItem=1;
     this->lineWall=NULL;
     this->lineFilling=NULL;
+    this->linePoint1=NULL;
+    this->linePoint2=NULL;
     this->CreateMenuItem();
     this->pDiagramScene->setBackgroundBrush(QBrush(Qt::lightGray, Qt::CrossPattern));
     this->pillarBottom=false;
@@ -131,6 +133,17 @@ QGraphicsItem* DiagramView::AppendItem(TYPEITEM typeItem, QPointF point)
             this->objectBackUp.append(group->items().at(0));
             this->listGroup.append(group);
             return NULL;
+        }
+        case ITEM_LINE:{
+            GraphicsLineItem *line=new GraphicsLineItem();
+            line->setPoints(this->linePoint1->pos(),this->linePoint2->pos(),this->pDiagramScene);
+            this->pDiagramScene->removeItem(this->linePoint1);
+            this->pDiagramScene->removeItem(this->linePoint2);
+            delete this->linePoint1;
+            delete this->linePoint2;
+            this->linePoint1=NULL;
+            this->linePoint2=NULL;
+            break;
         }
         default:return NULL;
     }
@@ -360,19 +373,37 @@ void DiagramView::Filling(GraphicsPillarItem *a, GraphicsPillarItem *b,float int
 void DiagramView::setTypeItem(TYPEITEM type)
 {
     this->typeITEM=type;
+    if(this->linePoint1!=NULL)
+    {
+        this->pDiagramScene->removeItem(this->linePoint1);
+        delete this->linePoint1;
+        this->linePoint1=NULL;
+    }
+    if(this->linePoint2!=NULL)
+    {
+        this->pDiagramScene->removeItem(this->linePoint2);
+        delete this->linePoint2;
+        this->linePoint2=NULL;
+    }
 }
 
 void DiagramView::setTypeItem(TYPEITEM type, int interval)
 {
-    this->typeITEM=type;
+    this->setTypeItem(type);
     this->widthGroup=interval;
 }
 
 void DiagramView::ClearScene()
 {
+    foreach(GroupItem *group,this->listGroup)
+        delete group;
     this->listGroup.clear();
     foreach(QGraphicsItem *item,this->pDiagramScene->items())
-            delete item;
+    {
+        foreach(QGraphicsItem *child,item->childItems())
+            delete child;
+        delete item;
+    }
     this->pDiagramScene->clear();
 }
 
@@ -1240,6 +1271,18 @@ void DiagramView::mousePressEvent(QMouseEvent *event)
         this->pDiagramScene->addItem(this->lineFilling);
         this->pDiagramScene->clearSelection();
     }
+    if(this->typeITEM==ITEM_LINE)
+    {
+        QGraphicsEllipseItem *ellipse=new QGraphicsEllipseItem();
+        ellipse->setBrush(QBrush(Qt::blue));
+        ellipse->setPen(QPen(Qt::black, 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+        ellipse->setRect(0,0,5,5);
+        ellipse->setPos(this->mapToScene(event->pos()));
+        if(this->linePoint1==NULL)
+            this->linePoint1=ellipse;
+        else this->linePoint2=ellipse;
+        this->pDiagramScene->addItem(ellipse);
+    }
     QGraphicsView::mousePressEvent(event);
 }
 
@@ -1282,7 +1325,15 @@ void DiagramView::mouseReleaseEvent(QMouseEvent *event)
         connect(setIntervalWindow,SIGNAL(setInterval(float,bool)),this,SLOT(setInterval(float,bool)));
         setIntervalWindow->show();
     }
-    this->typeITEM=ITEM_NONE;
+    if(this->typeITEM==ITEM_LINE)
+    {
+        if(this->linePoint1!=NULL && this->linePoint2!=NULL)
+        {
+            this->AppendItem(ITEM_LINE,QPointF(0,0));
+            this->typeITEM=ITEM_NONE;
+        }
+    }
+    else this->typeITEM=ITEM_NONE;
     QApplication::restoreOverrideCursor();
     QGraphicsView::mouseReleaseEvent(event);
 }

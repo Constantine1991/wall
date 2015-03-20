@@ -35,7 +35,8 @@ SOURCES += \
     graphicsgate1item.cpp \
     graphicsgate2item.cpp \
     interval.cpp \
-    component.cpp
+    component.cpp \
+    graphicslineitem.cpp
 
 HEADERS  += \
     settingswindow.h \
@@ -60,7 +61,8 @@ HEADERS  += \
     graphicsgate1item.h \
     graphicsgate2item.h \
     interval.h \
-    component.h
+    component.h \
+    graphicslineitem.h
 
 FORMS    += \
     settingswindow.ui \

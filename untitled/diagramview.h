@@ -25,6 +25,7 @@
 #include "excelexport.h"
 #include "interval.h"
 #include "groupitem.h"
+#include "graphicslineitem.h"
 //---------WINDOW FORMS---------------//
 #include "propertiespillarwindow.h"
 #include "propertieswallwindow.h"
@@ -45,6 +46,8 @@ private:
     QGraphicsItem *itemGraphicsChange;
     QGraphicsLineItem *lineWall;
     QGraphicsLineItem *lineFilling;
+    QGraphicsEllipseItem *linePoint1;
+    QGraphicsEllipseItem *linePoint2;
     SETTINGS *itemSetting;
     QMenu *MenuItem;
     QAction *Rotate_45Action;

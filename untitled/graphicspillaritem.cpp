@@ -57,7 +57,6 @@ QVariant GraphicsPillarItem::itemChange(GraphicsItemChange change, const QVarian
         if(this->mouseRelease && this->enabledBackUp && !this->isBackUp)
         {
             this->lastPos.append(this->pos());
-            qDebug()<<"append pos:"<<this->pos();
             this->mouseRelease=false;
         }
         foreach(GraphicsWallItem *changeline,this->listWall.keys())
@@ -272,7 +271,6 @@ void GraphicsPillarItem::backUp()
     if(this->lastPos.isEmpty())
         return;
     this->isBackUp=true;
-    qDebug()<<"BackUp:"<<this->lastPos.last();
     this->setPos(this->lastPos.last());
     if(this->lastPos.count()>1)
         this->lastPos.removeLast();
@@ -295,7 +293,6 @@ void GraphicsPillarItem::setPosition(QPointF pos)
     if(this->enabledBackUp)
     {
         this->lastPos.append(pos);
-        qDebug()<<"append pos:"<<pos;
     }
     this->setPos(pos);
 }
