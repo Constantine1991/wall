@@ -6,7 +6,12 @@
 #include <QGraphicsTextItem>
 #include <QPointF>
 #include <QRectF>
-#include "groupitem.h"
+#include <QPolygonF>
+#include "graphicsgate1item.h"
+#include "graphicsgate2item.h"
+#include "graphicspillaritem.h"
+#include "graphicswallitem.h"
+#include "graphicswicketitem.h"
 
 class GraphicsLineItem:public QGraphicsLineItem
 {
@@ -26,7 +31,7 @@ private:
     float rotationLocalCoords();
     void updatePosText();
     GraphicsPillarItem *pillar(QPointF pos,QGraphicsScene *scene);
-    int width(QPointF p1, QPointF p2, QGraphicsScene *scene);
+    int width(GraphicsPillarItem *p1, GraphicsPillarItem *p2, QGraphicsScene *scene);
 };
 
 #endif // GRAPHICSLINEITEM_H

@@ -36,12 +36,16 @@ MainWindow::MainWindow(QWidget *parent) :
     QPixmap pixmap2(250, 250);
     pixmap2.fill(Qt::transparent);
     QPainter painter2(&pixmap2);
-    painter2.setPen(QPen(Qt::black, 4, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+    painter2.setPen(QPen(Qt::black, 6, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
     painter2.translate(10, 10);
-    painter2.setBrush(Qt::gray);
-    painter2.drawRect(0,75,65,100);
     painter2.setBrush(Qt::white);
-    painter2.drawRect(65,75,165,100);
+    painter2.drawEllipse(QPoint(20,125),35,35);
+    painter2.setBrush(Qt::black);
+    painter2.drawLine(20,50,210,50);
+    painter2.drawLine(50,125,95,210);
+    painter2.drawLine(180,125,135,210);
+    painter2.setBrush(Qt::white);
+    painter2.drawEllipse(QPoint(210,125),35,35);
     QIcon iconGateA(pixmap2);
     ui->pushButton_3->setIcon(iconGateA);
     ui->pushButton_3->setIconSize(QSize(32,32));
@@ -49,19 +53,16 @@ MainWindow::MainWindow(QWidget *parent) :
     QPixmap pixmap3(250, 250);
     pixmap3.fill(Qt::transparent);
     QPainter painter3(&pixmap3);
-    painter3.setPen(QPen(Qt::black, 4, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+    painter3.setPen(QPen(Qt::black, 6, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
     painter3.translate(10, 10);
-    painter3.setBrush(Qt::gray);
-    painter3.drawRect(0,75,65,100);
-    painter3.setBrush(Qt::white);
-    painter3.drawRect(65,75,100,100);
-    painter3.setBrush(Qt::gray);
-    painter3.drawRect(165,75,65,100);
+    painter3.setBrush(Qt::blue);
+    painter3.drawEllipse(QPoint(20,125),30,30);
+    painter3.drawEllipse(QPoint(210,125),30,30);
     QIcon iconGateB(pixmap3);
     ui->pushButton_4->setIcon(iconGateB);
     ui->pushButton_4->setIconSize(QSize(32,32));
     //////////////////////////////////////////////////////////////////////
-    QPixmap pixmap4(250, 250);
+    /*QPixmap pixmap4(250, 250);
     pixmap4.fill(Qt::transparent);
     QPainter painter4(&pixmap4);
     painter4.setPen(QPen(Qt::black, 4, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
@@ -70,7 +71,8 @@ MainWindow::MainWindow(QWidget *parent) :
     painter4.drawRect(0,75,230,100);
     QIcon iconGateC(pixmap4);
     ui->pushButton_5->setIcon(iconGateC);
-    ui->pushButton_5->setIconSize(QSize(32,32));
+    ui->pushButton_5->setIconSize(QSize(32,32));*/
+    ui->pushButton_8->setVisible(false);
     /////////////////////////////////////////////////////////////////////////
     QPixmap pixmap5(250, 250);
     pixmap5.fill(Qt::transparent);
@@ -86,8 +88,8 @@ MainWindow::MainWindow(QWidget *parent) :
     painter5.drawLine(190,125,150,145);
     painter5.drawEllipse(QPoint(210,125),30,30);
     QIcon iconLine(pixmap5);
-    ui->pushButton_8->setIcon(iconLine);
-    ui->pushButton_8->setIconSize(QSize(32,32));
+    ui->pushButton_5->setIcon(iconLine);
+    ui->pushButton_5->setIconSize(QSize(32,32));
 }
 
 MainWindow::~MainWindow()
@@ -127,7 +129,7 @@ void MainWindow::on_pushButton_4_clicked()
 
 void MainWindow::on_pushButton_5_clicked()
 {
-
+        ui->widget->setTypeItem(ITEM_FILLING);
 }
 
 void MainWindow::on_action_6_activated()
@@ -258,8 +260,8 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::on_action_7_activated()
 {
-    /*about *a=new about(this);
-    a->show();*/
+    about *a=new about(this);
+    a->show();
 }
 
 void MainWindow::on_action_8_activated()
@@ -269,5 +271,5 @@ void MainWindow::on_action_8_activated()
 
 void MainWindow::on_pushButton_8_clicked()
 {
-    ui->widget->setTypeItem(ITEM_FILLING);
+
 }

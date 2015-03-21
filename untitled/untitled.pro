@@ -26,7 +26,6 @@ SOURCES += \
     diagramviewpillar.cpp \
     diagramview.cpp \
     calculate.cpp \
-    about.cpp \
     cryptxor.cpp \
     activationform.cpp \
     graphicswallitem.cpp \
@@ -36,7 +35,8 @@ SOURCES += \
     graphicsgate2item.cpp \
     interval.cpp \
     component.cpp \
-    graphicslineitem.cpp
+    graphicslineitem.cpp \
+    about.cpp
 
 HEADERS  += \
     settingswindow.h \
@@ -53,7 +53,6 @@ HEADERS  += \
     diagramviewpillar.h \
     diagramview.h \
     calculate.h \
-    about.h \
     cryptxor.h \
     activationform.h \
     graphicswicketitem.h \
@@ -62,17 +61,18 @@ HEADERS  += \
     graphicsgate2item.h \
     interval.h \
     component.h \
-    graphicslineitem.h
+    graphicslineitem.h \
+    about.h
 
 FORMS    += \
     settingswindow.ui \
     propertieswallwindow.ui \
     propertiespillarwindow.ui \
     mainwindow.ui \
-    about.ui \
     activationform.ui \
     interval.ui \
-    component.ui
+    component.ui \
+    about.ui
 
 RESOURCES += \
     res.qrc

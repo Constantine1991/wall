@@ -920,7 +920,7 @@
            </rect>
           </property>
           <property name="toolTip">
-           <string>Калитка</string>
+           <string>Автоматическая растоновка</string>
           </property>
           <property name="text">
            <string/>
@@ -936,7 +936,7 @@
            </rect>
           </property>
           <property name="toolTip">
-           <string>Ворота распашные</string>
+           <string>Компонент линейка</string>
           </property>
           <property name="text">
            <string/>

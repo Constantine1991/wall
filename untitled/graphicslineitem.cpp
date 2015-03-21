@@ -7,13 +7,13 @@ GraphicsLineItem::GraphicsLineItem(QGraphicsItem *parent, QGraphicsScene *scene)
     this->setPen(QPen(Qt::black, 2, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
     this->setFlag(QGraphicsItem::ItemIsSelectable,true);
     this->setFlag(QGraphicsItem::ItemSendsGeometryChanges,false);
-    this->text=new QGraphicsTextItem("55555",this);
+    this->text=new QGraphicsTextItem("0",this);
     this->line1=new QGraphicsLineItem(this);
-    this->line1->setPen(QPen(Qt::black, 2, Qt::DashLine, Qt::SquareCap, Qt::MiterJoin));
+    this->line1->setPen(QPen(Qt::black, 2, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
     this->line1->setFlag(QGraphicsItem::ItemIsSelectable,false);
     this->line1->setFlag(QGraphicsItem::ItemSendsGeometryChanges,false);
     this->line2=new QGraphicsLineItem(this);
-    this->line2->setPen(QPen(Qt::black, 2, Qt::DashLine, Qt::SquareCap, Qt::MiterJoin));
+    this->line2->setPen(QPen(Qt::black, 2, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
     this->line2->setFlag(QGraphicsItem::ItemIsSelectable,false);
     this->line2->setFlag(QGraphicsItem::ItemSendsGeometryChanges,false);
 }
@@ -32,7 +32,7 @@ void GraphicsLineItem::setPoints(QPointF p1, QPointF p2, QGraphicsScene *scene)
                             this->rotationLocalCoords()+90);
     this->line2->setLine(QLineF(pillar2->centre(),point));
     this->setLine(QLineF(this->line1->line().p2(),this->line2->line().p2()));
-    this->text->setPlainText(QString::number(this->width(p1,p2,scene)));
+    this->text->setPlainText(QString::number(this->width(pillar1,pillar2,scene)));
     this->updatePosText();
     scene->addItem(this);
 }
@@ -75,7 +75,47 @@ GraphicsPillarItem *GraphicsLineItem::pillar(QPointF pos, QGraphicsScene *scene)
     return NULL;
 }
 
-int GraphicsLineItem::width(QPointF p1, QPointF p2, QGraphicsScene *scene)
+int GraphicsLineItem::width(GraphicsPillarItem *p1, GraphicsPillarItem *p2, QGraphicsScene *scene)
 {
-
+    QPolygonF bounding;
+    bounding.append(this->rotatePoint(p1->centre(),QPointF(p1->centre().x()+p1->boundingRect().width()/2,p1->centre().y()),
+                                      this->rotationLocalCoords()+90));
+    bounding.append(this->rotatePoint(p1->centre(),QPointF(p1->centre().x()+p1->boundingRect().width()/2,p1->centre().y()),
+                                      this->rotationLocalCoords()-90));
+    bounding.append(this->rotatePoint(p2->centre(),QPointF(p2->centre().x()+p2->boundingRect().width()/2,p2->centre().y()),
+                                      this->rotationLocalCoords()+90));
+    bounding.append(this->rotatePoint(p2->centre(),QPointF(p2->centre().x()+p1->boundingRect().width()/2,p2->centre().y()),
+                                      this->rotationLocalCoords()-90));
+    int w=0;
+    QList<QGraphicsItem*> objects=scene->items(bounding);
+    foreach(QGraphicsItem *item,objects)
+        switch(item->type())
+        {
+            case GraphicsPillarItem::Type:{
+                w+=35;
+                break;
+            }
+            case GraphicsWallItem::Type:{
+                GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(item);
+                w+=wall->width();
+                break;
+            }
+            case GraphicsGate1Item::Type:{
+                GraphicsGate1Item *gate1=qgraphicsitem_cast<GraphicsGate1Item*>(item);
+                w+=gate1->value();
+                break;
+            }
+            case GraphicsGate2Item::Type:{
+                GraphicsGate2Item *gate2=qgraphicsitem_cast<GraphicsGate2Item*>(item);
+                w+=gate2->value();
+                break;
+            }
+            case GraphicsWicketItem::Type:{
+                GraphicsWicketItem *wicket=qgraphicsitem_cast<GraphicsWicketItem*>(item);
+                w+=wicket->value();
+                break;
+            }
+            default: break;
+        }
+    return w-35;
 }
