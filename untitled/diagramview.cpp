@@ -461,7 +461,7 @@ void DiagramView::savePillar(QDomDocument *document,QDomElement *parent, Graphic
     }
     object.appendChild(colorRow);
     QDomElement bottomType=document->createElement("Bottom");
-    bottomType.setAttribute("type",pillar->isBottomType());
+    bottomType.setAttribute("type",pillar->isBottomTypeEnable());
     object.appendChild(bottomType);
     parent->appendChild(object);
 }
@@ -674,7 +674,7 @@ void DiagramView::loadPillar(QXmlStreamReader *xml, GraphicsPillarItem *pillar)
                     }
             }
             if(xml->name()=="Bottom")
-                pillar->setBottomType(xml->attributes().value("type").toString().toInt());
+                pillar->setBottomTypeEnable((bool)xml->attributes().value("type").toString().toInt());
         }
         xml->readNext();
     }
@@ -964,6 +964,7 @@ void DiagramView::PrintContract()
    FENCE allFence;
    COLUMN allColumn;
    QList<COLORBRICK*> colorBrick[6];
+   QHash<QString,int> residueTopWall;
    int countGirthRail[2];
    countGirthRail[0]=0;
    countGirthRail[1]=0;
@@ -988,6 +989,10 @@ void DiagramView::PrintContract()
                     allFence.count_cover+=tmpFence.count_cover;
                     this->AppendBrickColorPazzle(&colorBrick[2],tmpFence.count_cover,
                                                  wall->colorTop().caption);
+                    int residue=wall->width()-tmpFence.count_cover*this->itemSetting->widthWallTop;
+                    if(residue>(this->itemSetting->minWidthBrickR/2))
+                        residueTopWall.insertMulti(wall->colorTop().caption,residue);
+
                 }
                 if(tmpFence.count_brick==0)
                     break;
@@ -1036,8 +1041,8 @@ void DiagramView::PrintContract()
                 if(tmpColumn.count_brick_angle+tmpColumn.count_brick_angle_1+tmpColumn.count_brick_angle_2+
                    tmpColumn.count_brick_angle_3+tmpColumn.count_brick_angle_4==0)
                     break;
-                if(pillar->isBottomType()!=GraphicsPillarItem::BOTTOM_NONE)
-                    countBasePillar[(int)pillar->isBottomType()]+=1;
+                if(pillar->isBottomTypeEnable())
+                    countBasePillar[pillar->isBottomType()]+=1;
                 if(pillar->isTop())
                 {
                     countTop+=1;
@@ -1070,6 +1075,14 @@ void DiagramView::PrintContract()
        }
    }
     QString expColorBrick[6];
+    foreach(COLORBRICK *color,colorBrick[2])
+    {
+        int widthTopWall=0;
+        foreach(int i,residueTopWall.values(color->namedColor))
+            widthTopWall+=i;
+        allFence.count_cover+=calc.coverWall(widthTopWall);
+        this->AppendBrickColorPazzle(&colorBrick[2],calc.coverWall(widthTopWall),color->namedColor);
+    }
     for(int i=0;i<6;i++)
         if(!colorBrick[i].isEmpty())
             foreach(COLORBRICK *countColor,colorBrick[i])

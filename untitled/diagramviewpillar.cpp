@@ -9,6 +9,7 @@ DiagramViewPillar::DiagramViewPillar(QWidget *parent):QGraphicsView(parent)
     this->insertTop=0;
     this->pazzle=false;
     this->top=false;
+    this->bottom=false;
 }
 
 void DiagramViewPillar::setHeight(int height)
@@ -47,6 +48,12 @@ void DiagramViewPillar::setColorAllRow(QColor color)
 void DiagramViewPillar::setEnabledTop(bool top)
 {
     this->top=top;
+    this->rendering();
+}
+
+void DiagramViewPillar::setEnabledBottom(bool enable)
+{
+    this->bottom=enable;
     this->rendering();
 }
 
@@ -90,6 +97,15 @@ void DiagramViewPillar::setRenderingSide(int renderingSide)
 void DiagramViewPillar::createPillar()
 {
     int y=this->graphicsScene->height()-50;
+    if(this->bottom)
+    {
+        QGraphicsRectItem *bottomGraphic=new QGraphicsRectItem();
+        bottomGraphic->setBrush(QBrush(Qt::white));
+        bottomGraphic->setPen(QPen(Qt::black, 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+        bottomGraphic->setRect(225,y,100,50);
+        this->graphicsScene->addItem(bottomGraphic);
+    }
+   // y-=50;
     int Row=this->row();
     for(int i=0;i<Row;i++)
     {
@@ -106,8 +122,12 @@ void DiagramViewPillar::createPillar()
     QGraphicsRectItem *itemInsertBottomGraphics=new QGraphicsRectItem();
     itemInsertBottomGraphics->setBrush(QBrush(Qt::gray));
     itemInsertBottomGraphics->setPen(QPen(Qt::black, 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
-    itemInsertBottomGraphics->setRect(260,this->graphicsScene->height()-25-this->insertBottom/this->heightBrick*25,20,
-                                      this->insertBottom/this->heightBrick*25);
+    if(!this->bottom)
+        itemInsertBottomGraphics->setRect(260,this->graphicsScene->height()-25-this->insertBottom/this->heightBrick*25,20,
+                                          this->insertBottom/this->heightBrick*25);
+    else if(this->insertBottom>0)
+        itemInsertBottomGraphics->setRect(260,this->graphicsScene->height()-25-this->insertBottom/this->heightBrick*25,20,
+                                           this->insertBottom/this->heightBrick*25+25);
     this->graphicsScene->addItem(itemInsertBottomGraphics);
     QGraphicsRectItem *itemInsertTopGraphics=new QGraphicsRectItem();
     itemInsertTopGraphics->setBrush(QBrush(Qt::gray));
@@ -129,6 +149,14 @@ void DiagramViewPillar::createPillar()
 void DiagramViewPillar::createPillarPazzle()
 {
     int y=this->graphicsScene->height()-50;
+    if(this->bottom)
+    {
+        QGraphicsRectItem *bottomGraphic=new QGraphicsRectItem();
+        bottomGraphic->setBrush(QBrush(Qt::white));
+        bottomGraphic->setPen(QPen(Qt::black, 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+        bottomGraphic->setRect(225,y,100,50);
+        this->graphicsScene->addItem(bottomGraphic);
+    }
     int Row=this->row();
     for(int i=0;i<Row;i++)
     {
@@ -166,8 +194,12 @@ void DiagramViewPillar::createPillarPazzle()
     QGraphicsRectItem *itemInsertBottomGraphics=new QGraphicsRectItem();
     itemInsertBottomGraphics->setBrush(QBrush(Qt::gray));
     itemInsertBottomGraphics->setPen(QPen(Qt::black, 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
-    itemInsertBottomGraphics->setRect(260,this->graphicsScene->height()-25-this->insertBottom/this->heightBrick*25,20,
-                                      this->insertBottom/this->heightBrick*25);
+    if(!this->bottom)
+        itemInsertBottomGraphics->setRect(260,this->graphicsScene->height()-25-this->insertBottom/this->heightBrick*25,20,
+                                          this->insertBottom/this->heightBrick*25);
+    else if(this->insertBottom>0)
+        itemInsertBottomGraphics->setRect(260,this->graphicsScene->height()-25-this->insertBottom/this->heightBrick*25,20,
+                                           this->insertBottom/this->heightBrick*25+25);
     this->graphicsScene->addItem(itemInsertBottomGraphics);
     QGraphicsRectItem *itemInsertTopGraphics=new QGraphicsRectItem();
     itemInsertTopGraphics->setBrush(QBrush(Qt::gray));

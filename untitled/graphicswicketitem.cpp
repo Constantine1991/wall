@@ -4,7 +4,7 @@ GraphicsWicketItem::GraphicsWicketItem(QMenu *menuItem, QGraphicsItem *parent, Q
     :QGraphicsLineItem(parent,scene)
 {
     this->widthWicket=0;
-    this->width=50;
+    this->width=30;
     this->rot=130;
     this->setPen(QPen(Qt::black, 2, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
     this->setFlag(QGraphicsItem::ItemIsSelectable,true);

@@ -25,8 +25,9 @@ GraphicsPillarItem::GraphicsPillarItem(QMenu *menuItem, QGraphicsItem *parent, Q
     this->heightSidePillar[2]=0;
     this->heightSidePillar[3]=0;
     this->heightSidePillar[4]=0;
-    this->bottomTypePillar=GraphicsPillarItem::BOTTOM_NONE;
+    this->bottomTypePillar=GraphicsPillarItem::BOTTOM_DEAF;
     this->pazzlePillar=false;
+    this->bottomTypeEnablePillar=false;
 }
 
 GraphicsPillarItem::~GraphicsPillarItem()
@@ -115,6 +116,11 @@ void GraphicsPillarItem::setHeightSide(int side, int height)
     this->heightSidePillar[side]=height;
 }
 
+void GraphicsPillarItem::setBottomTypeEnable(bool enable)
+{
+    this->bottomTypeEnablePillar=enable;
+}
+
 int GraphicsPillarItem::heightSide(SIDETYPE sideType)
 {
     return this->heightSidePillar[(int)sideType];
@@ -125,14 +131,14 @@ int GraphicsPillarItem::heightSide(int side)
      return this->heightSidePillar[side];
 }
 
-void GraphicsPillarItem::setBottomType(BOTTOMTYPE bottomType)
+int GraphicsPillarItem::isBottomType()
 {
-    this->bottomTypePillar=bottomType;
-}
-
-void GraphicsPillarItem::setBottomType(int bottomType)
-{
-    switch(bottomType)
+    int front=this->heightSide(GraphicsPillarItem::SIDE_FRONT)>0?1:0;
+    int back=this->heightSide(GraphicsPillarItem::SIDE_BACK)>0?1:0;
+    int left=this->heightSide(GraphicsPillarItem::SIDE_LIFT)>0?1:0;
+    int right=this->heightSide(GraphicsPillarItem::SIDE_RIGHT)>0?1:0;
+    int typeSide=front+back+left+right;
+    switch(typeSide)
     {
         case 0:{
             this->bottomTypePillar=GraphicsPillarItem::BOTTOM_DEAF;
@@ -143,27 +149,32 @@ void GraphicsPillarItem::setBottomType(int bottomType)
             break;
         }
         case 2:{
-            this->bottomTypePillar=GraphicsPillarItem::BOTTOM_PASSAGE;
-            break;
+            if(((front+back)==2)||((left+right==2)))
+            {
+                this->bottomTypePillar=GraphicsPillarItem::BOTTOM_PASSAGE;
+                break;
+            }
+            if(((front+left)==2)||((front+right)==2)||((back+left)==2)||((back+right)==2))
+            {
+                this->bottomTypePillar=GraphicsPillarItem::BOTTOM_ANGLETWO;
+                break;
+            }
         }
         case 3:{
-            this->bottomTypePillar=GraphicsPillarItem::BOTTOM_ANGLETWO;
-            break;
-        }
-        case 4:{
             this->bottomTypePillar=GraphicsPillarItem::BOTTOM_ANGLETHREE;
             break;
         }
         default:{
-            this->bottomTypePillar=GraphicsPillarItem::BOTTOM_NONE;
+            this->bottomTypePillar=GraphicsPillarItem::BOTTOM_DEAF;
             break;
         }
     }
+    return (int)this->bottomTypePillar;
 }
 
-GraphicsPillarItem::BOTTOMTYPE GraphicsPillarItem::isBottomType()
+bool GraphicsPillarItem::isBottomTypeEnable()
 {
-    return this->bottomTypePillar;
+    return this->bottomTypeEnablePillar;
 }
 
 void GraphicsPillarItem::clearColorRow()

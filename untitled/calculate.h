@@ -45,6 +45,7 @@ public:
     Calculate(SETTINGS *itemSetting);
     //Количество материала на забор
     FENCE GetCountOnFence(int WidthWall, int HeightWall, bool topWall);
+    int coverWall(int widthWall);
     COLORBRICKWALL colorBrickWall(int width, int height);
     COLORBRICKWALL colorListBrickWall(int width, int height);
     COLORBRICKPILLAR colorBrickPillar(int height,int *insert);

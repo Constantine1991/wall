@@ -37,9 +37,14 @@ FENCE Calculate::GetCountOnFence(int WidthWall,int HeightWall,bool topWall)
                           (this->colBrickBigWall(WidthWall)-1)*qFloor(this->rowBrickBigWall(HeightWall)/2);
     }
     if(topWall)
-        result.count_cover=WidthWall%this->itemSetting->widthWallTop>0?
-                    WidthWall/this->itemSetting->widthWallTop+1:WidthWall/this->itemSetting->widthWallTop;
+        result.count_cover=qFloor(WidthWall/this->itemSetting->widthWallTop);
     return result;
+}
+
+int Calculate::coverWall(int widthWall)
+{
+    return widthWall%this->itemSetting->widthWallTop>0?
+                widthWall/this->itemSetting->widthWallTop+1:widthWall/this->itemSetting->widthWallTop;
 }
 
 COLORBRICKWALL Calculate::colorBrickWall(int width,int height)

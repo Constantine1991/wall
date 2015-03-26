@@ -25,6 +25,7 @@ public:
     void setColorRow(int index, QColor color);
     void setColorAllRow(QColor color);
     void setEnabledTop(bool enable=false);
+    void setEnabledBottom(bool enable=false);
     void setColorTop(QColor color);
     void setEnabledPazzle(bool enable,QColor color1,QColor color2);
     QColor colorRow(int index);
@@ -46,6 +47,7 @@ private:
     QColor colorPazzle1;
     QColor colorPazzle2;
     QList<QColor> color;
+    bool bottom;
 };
 
 #endif // DIAGRAMVIEWPILLAR_H

@@ -59,6 +59,8 @@ private slots:
 
     void on_checkBox_6_clicked();
 
+    void on_lineEdit_3_textEdited(const QString &arg1);
+
 protected:
     void closeEvent(QCloseEvent *event);
 private:

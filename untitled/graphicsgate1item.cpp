@@ -4,7 +4,7 @@ GraphicsGate1Item::GraphicsGate1Item(QMenu *menu, QGraphicsItem *parent, QGraphi
     :QGraphicsLineItem(parent,scene)
 {
     this->widthGate=0;
-    this->width=50;
+    this->width=30;
     this->rotP1=130;
     this->rotP2=50;
     this->setPen(QPen(Qt::black, 2, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));

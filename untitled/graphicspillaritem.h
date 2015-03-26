@@ -28,8 +28,7 @@ public:
            BOTTOM_BEGINEND     =   1, // Начальное/конечное
            BOTTOM_PASSAGE      =   2, // Проходное
            BOTTOM_ANGLETWO     =   3, //Угловое двойное
-           BOTTOM_ANGLETHREE   =   4, // Угловое тройное
-           BOTTOM_NONE         =   -1
+           BOTTOM_ANGLETHREE   =   4 // Угловое тройное
        };
        GraphicsPillarItem(QMenu *menuItem=0,QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
        ~GraphicsPillarItem();
@@ -42,8 +41,7 @@ public:
        void setHeight(int height);
        void setHeightSide(SIDETYPE sideType,int height);
        void setHeightSide(int side,int height);
-       void setBottomType(BOTTOMTYPE bottomType);
-       void setBottomType(int bottomType);
+       void setBottomTypeEnable(bool enable);
        void clearColorRow();
        void addColorRow(COLOR color);
        void setCountColorRow(int count);
@@ -58,7 +56,8 @@ public:
        QPointF centre();
        int heightSide(SIDETYPE sideType);
        int heightSide(int side);
-       BOTTOMTYPE isBottomType();
+       int isBottomType();
+       bool isBottomTypeEnable();
        bool isTop();
        int countColorRow();
        COLOR colorRow(int row);
@@ -86,6 +85,7 @@ private:
     bool pazzlePillar;
     COLOR colorPazzlePillar[2];
     BOTTOMTYPE bottomTypePillar;
+    bool bottomTypeEnablePillar;
     QHash<GraphicsWallItem*,bool> listWall;
     QList<QPointF> lastPos;
     bool mouseRelease;

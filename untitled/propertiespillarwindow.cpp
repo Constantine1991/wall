@@ -38,14 +38,9 @@ void PropertiesPillarWindow::SetPropertiesPillar(GraphicsPillarItem *item, QList
     ui->checkBox_3->setEnabled(!ui->checkBox_5->isChecked());
     ui->comboBox_4->setEnabled(ui->checkBox_5->isChecked());
     ui->comboBox_5->setEnabled(ui->checkBox_5->isChecked());
-    if(this->Pillar->isBottomType()==GraphicsPillarItem::BOTTOM_NONE)
-        ui->checkBox_6->setChecked(false);
-    else{
-        ui->checkBox_6->setChecked(true);
-        ui->comboBox_6->setCurrentIndex((int)this->Pillar->isBottomType());
-        ui->comboBox_6->setEnabled(true);
-    }
-
+    ui->checkBox_6->setChecked(this->Pillar->isBottomTypeEnable());
+    ui->comboBox_6->setCurrentIndex(this->Pillar->isBottomType());
+    ui->comboBox_6->setEnabled(this->Pillar->isBottomTypeEnable());
     ui->comboBox_2->setFocusPolicy(Qt::NoFocus);
     int size = ui->comboBox_2 ->style()->pixelMetric(QStyle::PM_IconViewIconSize);
     QPixmap pixmap(size,size-5);
@@ -127,11 +122,10 @@ void PropertiesPillarWindow::on_comboBox_activated(const QString &arg1)
 
 void PropertiesPillarWindow::on_comboBox_activated(int index)
 {
-    this->Pillar->setHeightSide(this->lastIndexCheckBox,ui->lineEdit_3->text().toInt());
+//    this->Pillar->setHeightSide(this->lastIndexCheckBox,ui->lineEdit_3->text().toInt());
     ui->widget->setRenderingSide(index);
-    ui->lineEdit_3->clear();
     ui->lineEdit_3->setText(QString::number(this->Pillar->heightSide(index)));
-    this->lastIndexCheckBox=index;
+   // this->lastIndexCheckBox=index;
 
 }
 
@@ -154,7 +148,14 @@ void PropertiesPillarWindow::on_lineEdit_2_textChanged(const QString &arg1)
 
 void PropertiesPillarWindow::on_lineEdit_3_textChanged(const QString &arg1)
 {
-    ui->widget->setInsertBottom(arg1.toInt());
+    if(arg1.toInt()<=ui->lineEdit->text().toInt())
+    {
+        ui->widget->setInsertBottom(arg1.toInt());
+        this->Pillar->setHeightSide(ui->comboBox->currentIndex(),ui->lineEdit_3->text().toInt());
+        if(ui->checkBox_6->isChecked())
+            ui->comboBox_6->setCurrentIndex(this->Pillar->isBottomType());
+    }
+    else ui->lineEdit_3->setText(ui->lineEdit->text());
 }
 
 void PropertiesPillarWindow::on_checkBox_clicked()
@@ -229,9 +230,10 @@ void PropertiesPillarWindow::saveSetting()
         this->Pillar->setPazzle(ui->checkBox_5->isChecked());
         this->Pillar->setColorPazzle(0,*this->listColor.at(ui->comboBox_4->currentIndex()));
         this->Pillar->setColorPazzle(1,*this->listColor.at(ui->comboBox_5->currentIndex()));
-        if(ui->checkBox_6->isChecked())
+        this->Pillar->setBottomTypeEnable(ui->checkBox_6->isChecked());
+        /*if(ui->checkBox_6->isChecked())
             this->Pillar->setBottomType(ui->comboBox_6->currentIndex());
-        else this->Pillar->setBottomType(GraphicsPillarItem::BOTTOM_NONE);
+        else this->Pillar->setBottomType(GraphicsPillarItem::BOTTOM_NONE);*/
         this->Pillar->clearColorRow();
         if(!this->Pillar->isPazzle())
         {
@@ -269,4 +271,10 @@ void PropertiesPillarWindow::on_checkBox_2_clicked()
 void PropertiesPillarWindow::on_checkBox_6_clicked()
 {
     ui->comboBox_6->setEnabled(ui->checkBox_6->isChecked());
+    ui->widget->setEnabledBottom(ui->checkBox_6->isChecked());
+}
+
+void PropertiesPillarWindow::on_lineEdit_3_textEdited(const QString &arg1)
+{
+
 }
