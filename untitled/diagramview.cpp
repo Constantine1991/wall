@@ -1376,7 +1376,6 @@ void DiagramView::mouseDoubleClickEvent(QMouseEvent *event)
             QGraphicsItem *wallPillar2=this->itemToScene(ITEM_PILLAR,wall->line().p2());
             if(wallPillar!=NULL && wallPillar2!=NULL)
             {
-
                 GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(wallPillar);
                 GraphicsPillarItem *pillar2=qgraphicsitem_cast<GraphicsPillarItem*>(wallPillar2);
                 if((pillar->height()>=this->itemSetting->heightBrickAngle)&&

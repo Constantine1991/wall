@@ -311,6 +311,9 @@ void GraphicsPillarItem::setPosition(QPointF pos)
 void GraphicsPillarItem::setGraphicsPillarItem(GraphicsPillarItem *graphicsItem)
 {
     this->setHeight(graphicsItem->height());
+    for(int i=0;i<4;i++)
+        this->setHeightSide(i,graphicsItem->heightSide(i));
+    this->setBottomTypeEnable(graphicsItem->isBottomTypeEnable());
     this->setText(graphicsItem->text());
     this->setTop(graphicsItem->isTop());
     this->setPazzle(graphicsItem->isPazzle());
