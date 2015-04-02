@@ -71,6 +71,7 @@ private:
     void savePillar(QDomDocument *document, QDomElement *parent, GraphicsPillarItem *pillar);
     void loadPillar(QXmlStreamReader *xml,GraphicsPillarItem *pillar);
     void setLastPosObject();
+    void isValidateObject();
 private slots:
     void RotateItem_45();
     void RotateItem_90();

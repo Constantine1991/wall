@@ -289,9 +289,7 @@ void GroupItem::setPos(GroupItem::TYPEGROUP typeItem,QGraphicsItem *p1,QGraphics
         case GroupItem::ITEM_WICKET:{
 
             GraphicsWicketItem *wicket=qgraphicsitem_cast<GraphicsWicketItem*>(c);
-            wicket->setPosition(this->rotatePoint(pillar1->centre(),
-                                                  QPointF(pillar1->centre().x()+pillar1->boundingRect().width()/2,
-                                                          pillar1->centre().y()),this->rotation));
+            wicket->setPosition(this->centreLine(line));
             break;
         }
         case GroupItem::ITEM_GATE1:{
@@ -643,4 +641,10 @@ QPointF GroupItem::centre()
 {
     return QPointF((this->boundingLine.p1().x()+this->boundingLine.p2().x())/2,
                    (this->boundingLine.p1().y()+this->boundingLine.p2().y())/2);
+}
+
+QPointF GroupItem::centreLine(QLineF line)
+{
+    return QPointF((line.p1().x()+line.p2().x())/2,
+                   (line.p1().y()+line.p2().y())/2);
 }

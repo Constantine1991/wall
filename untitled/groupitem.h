@@ -49,6 +49,7 @@ private:
     void setBoundingLine(QLineF line);
     QPointF rotatePoint(QPointF center, QPointF point,float angle);
     QPointF centre();
+    QPointF centreLine(QLineF line);
     TYPEGROUP type;
     QList<QGraphicsItem*> group;
     QLineF boundingLine;

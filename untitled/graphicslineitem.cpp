@@ -61,7 +61,7 @@ void GraphicsLineItem::updatePosText()
 {
 
     QPointF centreLine=this->center();
-    this->text->setRotation(this->rotationLocalCoords());
+    this->text->setRotation(this->rotationLocalCoords()+180);
     this->text->setPos(centreLine);
 }
 
@@ -91,31 +91,27 @@ int GraphicsLineItem::width(GraphicsPillarItem *p1, GraphicsPillarItem *p2, QGra
     foreach(QGraphicsItem *item,objects)
         switch(item->type())
         {
-            case GraphicsPillarItem::Type:{
-                w+=35;
-                break;
-            }
             case GraphicsWallItem::Type:{
                 GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(item);
-                w+=wall->width();
+                w+=wall->width()==0?0:wall->width()+35;
                 break;
             }
             case GraphicsGate1Item::Type:{
                 GraphicsGate1Item *gate1=qgraphicsitem_cast<GraphicsGate1Item*>(item);
-                w+=gate1->value();
+                w+=gate1->value()==0?0:gate1->value()+35;
                 break;
             }
             case GraphicsGate2Item::Type:{
                 GraphicsGate2Item *gate2=qgraphicsitem_cast<GraphicsGate2Item*>(item);
-                w+=gate2->value();
+                w+=gate2->value()==0?0:gate2->value()+35;
                 break;
             }
             case GraphicsWicketItem::Type:{
                 GraphicsWicketItem *wicket=qgraphicsitem_cast<GraphicsWicketItem*>(item);
-                w+=wicket->value();
+                w+=wicket->value()==0?0:wicket->value()+35;
                 break;
             }
             default: break;
         }
-    return w-35;
+    return w;
 }

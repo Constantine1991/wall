@@ -1393,6 +1393,94 @@ void DiagramView::mouseDoubleClickEvent(QMouseEvent *event)
     QGraphicsView::mouseDoubleClickEvent(event);
 }
 
+void DiagramView::isValidateObject()
+{
+    QList<QGraphicsItem*>itemGraphics=this->pDiagramScene->items();
+    foreach(QGraphicsItem* item,itemGraphics)
+    {
+        if(item->type()==GraphicsWallItem::Type)
+        {
+            GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(item);
+            QGraphicsItem *wallPillar=this->itemToScene(ITEM_PILLAR,wall->line().p1());
+            QGraphicsItem *wallPillar2=this->itemToScene(ITEM_PILLAR,wall->line().p2());
+            if(wallPillar!=NULL && wallPillar2!=NULL)
+            {
+                qDebug()<<"-----------------------------------";
+                GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(wallPillar);
+                GraphicsPillarItem *pillar2=qgraphicsitem_cast<GraphicsPillarItem*>(wallPillar2);
+                if((pillar->height()>=this->itemSetting->heightBrickAngle)&&
+                   (pillar2->height()>=this->itemSetting->heightBrickAngle))
+                {
+                    qDebug()<<"PILLAR 2: height="<<pillar2->height();
+                    qDebug()<<"PILLAR 1: height="<<pillar->height();
+                    for(int i=0;i<4;i++)
+                        qDebug()<<"Side("<<i<<"):"<<pillar->heightSide(i);
+                    if(pillar->isTop())
+                        qDebug()<<"Top color:"<<pillar->topColor().caption;
+                    if(pillar->isPazzle())
+                        qDebug()<<"Pazzle color(1):"<<pillar->colorPazzle(0).caption<<" color(2):"<<
+                                  pillar->colorPazzle(0).caption;
+                    if(!pillar->colorListRow().isEmpty())
+                    {
+                        qDebug()<<"Count color list row:"<<pillar->countColorRow();
+                        foreach(COLOR color,pillar->colorListRow())
+                            qDebug()<<"Color row:"<<color.caption;
+                    }
+                    if(pillar->isBottomTypeEnable())
+                        qDebug()<<"Bottom type:"<<pillar->isBottomType();
+                    ////////////////////////////////////////////////////////////
+                    qDebug()<<"WALL width:"<<wall->width()<<" height:"<<wall->height();
+                    if(wall->isTop())
+                        qDebug()<<"Top color:"<<wall->colorTop().caption;
+                    if(wall->isPazzle())
+                        qDebug()<<"Pazzle color(1):"<<wall->colorPazzle(0).caption<<" color(2):"<<
+                                  wall->colorPazzle(1).caption;
+                    if(!wall->colorListRow().isEmpty())
+                    {
+                        qDebug()<<"Count color list row:"<<wall->countColorRow();
+                        foreach(COLOR color,wall->colorListRow())
+                            qDebug()<<"Color row:"<<color.caption;
+                    }
+                    qDebug()<<wall->isDecoreid();
+                }
+            }
+        }
+    }
+   /*if(!itemGraphics.isEmpty())
+    {
+        if(itemGraphics.at(0)->type()==GraphicsPillarItem::Type)
+        {
+            PropertiesPillarWindow *PillarWindow=new PropertiesPillarWindow(this);
+            PillarWindow->heightBrick=this->itemSetting->heightBrickAngle;
+            connect(PillarWindow,SIGNAL(closeProperties(TYPEITEM,bool)),this,SLOT(closeProperties(TYPEITEM,bool)));
+            this->itemGraphicsChange=itemGraphics.at(0);
+            GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(this->itemGraphicsChange);
+            PillarWindow->SetPropertiesPillar(pillar,this->itemSetting->color);
+            PillarWindow->show();
+        }
+        if(itemGraphics.at(0)->type()==GraphicsWallItem::Type)
+        {
+            this->itemGraphicsChange=itemGraphics.at(0);
+            GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(this->itemGraphicsChange);
+            QGraphicsItem *wallPillar=this->itemToScene(ITEM_PILLAR,wall->line().p1());
+            QGraphicsItem *wallPillar2=this->itemToScene(ITEM_PILLAR,wall->line().p2());
+            if(wallPillar!=NULL && wallPillar2!=NULL)
+            {
+                GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(wallPillar);
+                GraphicsPillarItem *pillar2=qgraphicsitem_cast<GraphicsPillarItem*>(wallPillar2);
+                if((pillar->height()>=this->itemSetting->heightBrickAngle)&&
+                   (pillar2->height()>=this->itemSetting->heightBrickAngle))
+                {
+                    PropertiesWallWindow *wallWindow=new PropertiesWallWindow(this);
+                    connect(wallWindow,SIGNAL(closeProperties(TYPEITEM,bool)),this,SLOT(closeProperties(TYPEITEM,bool)));
+                    wallWindow->SetPropertiesWall(wall,this->itemSetting,pillar);
+                    wallWindow->show();
+                }
+            }
+        }
+    }*/
+}
+
 void DiagramView::keyPressEvent(QKeyEvent *event)
 {
     if(event->key()==Qt::Key_Delete)
@@ -1404,6 +1492,10 @@ void DiagramView::keyPressEvent(QKeyEvent *event)
     if(event->key()==Qt::Key_Z)
         if(event->modifiers()==Qt::ControlModifier)
             this->setLastPosObject();
+    if(event->key()==Qt::Key_1)
+    {
+        this->isValidateObject();
+    }
     QGraphicsView::keyPressEvent(event);
 }
 

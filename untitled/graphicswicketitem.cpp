@@ -1,17 +1,13 @@
 #include "graphicswicketitem.h"
-
+#include "QDebug"
 GraphicsWicketItem::GraphicsWicketItem(QMenu *menuItem, QGraphicsItem *parent, QGraphicsScene *scene)
-    :QGraphicsLineItem(parent,scene)
+    :QGraphicsTextItem(parent,scene)
 {
     this->widthWicket=0;
-    this->width=30;
-    this->rot=130;
-    this->setPen(QPen(Qt::black, 2, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+    this->rot=0;
     this->setFlag(QGraphicsItem::ItemIsSelectable,true);
-    QPointF p2=this->rotatePoint(QPointF(0,0),QPointF(0,this->width),this->rot);
-    this->setLine(QLineF(QPointF(0,0),p2));
-    this->text=new QGraphicsTextItem("0",this);
-    this->text->setPos(50,0);
+    this->setPos(0,0);
+    this->setPlainText(QString::fromLocal8Bit("Калитка\n\n\n0"));
     this->menu=menuItem;
 }
 
@@ -21,9 +17,8 @@ GraphicsWicketItem::~GraphicsWicketItem()
 
 void GraphicsWicketItem::setText(QString text)
 {
-    this->text->setPlainText(text);
+    this->setPlainText(QString::fromLocal8Bit("Калитка\n\n\n")+text);
     this->widthWicket=text.toInt();
-    this->updateText();
 }
 
 int GraphicsWicketItem::value()
@@ -33,25 +28,22 @@ int GraphicsWicketItem::value()
 
 void GraphicsWicketItem::setPosition(QPointF pos)
 {
-    QPointF p2=this->rotatePoint(pos,QPointF(pos.x()+this->width,pos.y()),this->rot);
-    this->setLine(QLineF(pos,p2));
-    this->updateText();
+    this->setPos(this->rotatePoint(pos,QPointF(pos.x()-15,pos.y()-40),this->rotation()));
 }
 
 QPointF GraphicsWicketItem::position()
 {
-    return this->line().p1();
+    return this->pos();
 }
 
 int GraphicsWicketItem::rotationWicket()
 {
-    return this->rot-130;
+    return this->rotation();
 }
 
 void GraphicsWicketItem::setRotate(int angle)
 {
-    this->rot=130+angle;
-    this->setPosition(this->line().p1());
+    this->setRotation(angle);
 }
 
 void GraphicsWicketItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
@@ -70,18 +62,8 @@ QPointF GraphicsWicketItem::rotatePoint(QPointF center, QPointF point,float angl
     return QPoint(center.x()+(point.x()-center.x())*::cos(angle*PI/180)-(point.y()-center.y())*::sin(angle*PI/180),
                   center.y()+(point.y()-center.y())*::cos(angle*PI/180)+(point.x()-center.x())*::sin(angle*PI/180));
 }
-
+/*
 QPointF GraphicsWicketItem::centre()
 {
     return QPointF((this->line().p1().x()+this->line().p2().x())/2,(this->line().p1().y()+this->line().p2().y())/2);
-}
-
-void GraphicsWicketItem::updateText()
-{
-    QPointF p1=this->line().p1();
-    QPointF p2=this->line().p2();
-    float angle=::atan2(p1.y()-p2.y(),p1.x()-p2.x())/PI*180;
-    angle=angle<0?angle+360:angle;
-    this->text->setRotation(angle);
-    this->text->setPos(this->line().p2());
-}
+}*/

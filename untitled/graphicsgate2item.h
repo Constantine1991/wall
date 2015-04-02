@@ -2,14 +2,13 @@
 #define GRAPHICSGATE2ITEM_H
 
 #include <QGraphicsScene>
-#include <QGraphicsLineItem>
 #include <QGraphicsTextItem>
 #include <QPointF>
 #include <QGraphicsSceneContextMenuEvent>
 #include <QMenu>
 #include "propertiesitem.h"
 
-class GraphicsGate2Item:public QGraphicsLineItem
+class GraphicsGate2Item:public QGraphicsTextItem
 {
 public:
     enum {Type=UserType + 5};
@@ -29,8 +28,6 @@ protected:
     void contextMenuEvent(QGraphicsSceneContextMenuEvent *event);
 private:
     QPointF rotatePoint(QPointF center, QPointF point,float angle);
-    QPointF centre();
-    void updateText();
     QGraphicsTextItem *text;
     QGraphicsLineItem *mirrorLine;
     QGraphicsLineItem *topLine;

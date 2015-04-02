@@ -2,7 +2,6 @@
 #define GRAPHICSWICKETITEM_H
 
 #include <QGraphicsScene>
-#include <QGraphicsLineItem>
 #include <QGraphicsTextItem>
 #include <QGraphicsSceneContextMenuEvent>
 #include <QLineF>
@@ -11,7 +10,7 @@
 #include <qmath.h>
 #include "propertiesitem.h"
 
-class GraphicsWicketItem: public QGraphicsLineItem
+class GraphicsWicketItem: public QGraphicsTextItem
 {
 public:
     enum {Type=UserType + 3};
@@ -31,8 +30,6 @@ protected:
 private:
     QPointF rotatePoint(QPointF center, QPointF point,float angle);
     QPointF centre();
-    void updateText();
-    QGraphicsTextItem *text;
     QMenu *menu;
     int width;
     int widthWicket;

@@ -2,7 +2,7 @@
 #include "QDebug"
 GraphicsWallItem::GraphicsWallItem(QMenu *menuItem, QGraphicsItem *parent, QGraphicsScene *scene):QGraphicsLineItem(parent,scene)
 {
-    this->setPen(QPen(Qt::black, 2, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+    this->setPen(QPen(Qt::black, 3, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
     this->setFlag(QGraphicsItem::ItemIsSelectable,true);
     this->setFlag(QGraphicsItem::ItemSendsGeometryChanges,true);
     this->itemText=new QGraphicsTextItem("0|0",this);
@@ -44,7 +44,7 @@ void GraphicsWallItem::updatePosText()
     float angle=::atan2(p1.y()-p2.y(),p1.x()-p2.x())/PI*180;
     angle=angle<0?angle+360:angle;
     QPointF centreLine=this->centre();
-    this->itemText->setRotation(angle);
+    this->itemText->setRotation(angle+180);
     this->itemText->setPos(centreLine);
 }
 
@@ -199,7 +199,7 @@ bool GraphicsWallItem::isGirthRail()
 void GraphicsWallItem::setGraphicsWallItem(GraphicsWallItem *wall)
 {
     this->setHeight(wall->height());
-    this->setWidth(wall->width());
+    //this->setWidth(wall->width());
     this->setTop(wall->isTop());
     if(this->isTop())
         this->setColorTop(wall->colorTop());

@@ -24,6 +24,7 @@ void PropertiesWallWindow::SetPropertiesWall(GraphicsWallItem *item, SETTINGS *i
     ui->widget->setColorListPillar(itemPillar->colorListRow());
     this->wall=item;
     this->itemSetting=itemSetting;
+    this->itemPillar=itemPillar;
 
     ui->checkBox_5->setChecked(this->wall->isGirthRail());
     ui->lineEdit_2->setText(QString::number(this->wall->height()));
