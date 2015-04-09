@@ -105,7 +105,7 @@ QGraphicsItem* DiagramView::AppendItem(TYPEITEM typeItem, QPointF point)
             group->createGroup(GroupItem::ITEM_GATE1,this->MenuItem,this->pDiagramScene);
             group->setPos(point);
             this->objectBackUp.append(group->items().at(0));
-            GraphicsGate1Item *g=qgraphicsitem_cast<GraphicsGate1Item*>(group->items().at(2));
+            GraphicsGate1Item *g=qgraphicsitem_cast<GraphicsGate1Item*>(group->items().at(1));
             g->setText(QString::number(this->widthGroup));
             this->listGroup.append(group);
             return NULL;
@@ -115,7 +115,7 @@ QGraphicsItem* DiagramView::AppendItem(TYPEITEM typeItem, QPointF point)
             connect(this,SIGNAL(itemMoveScene(QPointF)),group,SLOT(itemMoveScene(QPointF)));
             connect(this,SIGNAL(mouseRelease()),group,SLOT(mouseRelease()));
             group->createGroup(GroupItem::ITEM_GATE2,this->MenuItem,this->pDiagramScene);
-            GraphicsGate2Item *g=qgraphicsitem_cast<GraphicsGate2Item*>(group->items().at(2));
+            GraphicsGate2Item *g=qgraphicsitem_cast<GraphicsGate2Item*>(group->items().at(1));
             g->setText(QString::number(this->widthGroup));
             group->setPos(point);
             this->objectBackUp.append(group->items().at(0));
@@ -127,7 +127,7 @@ QGraphicsItem* DiagramView::AppendItem(TYPEITEM typeItem, QPointF point)
             connect(this,SIGNAL(itemMoveScene(QPointF)),group,SLOT(itemMoveScene(QPointF)));
             connect(this,SIGNAL(mouseRelease()),group,SLOT(mouseRelease()));
             group->createGroup(GroupItem::ITEM_WICKET,this->MenuItem,this->pDiagramScene);
-            GraphicsWicketItem *w=qgraphicsitem_cast<GraphicsWicketItem*>(group->items().at(2));
+            GraphicsWicketItem *w=qgraphicsitem_cast<GraphicsWicketItem*>(group->items().at(1));
             w->setText(QString::number(this->widthGroup));
             group->setPos(point);
             this->objectBackUp.append(group->items().at(0));
@@ -147,6 +147,7 @@ QGraphicsItem* DiagramView::AppendItem(TYPEITEM typeItem, QPointF point)
         }
         default:return NULL;
     }
+    return NULL;
 }
 
 void DiagramView::AppendItem(GroupItem::TYPEGROUP typeGroup,QPointF point)
@@ -291,7 +292,6 @@ void DiagramView::Filling(GraphicsPillarItem *a, GraphicsPillarItem *b,float int
     posA=a->centre();
     posB=b->centre();
     GroupItem *groupItem=new GroupItem();
-    groupItem->setType(GroupItem::ITEM_NONE);
     foreach(GroupItem *group,this->listGroup)
         if(group->isItem(b))
         {
@@ -321,7 +321,7 @@ void DiagramView::Filling(GraphicsPillarItem *a, GraphicsPillarItem *b,float int
         point.setX(point.x()-b->boundingRect().width()/2);
         point.setY(point.y()-b->boundingRect().height()/2);
         b->setPos(point);
-        if(groupItem->isType()!=GroupItem::ITEM_NONE)
+        if(!groupItem->types().isEmpty())
             groupItem->setPosItem(b->centre(),b);
         this->lineWall=new QGraphicsLineItem(QLineF(a->centre(),b->centre()));
         GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(this->AppendItem(ITEM_WALL,QPointF(0,0)));
@@ -360,7 +360,7 @@ void DiagramView::Filling(GraphicsPillarItem *a, GraphicsPillarItem *b,float int
         point.setX(point.x()-b->boundingRect().width()/2);
         point.setY(point.y()-b->boundingRect().height()/2);
         b->setPos(point);
-        if(groupItem->isType()!=GroupItem::ITEM_NONE)
+        if(!groupItem->types().isEmpty())
             groupItem->setPosItem(b->centre(),b);
         this->lineWall=new QGraphicsLineItem(QLineF(a->centre(),b->centre()));
         GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(this->AppendItem(ITEM_WALL,QPointF(0,0)));
@@ -492,7 +492,6 @@ void DiagramView::SaveDiagramScene(QString nameFile)
     foreach(GroupItem *group,this->listGroup)
     {
         QDomElement groupObject=document.createElement("GroupObject");
-        groupObject.setAttribute("type",(int)group->isType());
         groupObject.setAttribute("x",group->pos().x());
         groupObject.setAttribute("y",group->pos().y());
         groupObject.setAttribute("rotation",group->rot());
@@ -795,64 +794,8 @@ bool DiagramView::LoadDiagramScene(QString nameFile)
                 float x=xml.attributes().value("x").toString().toFloat();
                 float y=xml.attributes().value("y").toString().toFloat();
                 int angle=xml.attributes().value("rot").toString().toInt();
-                int type=xml.attributes().value("type").toString().toInt();
-                switch(type)
-                {
-                    case GroupItem::ITEM_WICKET:{
-                        this->group->createGroup(GroupItem::ITEM_WICKET,this->MenuItem,this->pDiagramScene);
-                        break;
-                    }
-                    case GroupItem::ITEM_WICKET_WICKET:{
-                        this->group->createGroup(GroupItem::ITEM_WICKET_WICKET,this->MenuItem,this->pDiagramScene);
-                        break;
-                    }
-                    case GroupItem::ITEM_WICKET_GATE1:{
-                        this->group->createGroup(GroupItem::ITEM_WICKET_GATE1,this->MenuItem,this->pDiagramScene);
-                        break;
-                    }
-                    case GroupItem::ITEM_WICKET_GATE2:{
-                        this->group->createGroup(GroupItem::ITEM_WICKET_GATE2,this->MenuItem,this->pDiagramScene);
-                        break;
-                    }
-                    case GroupItem::ITEM_GATE1:{
-                        this->group->createGroup(GroupItem::ITEM_GATE1,this->MenuItem,this->pDiagramScene);
-                        break;
-                    }
-                    case GroupItem::ITEM_GATE1_GATE1:{
-                        this->group->createGroup(GroupItem::ITEM_GATE1_GATE1,this->MenuItem,this->pDiagramScene);
-                        break;
-                    }
-                    case GroupItem::ITEM_GATE1_GATE2:{
-                        this->group->createGroup(GroupItem::ITEM_GATE1_GATE2,this->MenuItem,this->pDiagramScene);
-                        break;
-                    }
-                    case GroupItem::ITEM_GATE1_WICKET:{
-                        this->group->createGroup(GroupItem::ITEM_GATE1_WICKET,this->MenuItem,this->pDiagramScene);
-                        break;
-                    }
-                    case GroupItem::ITEM_GATE2:{
-                        this->group->createGroup(GroupItem::ITEM_GATE2,this->MenuItem,this->pDiagramScene);
-                        break;
-                    }
-                    case GroupItem::ITEM_GATE2_GATE1:{
-                        this->group->createGroup(GroupItem::ITEM_GATE2_GATE1,this->MenuItem,this->pDiagramScene);
-                        break;
-                    }
-                    case GroupItem::ITEM_GATE2_GATE2:{
-                        this->group->createGroup(GroupItem::ITEM_GATE2_GATE2,this->MenuItem,this->pDiagramScene);
-                        break;
-                    }
-                    case GroupItem::ITEM_GATE2_WICKET:{
-                        this->group->createGroup(GroupItem::ITEM_GATE2_WICKET,this->MenuItem,this->pDiagramScene);
-                        break;
-                    }
-                    default:{
-                        delete this->group;
-                        this->group=NULL;
-                        break;
-                    }
-                }
                 int i=0;
+                QList<GraphicsPillarItem*> listPillar;
                 while(!(xml.isEndElement()&&xml.name()=="GroupObject"))
                 {
                     if(xml.isStartElement()&&xml.name()=="Object")
@@ -860,38 +803,48 @@ bool DiagramView::LoadDiagramScene(QString nameFile)
                         switch(xml.attributes().value("type").toString().toInt())
                         {
                             case GraphicsPillarItem::Type:{
-                                GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(this->group->items().at(i));
+                                GraphicsPillarItem *pillar=new GraphicsPillarItem(this->MenuItem);
                                 this->loadPillar(&xml,pillar);
+                                listPillar.append(pillar);
                                 break;
                             }
                             case GraphicsWicketItem::Type:{
-                                GraphicsWicketItem *groupObject=qgraphicsitem_cast<GraphicsWicketItem*>(this->group->items().at(i));
                                 while(!(xml.isEndElement()&&xml.name()=="Object"))
                                 {
                                     if(xml.isStartElement()&&xml.name()=="Width")
-                                        groupObject->setText(xml.attributes().value("value").toString());
+                                        this->widthGroup=xml.attributes().value("value").toString().toInt();
                                     xml.readNext();
                                 }
+                                if(this->group->types().isEmpty())
+                                    this->AppendItem(ITEM_WICKET,QPointF(0,0));
+                                else this->group->addGroup(GroupItem::ITEM_WICKET,QString::number(this->widthGroup),
+                                                           this->MenuItem,this->pDiagramScene);
                                 break;
                             }
                             case GraphicsGate1Item::Type:{
-                                GraphicsGate1Item *groupObject=qgraphicsitem_cast<GraphicsGate1Item*>(this->group->items().at(i));
                                 while(!(xml.isEndElement()&&xml.name()=="Object"))
                                 {
                                     if(xml.isStartElement()&&xml.name()=="Width")
-                                        groupObject->setText(xml.attributes().value("value").toString());
+                                        this->widthGroup=xml.attributes().value("value").toString().toInt();
                                     xml.readNext();
                                 }
+                                if(this->group->types().isEmpty())
+                                    this->AppendItem(ITEM_GATE_A,QPointF(0,0));
+                                else this->group->addGroup(GroupItem::ITEM_GATE1,QString::number(this->widthGroup),
+                                                           this->MenuItem,this->pDiagramScene);
                                 break;
                             }
                             case GraphicsGate2Item::Type:{
-                                GraphicsGate2Item *groupObject=qgraphicsitem_cast<GraphicsGate2Item*>(this->group->items().at(i));
                                 while(!(xml.isEndElement()&&xml.name()=="Object"))
                                 {
                                     if(xml.isStartElement()&&xml.name()=="Width")
-                                        groupObject->setText(xml.attributes().value("value").toString());
+                                        this->widthGroup=xml.attributes().value("value").toString().toInt();
                                     xml.readNext();
                                 }
+                                if(this->group->types().isEmpty())
+                                    this->AppendItem(ITEM_GATE_B,QPointF(0,0));
+                                else this->group->addGroup(GroupItem::ITEM_GATE2,QString::number(this->widthGroup),
+                                                           this->MenuItem,this->pDiagramScene);
                                 break;
                             }
                             default:break;
@@ -902,7 +855,13 @@ bool DiagramView::LoadDiagramScene(QString nameFile)
                 }
                 this->group->setPos(QPointF(x,y));
                 this->group->setRotate(angle);
-                this->listGroup.append(group);
+                for(int i=0,j=0;i<this->group->items().count();i+=2,j++)
+                {
+                    GraphicsPillarItem *p1=qgraphicsitem_cast<GraphicsPillarItem*>(listPillar.at(j));
+                    GraphicsPillarItem *p2=qgraphicsitem_cast<GraphicsPillarItem*>(this->group->items().at(i));
+                    p2->setGraphicsPillarItem(p1);
+                }
+               // this->listGroup.append(group);
             }
         }
         xml.readNext();
@@ -1199,7 +1158,7 @@ void DiagramView::collidingGroup(QPointF point)
             moveGroup=group;
             break;
         }
-    if(moveGroup->isType()==GroupItem::ITEM_NONE)
+    if(moveGroup->types().isEmpty())
         return;
     QList<QGraphicsItem*> colidingItemList=this->pDiagramScene->collidingItems(moveGroup->items().at(0));
     colidingItemList.append(this->pDiagramScene->collidingItems(moveGroup->items().at(1)));
@@ -1215,41 +1174,28 @@ void DiagramView::collidingGroup(QPointF point)
             if(group->isItem(colidingItem))
                 coliding=group;
         }
-        if(coliding->isType()!=GroupItem::ITEM_NONE)
+        if(!coliding->types().isEmpty())
             break;
     }
-    if(coliding->isType()==GroupItem::ITEM_NONE)
+    if(coliding->types().isEmpty())
         return;
-    if((int)coliding->isType()<3 && (int)moveGroup->isType()<3)
+    if(coliding->types().count()>4 || moveGroup->types().count()>1)
+        return;
+    coliding->addGroup(moveGroup,this->MenuItem,this->pDiagramScene);
+    coliding->setPos(point);
+    foreach(QGraphicsItem *item,moveGroup->items())
+        this->pDiagramScene->removeItem(item);
+    this->listGroup.removeAt(this->listGroup.indexOf(moveGroup));
+    while(true)
     {
-        group=new GroupItem();
-        connect(this,SIGNAL(itemMoveScene(QPointF)),group,SLOT(itemMoveScene(QPointF)));
-        connect(this,SIGNAL(mouseRelease()),group,SLOT(mouseRelease()));
-        group->createGroup(coliding,moveGroup,this->MenuItem,this->pDiagramScene);
-        this->objectBackUp.append(group->items().at(0));
-        group->setPos(point);
-        this->listGroup.append(group);
-        foreach(QGraphicsItem *item,moveGroup->items())
-            this->pDiagramScene->removeItem(item);
-        foreach(QGraphicsItem *item,coliding->items())
-            this->pDiagramScene->removeItem(item);
-        this->listGroup.removeAt(this->listGroup.indexOf(moveGroup));
-        this->listGroup.removeAt(this->listGroup.indexOf(coliding));
-        while(true)
-        {
-            int indexA=this->objectBackUp.indexOf(moveGroup->items().at(0));
-            if(indexA!=-1)
-                this->objectBackUp.removeAt(indexA);
-            int indexB=this->objectBackUp.indexOf(coliding->items().at(0));
-            if(indexB!=-1)
-                this->objectBackUp.removeAt(indexB);
-            if(indexA==-1 && indexB==-1)
-                break;
+        int indexA=this->objectBackUp.indexOf(moveGroup->items().at(0));
+        if(indexA!=-1)
+            this->objectBackUp.removeAt(indexA);
+        if(indexA==-1)
+            break;
 
-        }
-        delete moveGroup;
-        delete coliding;
     }
+    delete moveGroup;
 }
 /*----------------------------------------protected--------------------------------------------------------*/
 

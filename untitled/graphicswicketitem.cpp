@@ -28,6 +28,7 @@ int GraphicsWicketItem::value()
 
 void GraphicsWicketItem::setPosition(QPointF pos)
 {
+   // point=pos;
     this->setPos(this->rotatePoint(pos,QPointF(pos.x()-15,pos.y()-40),this->rotation()));
 }
 
@@ -44,6 +45,7 @@ int GraphicsWicketItem::rotationWicket()
 void GraphicsWicketItem::setRotate(int angle)
 {
     this->setRotation(angle);
+    this->setPos(this->rotatePoint(this->centre(),this->pos(),angle));
 }
 
 void GraphicsWicketItem::contextMenuEvent(QGraphicsSceneContextMenuEvent *event)
@@ -62,8 +64,10 @@ QPointF GraphicsWicketItem::rotatePoint(QPointF center, QPointF point,float angl
     return QPoint(center.x()+(point.x()-center.x())*::cos(angle*PI/180)-(point.y()-center.y())*::sin(angle*PI/180),
                   center.y()+(point.y()-center.y())*::cos(angle*PI/180)+(point.x()-center.x())*::sin(angle*PI/180));
 }
-/*
+
 QPointF GraphicsWicketItem::centre()
 {
-    return QPointF((this->line().p1().x()+this->line().p2().x())/2,(this->line().p1().y()+this->line().p2().y())/2);
-}*/
+    int x=this->pos().x()+(this->boundingRect().width()/2*TableAngle[0][(int)this->rotation()/45]);
+    int y=this->pos().y()+(this->boundingRect().height()/2*TableAngle[1][(int)this->rotation()/45]);
+    return QPointF(x,y);
+}

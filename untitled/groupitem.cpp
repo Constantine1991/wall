@@ -4,240 +4,128 @@
 GroupItem::GroupItem(QObject *parent):QObject(parent)
 {
     this->rotation=0;
-    this->type=GroupItem::ITEM_NONE;
     this->isMouseRelease=false;
     this->isBackUp=false;
 }
 
 QList<QGraphicsItem*> GroupItem::create(TYPEGROUP type, QMenu *menu)
 {
-    this->type=type;
     QList<QGraphicsItem*> result;
     GraphicsPillarItem *pillar1=new GraphicsPillarItem(menu);
-    GraphicsPillarItem *pillar2=new GraphicsPillarItem(menu);
-    GraphicsPillarItem *pillar3=new GraphicsPillarItem(menu);
     result.append(pillar1);
-    result.append(pillar2);
-    switch(this->type)
+    switch(type)
     {
         case GroupItem::ITEM_WICKET:{
             GraphicsWicketItem *wicket=new GraphicsWicketItem(menu);
             result.append(wicket);
-            delete pillar3;
             break;
         }
         case GroupItem::ITEM_GATE1:{
             GraphicsGate1Item *gate1=new GraphicsGate1Item(menu);
             result.append(gate1);
-            delete pillar3;
             break;
         }
         case GroupItem::ITEM_GATE2:{
            GraphicsGate2Item *gate2=new GraphicsGate2Item(menu);
            result.append(gate2);
-           delete pillar3;
            break;
-        }
-        case GroupItem::ITEM_WICKET_WICKET:{
-            GraphicsWicketItem *w1=new GraphicsWicketItem(menu);
-            GraphicsWicketItem *w2=new GraphicsWicketItem(menu);
-            result.append(pillar3);
-            result.append(w1);
-            result.append(w2);
-            break;
-        }
-        case GroupItem::ITEM_WICKET_GATE1:{
-            GraphicsWicketItem *w=new GraphicsWicketItem(menu);
-            GraphicsGate1Item *g1=new GraphicsGate1Item(menu);
-            result.append(pillar3);
-            result.append(w);
-            result.append(g1);
-            break;
-        }
-        case GroupItem::ITEM_WICKET_GATE2:{
-            GraphicsWicketItem *w=new GraphicsWicketItem(menu);
-            GraphicsGate2Item *g2=new GraphicsGate2Item(menu);
-            result.append(pillar3);
-            result.append(w);
-            result.append(g2);
-            break;
-        }
-        case GroupItem::ITEM_GATE1_GATE1:{
-            GraphicsGate1Item *g0=new GraphicsGate1Item(menu);
-            GraphicsGate1Item *g1=new GraphicsGate1Item(menu);
-            result.append(pillar3);
-            result.append(g0);
-            result.append(g1);
-            break;
-        }
-        case GroupItem::ITEM_GATE1_GATE2:{
-            GraphicsGate1Item *g1=new GraphicsGate1Item(menu);
-            GraphicsGate2Item *g2=new GraphicsGate2Item(menu);
-            result.append(pillar3);
-            result.append(g1);
-            result.append(g2);
-            break;
-        }
-        case GroupItem::ITEM_GATE1_WICKET:{
-            GraphicsGate1Item *g1=new GraphicsGate1Item(menu);
-            GraphicsWicketItem *w=new GraphicsWicketItem(menu);
-            result.append(pillar3);
-            result.append(g1);
-            result.append(w);
-            break;
-        }
-        case GroupItem::ITEM_GATE2_GATE2:{
-            GraphicsGate2Item *g0=new GraphicsGate2Item(menu);
-            GraphicsGate2Item *g2=new GraphicsGate2Item(menu);
-            result.append(pillar3);
-            result.append(g0);
-            result.append(g2);
-            break;
-        }
-        case GroupItem::ITEM_GATE2_GATE1:{
-            GraphicsGate2Item *g2=new GraphicsGate2Item(menu);
-            GraphicsGate1Item *g1=new GraphicsGate1Item(menu);
-            result.append(pillar3);
-            result.append(g2);
-            result.append(g1);
-            break;
-        }
-        case GroupItem::ITEM_GATE2_WICKET:{
-            GraphicsGate2Item *g2=new GraphicsGate2Item(menu);
-            GraphicsWicketItem *w=new GraphicsWicketItem(menu);
-            result.append(pillar3);
-            result.append(g2);
-            result.append(w);
-            break;
         }
         default:break;
     }
+    GraphicsPillarItem *pillar2=new GraphicsPillarItem(menu);
+    result.append(pillar2);
     return result;
 }
 
 void GroupItem::createGroup(TYPEGROUP type,QMenu *menu, QGraphicsScene *scene)
 {
     QList<QGraphicsItem*> newGroup=this->create(type,menu);
+    this->type.clear();
+    this->type.append(type);
     this->group.clear();
     this->group.append(newGroup);
-    scene->addItem(this->group.at(0));
-    scene->addItem(this->group.at(1));
-    scene->addItem(this->group.at(2));
-    if(this->group.count()==5)
-    {
-        scene->addItem(this->group.at(3));
-        scene->addItem(this->group.at(4));
-    }
+    foreach(QGraphicsItem *item,this->group)
+        scene->addItem(item);
 }
 
-void GroupItem::createGroup(GroupItem *g1, GroupItem *g2, QMenu *menu, QGraphicsScene *scene)
+void GroupItem::addGroup(GroupItem::TYPEGROUP type, QString value, QMenu *menu, QGraphicsScene *scene)
 {
-    GroupItem::TYPEGROUP t1=g1->isType();
-    GroupItem::TYPEGROUP t2=g2->isType();
-    QList<QGraphicsItem*> newGroup;
-    if(t1==GroupItem::ITEM_WICKET && t2==GroupItem::ITEM_WICKET)
+    QList<QGraphicsItem*> appendGroup=this->create(type,menu);
+    this->type.append(type);
+    switch(type)
     {
-        newGroup=this->create(GroupItem::ITEM_WICKET_WICKET,menu);
-        GraphicsWicketItem *wicketG1=qgraphicsitem_cast<GraphicsWicketItem*>(g1->items().at(2));
-        GraphicsWicketItem *wicketG2=qgraphicsitem_cast<GraphicsWicketItem*>(g2->items().at(2));
-        GraphicsWicketItem *newWicket1=qgraphicsitem_cast<GraphicsWicketItem*>(newGroup.at(3));
-        GraphicsWicketItem *newWicket2=qgraphicsitem_cast<GraphicsWicketItem*>(newGroup.at(4));
-        newWicket1->setText(QString::number(wicketG1->value()));
-        newWicket2->setText(QString::number(wicketG2->value()));
+        case GroupItem::ITEM_WICKET:{
+            GraphicsWicketItem *object=qgraphicsitem_cast<GraphicsWicketItem*>(appendGroup.at(1));
+            object->setText(value);
+            break;
+        }
+        case GroupItem::ITEM_GATE1:{
+            GraphicsGate1Item *object=qgraphicsitem_cast<GraphicsGate1Item*>(appendGroup.at(1));
+            object->setText(value);
+            break;
+        }
+        case GroupItem::ITEM_GATE2:{
+            GraphicsGate2Item *object=qgraphicsitem_cast<GraphicsGate2Item*>(appendGroup.at(1));
+            object->setText(value);
+            break;
+        }
+        default:break;
     }
-    if(t1==GroupItem::ITEM_WICKET && t2==GroupItem::ITEM_GATE1)
-    {
-        newGroup=this->create(GroupItem::ITEM_WICKET_GATE1,menu);
-        GraphicsWicketItem *wicketG1=qgraphicsitem_cast<GraphicsWicketItem*>(g1->items().at(2));
-        GraphicsGate1Item *g1G2=qgraphicsitem_cast<GraphicsGate1Item*>(g2->items().at(2));
-        GraphicsWicketItem *newWicket1=qgraphicsitem_cast<GraphicsWicketItem*>(newGroup.at(3));
-        GraphicsGate1Item *newg1=qgraphicsitem_cast<GraphicsGate1Item*>(newGroup.at(4));
-        newWicket1->setText(QString::number(wicketG1->value()));
-        newg1->setText(QString::number(g1G2->value()));
-    }
-    if(t1==GroupItem::ITEM_WICKET && t2==GroupItem::ITEM_GATE2)
-    {
-        newGroup=this->create(GroupItem::ITEM_WICKET_GATE2,menu);
-        GraphicsWicketItem *wicketG1=qgraphicsitem_cast<GraphicsWicketItem*>(g1->items().at(2));
-        GraphicsGate2Item *g1G2=qgraphicsitem_cast<GraphicsGate2Item*>(g2->items().at(2));
-        GraphicsWicketItem *newWicket1=qgraphicsitem_cast<GraphicsWicketItem*>(newGroup.at(3));
-        GraphicsGate2Item *newg1=qgraphicsitem_cast<GraphicsGate2Item*>(newGroup.at(4));
-        newWicket1->setText(QString::number(wicketG1->value()));
-        newg1->setText(QString::number(g1G2->value()));
-    }
-    if(t1==GroupItem::ITEM_GATE1 && t2==GroupItem::ITEM_GATE1)
-    {
-        newGroup=this->create(GroupItem::ITEM_GATE1_GATE1,menu);
-        GraphicsGate1Item *wicketG1=qgraphicsitem_cast<GraphicsGate1Item*>(g1->items().at(2));
-        GraphicsGate1Item *g1G2=qgraphicsitem_cast<GraphicsGate1Item*>(g2->items().at(2));
-        GraphicsGate1Item *newWicket1=qgraphicsitem_cast<GraphicsGate1Item*>(newGroup.at(3));
-        GraphicsGate1Item *newg1=qgraphicsitem_cast<GraphicsGate1Item*>(newGroup.at(4));
-        newWicket1->setText(QString::number(wicketG1->value()));
-        newg1->setText(QString::number(g1G2->value()));
-    }
-    if(t1==GroupItem::ITEM_GATE1 && t2==GroupItem::ITEM_GATE2)
-    {
-        newGroup=this->create(GroupItem::ITEM_GATE1_GATE2,menu);
-        GraphicsGate1Item *wicketG1=qgraphicsitem_cast<GraphicsGate1Item*>(g1->items().at(2));
-        GraphicsGate2Item *g1G2=qgraphicsitem_cast<GraphicsGate2Item*>(g2->items().at(2));
-        GraphicsGate1Item *newWicket1=qgraphicsitem_cast<GraphicsGate1Item*>(newGroup.at(3));
-        GraphicsGate2Item *newg1=qgraphicsitem_cast<GraphicsGate2Item*>(newGroup.at(4));
-        newWicket1->setText(QString::number(wicketG1->value()));
-        newg1->setText(QString::number(g1G2->value()));
-    }
-    if(t1==GroupItem::ITEM_GATE1 && t2==GroupItem::ITEM_WICKET)
-    {
-        newGroup=this->create(GroupItem::ITEM_GATE1_WICKET,menu);
-        GraphicsGate1Item *wicketG1=qgraphicsitem_cast<GraphicsGate1Item*>(g1->items().at(2));
-        GraphicsWicketItem *g1G2=qgraphicsitem_cast<GraphicsWicketItem*>(g2->items().at(2));
-        GraphicsGate1Item *newWicket1=qgraphicsitem_cast<GraphicsGate1Item*>(newGroup.at(3));
-        GraphicsWicketItem *newg1=qgraphicsitem_cast<GraphicsWicketItem*>(newGroup.at(4));
-        newWicket1->setText(QString::number(wicketG1->value()));
-        newg1->setText(QString::number(g1G2->value()));
-    }
-    if(t1==GroupItem::ITEM_GATE2 && t2==GroupItem::ITEM_WICKET)
-    {
-        newGroup=this->create(GroupItem::ITEM_GATE2_WICKET,menu);
-        GraphicsGate2Item *wicketG1=qgraphicsitem_cast<GraphicsGate2Item*>(g1->items().at(2));
-        GraphicsWicketItem *g1G2=qgraphicsitem_cast<GraphicsWicketItem*>(g2->items().at(2));
-        GraphicsGate2Item *newWicket1=qgraphicsitem_cast<GraphicsGate2Item*>(newGroup.at(3));
-        GraphicsWicketItem *newg1=qgraphicsitem_cast<GraphicsWicketItem*>(newGroup.at(4));
-        newWicket1->setText(QString::number(wicketG1->value()));
-        newg1->setText(QString::number(g1G2->value()));
-    }
-    if(t1==GroupItem::ITEM_GATE2 && t2==GroupItem::ITEM_GATE2)
-    {
-        newGroup=this->create(GroupItem::ITEM_GATE2_GATE2,menu);
-        GraphicsGate2Item *wicketG1=qgraphicsitem_cast<GraphicsGate2Item*>(g1->items().at(2));
-        GraphicsGate2Item *g1G2=qgraphicsitem_cast<GraphicsGate2Item*>(g2->items().at(2));
-        GraphicsGate2Item *newWicket1=qgraphicsitem_cast<GraphicsGate2Item*>(newGroup.at(3));
-        GraphicsGate2Item *newg1=qgraphicsitem_cast<GraphicsGate2Item*>(newGroup.at(4));
-        newWicket1->setText(QString::number(wicketG1->value()));
-        newg1->setText(QString::number(g1G2->value()));
-    }
-    if(t1==GroupItem::ITEM_GATE2 && t2==GroupItem::ITEM_GATE1)
-    {
-        newGroup=this->create(GroupItem::ITEM_GATE2_GATE1,menu);
-        GraphicsGate2Item *wicketG1=qgraphicsitem_cast<GraphicsGate2Item*>(g1->items().at(2));
-        GraphicsGate1Item *g1G2=qgraphicsitem_cast<GraphicsGate1Item*>(g2->items().at(2));
-        GraphicsGate2Item *newWicket1=qgraphicsitem_cast<GraphicsGate2Item*>(newGroup.at(3));
-        GraphicsGate1Item *newg1=qgraphicsitem_cast<GraphicsGate1Item*>(newGroup.at(4));
-        newWicket1->setText(QString::number(wicketG1->value()));
-        newg1->setText(QString::number(g1G2->value()));
-    }
-    GraphicsPillarItem *PillarG1=qgraphicsitem_cast<GraphicsPillarItem*>(g1->items().at(0));
-    GraphicsPillarItem *newPillar=qgraphicsitem_cast<GraphicsPillarItem*>(newGroup.at(0));
-    newPillar->setGraphicsPillarItem(PillarG1);
-    for(int i=0;i<2;i++)
-    {
-        GraphicsPillarItem *PillarG2=qgraphicsitem_cast<GraphicsPillarItem*>(g2->items().at(i));
-        newPillar=qgraphicsitem_cast<GraphicsPillarItem*>(newGroup.at(i+1));
-        newPillar->setGraphicsPillarItem(PillarG2);
-    }
-    foreach(QGraphicsItem *item,newGroup)
+    appendGroup.removeAt(0);
+    this->group.append(appendGroup);
+    foreach(QGraphicsItem *item,appendGroup)
         scene->addItem(item);
-    this->group.clear();
-    this->group.append(newGroup);
+}
+
+void GroupItem::addGroup(GroupItem *group, QMenu *menu, QGraphicsScene *scene)
+{
+    QList<QGraphicsItem*> appendGroup;
+    foreach(GroupItem::TYPEGROUP t,group->types())
+    {
+        appendGroup.append(this->create(t,menu));
+        this->type.append(t);
+    }
+    appendGroup.removeAt(0);
+    for(int i=1;i<group->items().count()-1;i++)
+    {
+        switch(group->items().at(i)->type())
+        {
+            case GraphicsPillarItem::Type:{
+                GraphicsPillarItem *pillar1=qgraphicsitem_cast<GraphicsPillarItem*>(appendGroup.at(i-1));
+                GraphicsPillarItem *pillar2=qgraphicsitem_cast<GraphicsPillarItem*>(group->items().at(i));
+                pillar1->setGraphicsPillarItem(pillar2);
+                break;
+            }
+            case GraphicsWicketItem::Type:{
+                GraphicsWicketItem *object1=qgraphicsitem_cast<GraphicsWicketItem*>(appendGroup.at(i-1));
+                GraphicsWicketItem *object2=qgraphicsitem_cast<GraphicsWicketItem*>(group->items().at(i));
+                object1->setText(QString::number(object2->value()));
+                break;
+            }
+            case GraphicsGate1Item::Type:{
+                GraphicsGate1Item *object1=qgraphicsitem_cast<GraphicsGate1Item*>(appendGroup.at(i-1));
+                GraphicsGate1Item *object2=qgraphicsitem_cast<GraphicsGate1Item*>(group->items().at(i));
+                object1->setText(QString::number(object2->value()));
+                break;
+            }
+            case GraphicsGate2Item::Type:{
+                GraphicsGate2Item *object1=qgraphicsitem_cast<GraphicsGate2Item*>(appendGroup.at(i-1));
+                GraphicsGate2Item *object2=qgraphicsitem_cast<GraphicsGate2Item*>(group->items().at(i));
+                object1->setText(QString::number(object2->value()));
+                break;
+            }
+            default:break;
+        }
+    }
+
+    this->group.append(appendGroup);
+    foreach(QGraphicsItem *item,appendGroup)
+        scene->addItem(item);
+}
+
+QList<GroupItem::TYPEGROUP> GroupItem::types()
+{
+    return this->type;
 }
 
 bool GroupItem::isItem(QGraphicsItem *item)
@@ -251,11 +139,6 @@ bool GroupItem::isItem(QGraphicsItem *item)
 QList<QGraphicsItem*> GroupItem::items()
 {
     return this->group;
-}
-
-GroupItem::TYPEGROUP GroupItem::isType()
-{
-    return this->type;
 }
 
 void GroupItem::backUp()
@@ -278,47 +161,6 @@ void GroupItem::setBoundingLine(QLineF line)
     this->boundingLine.setP2(this->rotatePoint(centreLine,this->boundingLine.p2(),this->rotation));
 }
 
-void GroupItem::setPos(GroupItem::TYPEGROUP typeItem,QGraphicsItem *p1,QGraphicsItem *p2,QGraphicsItem *c,QLineF line)
-{
-    GraphicsPillarItem *pillar1=qgraphicsitem_cast<GraphicsPillarItem*>(p1);
-    GraphicsPillarItem *pillar2=qgraphicsitem_cast<GraphicsPillarItem*>(p2);
-    pillar1->setPos(line.p1());
-    pillar2->setPos(line.p2());
-    switch(typeItem)
-    {
-        case GroupItem::ITEM_WICKET:{
-
-            GraphicsWicketItem *wicket=qgraphicsitem_cast<GraphicsWicketItem*>(c);
-            wicket->setPosition(this->centreLine(line));
-            break;
-        }
-        case GroupItem::ITEM_GATE1:{
-
-            GraphicsGate1Item *gate1=qgraphicsitem_cast<GraphicsGate1Item*>(c);
-            QPointF p1=this->rotatePoint(pillar1->centre(),
-                                         QPointF(pillar1->centre().x()+pillar1->boundingRect().width()/2,
-                                                 pillar1->centre().y()),this->rotation);
-            QPointF p2=this->rotatePoint(pillar2->centre(),
-                                         QPointF(pillar2->centre().x()-pillar2->boundingRect().width()/2,
-                                                 pillar2->centre().y()),this->rotation);
-            gate1->setPosition(p1,p2);
-            break;
-        }
-        case GroupItem::ITEM_GATE2:{
-            GraphicsGate2Item *gate2=qgraphicsitem_cast<GraphicsGate2Item*>(c);
-            QPointF p1=this->rotatePoint(pillar1->centre(),
-                                         QPointF(pillar1->centre().x()+pillar1->boundingRect().width()/2,
-                                                 pillar1->centre().y()),this->rotation);
-            QPointF p2=this->rotatePoint(pillar2->centre(),
-                                         QPointF(pillar2->centre().x()-pillar2->boundingRect().width()/2,
-                                                 pillar2->centre().y()),this->rotation);
-            gate2->setPosition(p1,p2);
-            break;
-        }
-        default:break;
-    }
-}
-
 void GroupItem::setPos(QPointF point)
 {
     if(this->group.isEmpty())
@@ -330,148 +172,61 @@ void GroupItem::setPos(QPointF point)
         this->lastPos.append(point);
         this->isMouseRelease=false;
     }
-    switch(this->type)
+    this->setBoundingLine(QLineF(QPointF(point.x()-40*this->type.count(),point.y()),
+                                 QPointF(point.x()+40*this->type.count(),point.y())));
+    float angle=::atan2(this->boundingLine.p1().y()-this->boundingLine.p2().y(),
+                        this->boundingLine.p1().x()-this->boundingLine.p2().x())/PI*180;
+    angle=angle<0?angle+360:angle;
+    angle=angle==0?180:angle;
+    GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(this->group.first());
+    pillar->setPos(this->boundingLine.p1());
+    pillar=qgraphicsitem_cast<GraphicsPillarItem*>(this->group.last());
+    pillar->setPos(this->boundingLine.p2());
+    QPointF p=this->boundingLine.p1();
+    for(int i=2;i<this->group.count()-1;i+=2)
     {
-        case ITEM_WICKET:{
-            this->setBoundingLine(QLineF(QPointF(point.x()-40,point.y()),
-                                         QPointF(point.x()+40,point.y())));
-            this->setPos(ITEM_WICKET,this->group.at(0),this->group.at(1),this->group.at(2),this->boundingLine);
-            break;
+        pillar=qgraphicsitem_cast<GraphicsPillarItem*>(this->group.at(i));
+        pillar->setPos(this->rotatePoint(p,QPointF(p.x()-80,p.y()),angle));
+        p=pillar->pos();
+    }
+    QLineF line;
+    line.setP1(this->boundingLine.p1());
+    for(int i=1;i<this->group.count()-1;i+=2)
+    {
+        line.setP2(this->rotatePoint(line.p1(),QPointF(line.p1().x()-80,line.p1().y()),angle));
+        switch(this->group.at(i)->type())
+        {
+            case GraphicsWicketItem::Type:{
+                GraphicsWicketItem  *wicket=qgraphicsitem_cast<GraphicsWicketItem*>(this->group.at(i));
+                wicket->setPosition(this->centreLine(line));
+                break;
+            }
+            case GraphicsGate1Item::Type:{
+                GraphicsGate1Item *gate1=qgraphicsitem_cast<GraphicsGate1Item*>(this->group.at(i));
+                gate1->setPosition(line.p1(),line.p2());
+                break;
+            }
+            case GraphicsGate2Item::Type:{
+                GraphicsGate2Item *gate2=qgraphicsitem_cast<GraphicsGate2Item*>(this->group.at(i));
+                gate2->setPosition(line.p1(),line.p2());
+                break;
+            }
+            default:break;
         }
-        case ITEM_GATE1:{
-            this->setBoundingLine(QLineF(QPointF(point.x()-40,point.y()),
-                                         QPointF(point.x()+40,point.y())));
-            this->setPos(ITEM_GATE1,this->group.at(0),this->group.at(1),this->group.at(2),this->boundingLine);
-            break;
-        }
-        case ITEM_GATE2:{
-            this->setBoundingLine(QLineF(QPointF(point.x()-40,point.y()),
-                                         QPointF(point.x()+40,point.y())));
-            this->setPos(ITEM_GATE2,this->group.at(0),this->group.at(1),this->group.at(2),this->boundingLine);
-            break;
-        }
-        case ITEM_WICKET_WICKET:{
-            this->setBoundingLine(QLineF(QPointF(point.x()-80,point.y()),
-                                         QPointF(point.x()+80,point.y())));
-            QLineF line;
-            line.setP1(this->boundingLine.p1());
-            line.setP2(this->centre());
-            this->setPos(ITEM_WICKET,this->group.at(0),this->group.at(1),this->group.at(3),line);
-            line.setP1(line.p2());
-            line.setP2(this->boundingLine.p2());
-            this->setPos(ITEM_WICKET,this->group.at(1),this->group.at(2),this->group.at(4),line);
-            break;
-        }
-        case ITEM_WICKET_GATE1:{
-            this->setBoundingLine(QLineF(QPointF(point.x()-80,point.y()),
-                                         QPointF(point.x()+80,point.y())));
-            QLineF line;
-            line.setP1(this->boundingLine.p1());
-            line.setP2(this->centre());
-            this->setPos(ITEM_WICKET,this->group.at(0),this->group.at(1),this->group.at(3),line);
-            line.setP1(line.p2());
-            line.setP2(this->boundingLine.p2());
-            this->setPos(ITEM_GATE1,this->group.at(1),this->group.at(2),this->group.at(4),line);
-            break;
-        }
-        case ITEM_WICKET_GATE2:{
-            this->setBoundingLine(QLineF(QPointF(point.x()-80,point.y()),
-                                         QPointF(point.x()+80,point.y())));
-            QLineF line;
-            line.setP1(this->boundingLine.p1());
-            line.setP2(this->centre());
-            this->setPos(ITEM_WICKET,this->group.at(0),this->group.at(1),this->group.at(3),line);
-            line.setP1(line.p2());
-            line.setP2(this->boundingLine.p2());
-            this->setPos(ITEM_GATE2,this->group.at(1),this->group.at(2),this->group.at(4),line);
-            break;
-        }
-        case ITEM_GATE1_GATE1:{
-            this->setBoundingLine(QLineF(QPointF(point.x()-80,point.y()),
-                                         QPointF(point.x()+80,point.y())));
-            QLineF line;
-            line.setP1(this->boundingLine.p1());
-            line.setP2(this->centre());
-            this->setPos(ITEM_GATE1,this->group.at(0),this->group.at(1),this->group.at(3),line);
-            line.setP1(line.p2());
-            line.setP2(this->boundingLine.p2());
-            this->setPos(ITEM_GATE1,this->group.at(1),this->group.at(2),this->group.at(4),line);
-            break;
-        }
-        case ITEM_GATE1_GATE2:{
-            this->setBoundingLine(QLineF(QPointF(point.x()-80,point.y()),
-                                         QPointF(point.x()+80,point.y())));
-            QLineF line;
-            line.setP1(this->boundingLine.p1());
-            line.setP2(this->centre());
-            this->setPos(ITEM_GATE1,this->group.at(0),this->group.at(1),this->group.at(3),line);
-            line.setP1(line.p2());
-            line.setP2(this->boundingLine.p2());
-            this->setPos(ITEM_GATE2,this->group.at(1),this->group.at(2),this->group.at(4),line);
-            break;
-        }
-        case ITEM_GATE1_WICKET:{
-            this->setBoundingLine(QLineF(QPointF(point.x()-80,point.y()),
-                                         QPointF(point.x()+80,point.y())));
-            QLineF line;
-            line.setP1(this->boundingLine.p1());
-            line.setP2(this->centre());
-            this->setPos(ITEM_GATE1,this->group.at(0),this->group.at(1),this->group.at(3),line);
-            line.setP1(line.p2());
-            line.setP2(this->boundingLine.p2());
-            this->setPos(ITEM_WICKET,this->group.at(1),this->group.at(2),this->group.at(4),line);
-            break;
-        }
-        case ITEM_GATE2_WICKET:{
-            this->setBoundingLine(QLineF(QPointF(point.x()-80,point.y()),
-                                         QPointF(point.x()+80,point.y())));
-            QLineF line;
-            line.setP1(this->boundingLine.p1());
-            line.setP2(this->centre());
-            this->setPos(ITEM_GATE2,this->group.at(0),this->group.at(1),this->group.at(3),line);
-            line.setP1(line.p2());
-            line.setP2(this->boundingLine.p2());
-            this->setPos(ITEM_WICKET,this->group.at(1),this->group.at(2),this->group.at(4),line);
-            break;
-        }
-        case ITEM_GATE2_GATE2:{
-            this->setBoundingLine(QLineF(QPointF(point.x()-80,point.y()),
-                                         QPointF(point.x()+80,point.y())));
-            QLineF line;
-            line.setP1(this->boundingLine.p1());
-            line.setP2(this->centre());
-            this->setPos(ITEM_GATE2,this->group.at(0),this->group.at(1),this->group.at(3),line);
-            line.setP1(line.p2());
-            line.setP2(this->boundingLine.p2());
-            this->setPos(ITEM_GATE2,this->group.at(1),this->group.at(2),this->group.at(4),line);
-            break;
-        }
-        case ITEM_GATE2_GATE1:{
-            this->setBoundingLine(QLineF(QPointF(point.x()-80,point.y()),
-                                         QPointF(point.x()+80,point.y())));
-            QLineF line;
-            line.setP1(this->boundingLine.p1());
-            line.setP2(this->centre());
-            this->setPos(ITEM_GATE2,this->group.at(0),this->group.at(1),this->group.at(3),line);
-            line.setP1(line.p2());
-            line.setP2(this->boundingLine.p2());
-            this->setPos(ITEM_GATE1,this->group.at(1),this->group.at(2),this->group.at(4),line);
-            break;
-        }
-        default:break;
+        line.setP1(line.p2());
     }
 }
 
 void GroupItem::setPosItem(QPointF point, QGraphicsItem *item)
 {
-    if(this->type==GroupItem::ITEM_NONE)
+   /* if(this->type.isEmpty())
         return;
     int at=this->group.indexOf(item);
     at=at==0?1:-1;
     if((int)this->type<3)
         this->setBoundingLine(QLineF(point,QPointF(point.x()+80*at,point.y())));
     else this->setBoundingLine(QLineF(point,QPointF(point.x()+160*at,point.y())));
-    this->setPos(this->centre());
+    this->setPos(this->centre());*/
 }
 
 QPointF GroupItem::pos()
@@ -479,132 +234,37 @@ QPointF GroupItem::pos()
     return this->centre();
 }
 
-void GroupItem::setType(GroupItem::TYPEGROUP type)
-{
-    this->type=type;
-}
-
 void GroupItem::setRotate(int angle)
 {
     this->rotation+=angle;
     this->rotation=this->rotation>360?this->rotation-360:this->rotation;
-    GraphicsPillarItem *pillar1=qgraphicsitem_cast<GraphicsPillarItem*>(this->group.at(0));
-    GraphicsPillarItem *pillar2=qgraphicsitem_cast<GraphicsPillarItem*>(this->group.at(1));
-    QPointF centreLine=this->centre();
-    this->boundingLine.setP1(this->rotatePoint(centreLine,this->boundingLine.p1(),this->rotation));
-    this->boundingLine.setP2(this->rotatePoint(centreLine,this->boundingLine.p2(),this->rotation));
-    pillar1->setPos(this->rotatePoint(pillar1->centre(),pillar1->pos(),this->rotation));
-    pillar1->setRotation(this->rotation);
-    pillar2->setPos(this->rotatePoint(pillar2->centre(),pillar2->pos(),this->rotation));
-    pillar2->setRotation(this->rotation);
-    switch(this->type)
+    for(int i=0;i<this->group.count();i+=2)
     {
-        case GroupItem::ITEM_WICKET:{
-            GraphicsWicketItem *wicket=qgraphicsitem_cast<GraphicsWicketItem*>(this->group.at(2));
+      GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(this->group.at(i));
+      pillar->setRotation(this->rotation);
+      pillar->setPos(this->rotatePoint(pillar->centre(),pillar->pos(),this->rotation));
+    }
+    for(int i=1;i<this->group.count()-1;i+=2)
+    {
+        switch(this->group.at(i)->type())
+        {
+        case GraphicsWicketItem::Type:{
+            GraphicsWicketItem *wicket=qgraphicsitem_cast<GraphicsWicketItem*>(this->group.at(i));
             wicket->setRotate(this->rotation);
             break;
         }
-        case GroupItem::ITEM_GATE1:{
-            GraphicsGate1Item *gate1=qgraphicsitem_cast<GraphicsGate1Item*>(this->group.at(2));
+        case GraphicsGate1Item::Type:{
+            GraphicsGate1Item *gate1=qgraphicsitem_cast<GraphicsGate1Item*>(this->group.at(i));
             gate1->setRotate(this->rotation);
             break;
         }
-        case GroupItem::ITEM_GATE2:{
-            GraphicsGate2Item *gate2=qgraphicsitem_cast<GraphicsGate2Item*>(this->group.at(2));
+        case GraphicsGate2Item::Type:{
+            GraphicsGate2Item *gate2=qgraphicsitem_cast<GraphicsGate2Item*>(this->group.at(i));
             gate2->setRotate(this->rotation);
             break;
         }
-        case GroupItem::ITEM_WICKET_WICKET:{
-            GraphicsPillarItem *pillar3=qgraphicsitem_cast<GraphicsPillarItem*>(this->group.at(2));
-            pillar3->setPos(this->rotatePoint(pillar3->centre(),pillar3->pos(),this->rotation));
-            pillar3->setRotation(this->rotation);
-            GraphicsWicketItem *w1=qgraphicsitem_cast<GraphicsWicketItem*>(this->group.at(3));
-            w1->setRotate(this->rotation);
-            GraphicsWicketItem *w2=qgraphicsitem_cast<GraphicsWicketItem*>(this->group.at(4));
-            w2->setRotate(this->rotation);
-            break;
+        default:break;
         }
-        case GroupItem::ITEM_WICKET_GATE1:{
-            GraphicsPillarItem *pillar3=qgraphicsitem_cast<GraphicsPillarItem*>(this->group.at(2));
-            pillar3->setPos(this->rotatePoint(pillar3->centre(),pillar3->pos(),this->rotation));
-            pillar3->setRotation(this->rotation);
-            GraphicsWicketItem *w1=qgraphicsitem_cast<GraphicsWicketItem*>(this->group.at(3));
-            w1->setRotate(this->rotation);
-            GraphicsGate1Item *w2=qgraphicsitem_cast<GraphicsGate1Item*>(this->group.at(4));
-            w2->setRotate(this->rotation);
-            break;
-        }
-        case GroupItem::ITEM_WICKET_GATE2:{
-            GraphicsPillarItem *pillar3=qgraphicsitem_cast<GraphicsPillarItem*>(this->group.at(2));
-            pillar3->setPos(this->rotatePoint(pillar3->centre(),pillar3->pos(),this->rotation));
-            pillar3->setRotation(this->rotation);
-            GraphicsWicketItem *w1=qgraphicsitem_cast<GraphicsWicketItem*>(this->group.at(3));
-            w1->setRotate(this->rotation);
-            GraphicsGate2Item *w2=qgraphicsitem_cast<GraphicsGate2Item*>(this->group.at(4));
-            w2->setRotate(this->rotation);
-            break;
-        }
-        case GroupItem::ITEM_GATE1_GATE1:{
-            GraphicsPillarItem *pillar3=qgraphicsitem_cast<GraphicsPillarItem*>(this->group.at(2));
-            pillar3->setPos(this->rotatePoint(pillar3->centre(),pillar3->pos(),this->rotation));
-            pillar3->setRotation(this->rotation);
-            GraphicsGate1Item *w1=qgraphicsitem_cast<GraphicsGate1Item*>(this->group.at(3));
-            w1->setRotate(this->rotation);
-            GraphicsGate1Item *w2=qgraphicsitem_cast<GraphicsGate1Item*>(this->group.at(4));
-            w2->setRotate(this->rotation);
-            break;
-        }
-        case GroupItem::ITEM_GATE1_GATE2:{
-            GraphicsPillarItem *pillar3=qgraphicsitem_cast<GraphicsPillarItem*>(this->group.at(2));
-            pillar3->setPos(this->rotatePoint(pillar3->centre(),pillar3->pos(),this->rotation));
-            pillar3->setRotation(this->rotation);
-            GraphicsGate1Item *w1=qgraphicsitem_cast<GraphicsGate1Item*>(this->group.at(3));
-            w1->setRotate(this->rotation);
-            GraphicsGate2Item *w2=qgraphicsitem_cast<GraphicsGate2Item*>(this->group.at(4));
-            w2->setRotate(this->rotation);
-            break;
-        }
-        case GroupItem::ITEM_GATE1_WICKET:{
-            GraphicsPillarItem *pillar3=qgraphicsitem_cast<GraphicsPillarItem*>(this->group.at(2));
-            pillar3->setPos(this->rotatePoint(pillar3->centre(),pillar3->pos(),this->rotation));
-            pillar3->setRotation(this->rotation);
-            GraphicsGate1Item *w1=qgraphicsitem_cast<GraphicsGate1Item*>(this->group.at(3));
-            w1->setRotate(this->rotation);
-            GraphicsWicketItem *w2=qgraphicsitem_cast<GraphicsWicketItem*>(this->group.at(4));
-            w2->setRotate(this->rotation);
-            break;
-        }
-        case GroupItem::ITEM_GATE2_WICKET:{
-            GraphicsPillarItem *pillar3=qgraphicsitem_cast<GraphicsPillarItem*>(this->group.at(2));
-            pillar3->setPos(this->rotatePoint(pillar3->centre(),pillar3->pos(),this->rotation));
-            pillar3->setRotation(this->rotation);
-            GraphicsGate2Item *w1=qgraphicsitem_cast<GraphicsGate2Item*>(this->group.at(3));
-            w1->setRotate(this->rotation);
-            GraphicsWicketItem *w2=qgraphicsitem_cast<GraphicsWicketItem*>(this->group.at(4));
-            w2->setRotate(this->rotation);
-            break;
-        }
-        case GroupItem::ITEM_GATE2_GATE2:{
-            GraphicsPillarItem *pillar3=qgraphicsitem_cast<GraphicsPillarItem*>(this->group.at(2));
-            pillar3->setPos(this->rotatePoint(pillar3->centre(),pillar3->pos(),this->rotation));
-            pillar3->setRotation(this->rotation);
-            GraphicsGate2Item *w1=qgraphicsitem_cast<GraphicsGate2Item*>(this->group.at(3));
-            w1->setRotate(this->rotation);
-            GraphicsGate2Item *w2=qgraphicsitem_cast<GraphicsGate2Item*>(this->group.at(4));
-            w2->setRotate(this->rotation);
-            break;
-        }
-        case GroupItem::ITEM_GATE2_GATE1:{
-            GraphicsPillarItem *pillar3=qgraphicsitem_cast<GraphicsPillarItem*>(this->group.at(2));
-            pillar3->setPos(this->rotatePoint(pillar3->centre(),pillar3->pos(),this->rotation));
-            pillar3->setRotation(this->rotation);
-            GraphicsGate2Item *w1=qgraphicsitem_cast<GraphicsGate2Item*>(this->group.at(3));
-            w1->setRotate(this->rotation);
-            GraphicsGate1Item *w2=qgraphicsitem_cast<GraphicsGate1Item*>(this->group.at(4));
-            w2->setRotate(this->rotation);
-            break;
-        }
-    default:break;
     }
     this->setPos(this->centre());
 }
@@ -616,14 +276,12 @@ int GroupItem::rot()
 
 void GroupItem::itemMoveScene(QPointF point)
 {
-    if(this->type==GroupItem::ITEM_WICKET || this->type==GroupItem::ITEM_GATE1 || this->type==GroupItem::ITEM_GATE2)
-        if(this->group.at(0)->isSelected()||this->group.at(1)->isSelected())
+    foreach(QGraphicsItem *item,this->group)
+        if(item->type()==GraphicsPillarItem::Type && item->isSelected())
         {
             this->setPos(point);
             return;
         }
-    if(this->group.at(0)->isSelected()||this->group.at(1)->isSelected()||this->group.at(2)->isSelected())
-        this->setPos(point);
 }
 
 void GroupItem::mouseRelease()

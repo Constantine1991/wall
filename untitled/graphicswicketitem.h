@@ -34,6 +34,7 @@ private:
     int width;
     int widthWicket;
     int rot;
+    QPointF point;
 };
 
 #endif // GRAPHICSWICKETITEM_H

@@ -32,6 +32,7 @@ private:
     void updatePosText();
     GraphicsPillarItem *pillar(QPointF pos,QGraphicsScene *scene);
     int width(GraphicsPillarItem *p1, GraphicsPillarItem *p2, QGraphicsScene *scene);
+    bool isPillar(QList<QGraphicsItem*> items,QPointF point);
 };
 
 #endif // GRAPHICSLINEITEM_H

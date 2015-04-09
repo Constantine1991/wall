@@ -82,10 +82,10 @@ int GraphicsLineItem::width(GraphicsPillarItem *p1, GraphicsPillarItem *p2, QGra
                                       this->rotationLocalCoords()+90));
     bounding.append(this->rotatePoint(p1->centre(),QPointF(p1->centre().x()+p1->boundingRect().width()/2,p1->centre().y()),
                                       this->rotationLocalCoords()-90));
-    bounding.append(this->rotatePoint(p2->centre(),QPointF(p2->centre().x()+p2->boundingRect().width()/2,p2->centre().y()),
-                                      this->rotationLocalCoords()+90));
     bounding.append(this->rotatePoint(p2->centre(),QPointF(p2->centre().x()+p1->boundingRect().width()/2,p2->centre().y()),
                                       this->rotationLocalCoords()-90));
+    bounding.append(this->rotatePoint(p2->centre(),QPointF(p2->centre().x()+p2->boundingRect().width()/2,p2->centre().y()),
+                                      this->rotationLocalCoords()+90));
     int w=0;
     QList<QGraphicsItem*> objects=scene->items(bounding);
     foreach(QGraphicsItem *item,objects)
@@ -93,7 +93,10 @@ int GraphicsLineItem::width(GraphicsPillarItem *p1, GraphicsPillarItem *p2, QGra
         {
             case GraphicsWallItem::Type:{
                 GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(item);
-                w+=wall->width()==0?0:wall->width()+35;
+                bool isValidatePillar1=this->isPillar(objects,wall->line().p1());
+                bool isValidatePillar2=this->isPillar(objects,wall->line().p2());
+                if(isValidatePillar1 && isValidatePillar2)
+                    w+=wall->width()==0?0:wall->width()+35;
                 break;
             }
             case GraphicsGate1Item::Type:{
@@ -114,4 +117,22 @@ int GraphicsLineItem::width(GraphicsPillarItem *p1, GraphicsPillarItem *p2, QGra
             default: break;
         }
     return w;
+}
+
+bool GraphicsLineItem::isPillar(QList<QGraphicsItem*> items, QPointF point)
+{
+    if(!items.isEmpty())
+    {
+        foreach(QGraphicsItem *item,items)
+            if(item->type()==GraphicsPillarItem::Type)
+            {
+                GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(item);
+                if(((pillar->centre().x()+pillar->boundingRect().width()/2)>=point.x())&&
+                   ((pillar->centre().x()-pillar->boundingRect().width()/2)<=point.x())&&
+                   ((pillar->centre().y()+pillar->boundingRect().height()/2)>=point.y())&&
+                   ((pillar->centre().y()-pillar->boundingRect().height()/2)<=point.y()))
+                    return true;
+            }
+    }
+    return false;
 }

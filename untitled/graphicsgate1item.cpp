@@ -30,7 +30,7 @@ void GraphicsGate1Item::setPosition(QPointF p1, QPointF p2)
     QPointF centre;
     centre.setX((p1.x()+p2.x())/2);
     centre.setY((p1.y()+p2.y())/2);
-    this->setPos(this->rotatePoint(centre,QPointF(centre.x()-30,centre.y()-60),this->rotation()));
+    this->setPos(this->rotatePoint(centre,QPointF(centre.x()-20,centre.y()-50),this->rotation()));
 }
 
 QPointF GraphicsGate1Item::posP1()
