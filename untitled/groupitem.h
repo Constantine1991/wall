@@ -24,7 +24,7 @@ public:
     QList<TYPEGROUP> types();
     QList<QGraphicsItem*> items();
     void setPos(QPointF point);
-    void setPosItem(QPointF point,QGraphicsItem *item);
+    void setPosItem(QPointF point, QGraphicsItem *item);
     QPointF pos();
     bool isItem(QGraphicsItem *item);
 

@@ -211,16 +211,18 @@ void DiagramView::Delete_Item()
             foreach(GroupItem *group,this->listGroup)
                 if(group->isItem(parentItem))
                 {
-                    if(parentItem->type()==GraphicsPillarItem::Type)
+                    QList<QGraphicsItem *> items=group->items();
+                    foreach(QGraphicsItem *item,items)
                     {
-                        QList<QGraphicsItem*> item=group->items();
-                        if(item.count()==3)
-                            this->pDiagramScene->removeItem(item.at(2));
-                        if(item.count()==5)
+                        if(parentItem==item)
+                            continue;
+                        foreach(QGraphicsItem *childItem,item->childItems())
                         {
-                            this->pDiagramScene->removeItem(item.at(4));
-                            this->pDiagramScene->removeItem(item.at(3));
+                            this->pDiagramScene->removeItem(childItem);
+                            delete childItem;
                         }
+                        this->pDiagramScene->removeItem(item);
+                        delete item;
                     }
                     this->listGroup.removeAt(this->listGroup.indexOf(group));
                     delete group;
@@ -235,6 +237,16 @@ void DiagramView::Delete_Item()
                         break;
                     this->objectBackUp.removeAt(index);
                 }
+            }
+            if(parentItem->type()==GraphicsWallItem::Type)
+            {
+                GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(parentItem);
+                GraphicsPillarItem *pillar1=qgraphicsitem_cast<GraphicsPillarItem*>(this->itemToScene(ITEM_PILLAR,wall->line().p1()));
+                GraphicsPillarItem *pillar2=qgraphicsitem_cast<GraphicsPillarItem*>(this->itemToScene(ITEM_PILLAR,wall->line().p2()));
+                if(pillar1!=NULL)
+                    pillar1->removeWall(wall);
+                if(pillar2!=NULL)
+                    pillar2->removeWall(wall);
             }
             foreach(QGraphicsItem *childItem,parentItem->childItems())
             {

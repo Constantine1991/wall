@@ -217,16 +217,13 @@ void GroupItem::setPos(QPointF point)
     }
 }
 
-void GroupItem::setPosItem(QPointF point, QGraphicsItem *item)
+void GroupItem::setPosItem(QPointF point,QGraphicsItem *item)
 {
-   /* if(this->type.isEmpty())
-        return;
-    int at=this->group.indexOf(item);
-    at=at==0?1:-1;
-    if((int)this->type<3)
-        this->setBoundingLine(QLineF(point,QPointF(point.x()+80*at,point.y())));
-    else this->setBoundingLine(QLineF(point,QPointF(point.x()+160*at,point.y())));
-    this->setPos(this->centre());*/
+    if(this->group.first()==item)
+        this->boundingLine.setP1(point);
+    if(this->group.last()==item)
+        this->boundingLine.setP2(point);
+    this->setPos(this->centre());
 }
 
 QPointF GroupItem::pos()

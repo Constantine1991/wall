@@ -51,6 +51,11 @@ void GraphicsPillarItem::addWall(GraphicsWallItem *lineWall, bool point)
     this->listWall.insert(lineWall,point);
 }
 
+void GraphicsPillarItem::removeWall(GraphicsWallItem *item)
+{
+    this->listWall.remove(item);
+}
+
 QVariant GraphicsPillarItem::itemChange(GraphicsItemChange change, const QVariant &value)
 {
     if(change==QGraphicsItem::ItemPositionChange || change==QGraphicsItem::ItemRotationChange)

@@ -36,6 +36,7 @@ public:
            return Type;
        }
        void addWall(GraphicsWallItem *lineWall,bool point);
+       void removeWall(GraphicsWallItem *item);
        void setText(QString caption);
        QString text();
        void setHeight(int height);
