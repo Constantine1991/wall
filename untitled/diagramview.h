@@ -42,6 +42,7 @@ private:
     TYPEITEM typeITEM;
     int currentIdItem;
     bool mousePrees;
+    bool keyPressA;
     int widthGroup;
     QGraphicsItem *itemGraphicsChange;
     QGraphicsLineItem *lineWall;
@@ -56,7 +57,7 @@ private:
     QAction *DeleteItem;
     void CreateMenuItem();
     QGraphicsItem *itemToScene(TYPEITEM typeItem,QPointF point);
-    void AppendItem(GroupItem::TYPEGROUP typeGroup, QPointF point);
+   // void AppendItem(GroupItem::TYPEGROUP typeGroup, QPointF point);
     QGraphicsItem *AppendItem(TYPEITEM typeItem,QPointF point);
     float distancePointToPoint(QPointF point1,QPointF point2);
     void itemChangeScene(int idItem);

@@ -27,7 +27,6 @@ SOURCES += \
     diagramview.cpp \
     calculate.cpp \
     cryptxor.cpp \
-    activationform.cpp \
     graphicswallitem.cpp \
     graphicswicketitem.cpp \
     groupitem.cpp \
@@ -36,7 +35,8 @@ SOURCES += \
     interval.cpp \
     component.cpp \
     graphicslineitem.cpp \
-    about.cpp
+    about.cpp \
+    activationwindow.cpp
 
 HEADERS  += \
     settingswindow.h \
@@ -54,7 +54,6 @@ HEADERS  += \
     diagramview.h \
     calculate.h \
     cryptxor.h \
-    activationform.h \
     graphicswicketitem.h \
     groupitem.h \
     graphicsgate1item.h \
@@ -62,17 +61,18 @@ HEADERS  += \
     interval.h \
     component.h \
     graphicslineitem.h \
-    about.h
+    about.h \
+    activationwindow.h
 
 FORMS    += \
     settingswindow.ui \
     propertieswallwindow.ui \
     propertiespillarwindow.ui \
     mainwindow.ui \
-    activationform.ui \
     interval.ui \
     component.ui \
-    about.ui
+    about.ui \
+    activationwindow.ui
 
 RESOURCES += \
     res.qrc

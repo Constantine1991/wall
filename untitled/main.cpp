@@ -9,16 +9,17 @@ int main(int argc, char *argv[])
     return a.exec();
 }
 /*
-#include "mainwindow.h"
-#include "activationform.h"
 #include <QApplication>
+#include "activationwindow.h"
+#include "mainwindow.h"
+
 
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
 
     MainWindow m_f;
-    ActivationForm f(&m_f);
+    ActivationWindow f(&m_f);
 
     QByteArray open_key;
     QByteArray date;

@@ -24,6 +24,7 @@ DiagramView::DiagramView(QWidget *parent):QGraphicsView(parent)
     this->mousePrees=false;
     this->centerOn(0,0);
     this->typeITEM=ITEM_NONE;
+    this->keyPressA=false;
 }
 
 DiagramView::~DiagramView()
@@ -149,7 +150,7 @@ QGraphicsItem* DiagramView::AppendItem(TYPEITEM typeItem, QPointF point)
     }
     return NULL;
 }
-
+/*
 void DiagramView::AppendItem(GroupItem::TYPEGROUP typeGroup,QPointF point)
 {
     group=new GroupItem();
@@ -158,7 +159,7 @@ void DiagramView::AppendItem(GroupItem::TYPEGROUP typeGroup,QPointF point)
     group->createGroup(typeGroup,this->MenuItem,this->pDiagramScene);
     group->setPos(point);
     this->listGroup.append(group);
-}
+}*/
 
 float DiagramView::distancePointToPoint(QPointF point1, QPointF point2)
 {
@@ -410,6 +411,10 @@ void DiagramView::ClearScene()
     foreach(GroupItem *group,this->listGroup)
         delete group;
     this->listGroup.clear();
+   /* foreach(QGraphicsItem *item,this->objectBackUp)
+        delete item;*/
+    if(!this->objectBackUp.isEmpty())
+        this->objectBackUp.clear();
     foreach(QGraphicsItem *item,this->pDiagramScene->items())
     {
         foreach(QGraphicsItem *child,item->childItems())
@@ -887,25 +892,28 @@ void DiagramView::PrintDiagram()
     this->pDiagramScene->clearSelection();
     QString fileName = QFileDialog::getSaveFileName(this, "Export PDF",
                                                 QString(), "*.pdf");
-    QPrinter printer(QPrinter::HighResolution);
-    printer.setPageSize(QPrinter::A4);
-    printer.setPaperSize(QSize(210,297),QPrinter::Millimeter);
-    printer.setOrientation(QPrinter::Portrait);
-    printer.setOutputFormat(QPrinter::PdfFormat);
-    printer.setOutputFileName(fileName);
-    QPainter p(&printer);
-    bool newPage=false;
-    for(int top=0;top<8001;top+=2000)
-        for(int left=0;left<8001;left+=2000)
-        {
-            if(this->pDiagramScene->items(left,top,2000,2000).isEmpty())
-                continue;
-            if(newPage)
-                printer.newPage();
-            p.setWindow(left,top,2000,2000);
-            this->scene()->render(&p,QRectF(left,top,2000,2000),QRectF(left,top,2000,2000));
-            newPage=true;
-        }
+    if(!fileName.isEmpty())
+    {
+        QPrinter printer(QPrinter::HighResolution);
+        printer.setPageSize(QPrinter::A4);
+        printer.setPaperSize(QSize(210,297),QPrinter::Millimeter);
+        printer.setOrientation(QPrinter::Portrait);
+        printer.setOutputFormat(QPrinter::PdfFormat);
+        printer.setOutputFileName(fileName);
+        QPainter p(&printer);
+        bool newPage=false;
+        for(int top=0;top<8001;top+=2000)
+            for(int left=0;left<8001;left+=2000)
+            {
+                if(this->pDiagramScene->items(left,top,2000,2000).isEmpty())
+                    continue;
+                if(newPage)
+                    printer.newPage();
+                p.setWindow(left,top,2000,2000);
+                this->scene()->render(&p,QRectF(left,top,2000,2000),QRectF(left,top,2000,2000));
+                newPage=true;
+            }
+    }
     this->pDiagramScene->setBackgroundBrush(QBrush(Qt::lightGray, Qt::CrossPattern));
 }
 
@@ -1150,8 +1158,9 @@ void DiagramView::closeProperties(TYPEITEM itemType,bool all)
                 if(graphicsItem==this->itemGraphicsChange)
                     continue;
                 GraphicsWallItem *changeWall=qgraphicsitem_cast<GraphicsWallItem*>(graphicsItem);
-                changeWall->setText(QString(QString::number(f.count_brick)+" | "+QString::number(f.count_brick_dob)));
                 changeWall->setGraphicsWallItem(wall);
+                f=calc.GetCountOnFence(changeWall->width(),changeWall->height(),false);
+                changeWall->setText(QString(QString::number(f.count_brick)+" | "+QString::number(f.count_brick_dob)));
             }
         }
     }
@@ -1215,7 +1224,7 @@ void DiagramView::mousePressEvent(QMouseEvent *event)
 {
     if(event->button()!=Qt::LeftButton)
         return;
-
+    this->keyPressA=false;
     this->mousePrees=true;
     QApplication::setOverrideCursor(Qt::PointingHandCursor);
     if(this->typeITEM==ITEM_PILLAR)
@@ -1442,18 +1451,26 @@ void DiagramView::isValidateObject()
 void DiagramView::keyPressEvent(QKeyEvent *event)
 {
     if(event->key()==Qt::Key_Delete)
-        this->Delete_Item();
+    {
+        if(this->keyPressA)
+             this->ClearScene();
+        else this->Delete_Item();
+        this->keyPressA=false;
+    }
     if(event->key()==Qt::Key_A)
         if(event->modifiers()==Qt::ControlModifier)
+        {
             foreach(QGraphicsItem* graphicsItem,this->pDiagramScene->items())
                     graphicsItem->setSelected(true);
+            this->keyPressA=true;
+        }
     if(event->key()==Qt::Key_Z)
         if(event->modifiers()==Qt::ControlModifier)
             this->setLastPosObject();
-    if(event->key()==Qt::Key_1)
+    /*if(event->key()==Qt::Key_1)
     {
         this->isValidateObject();
-    }
+    }*/
     QGraphicsView::keyPressEvent(event);
 }
 

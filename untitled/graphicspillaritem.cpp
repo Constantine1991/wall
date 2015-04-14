@@ -128,11 +128,15 @@ void GraphicsPillarItem::setBottomTypeEnable(bool enable)
 
 int GraphicsPillarItem::heightSide(SIDETYPE sideType)
 {
-    return this->heightSidePillar[(int)sideType];
+    return this->heightSide((int)sideType);
 }
 
 int GraphicsPillarItem::heightSide(int side)
 {
+     if(this->heightSidePillar[side]>this->heightPillar)
+        return 0;
+     else if(this->heightSidePillar[side]<0)
+            return 0;
      return this->heightSidePillar[side];
 }
 
