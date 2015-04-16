@@ -333,9 +333,9 @@ void DiagramView::Filling(GraphicsPillarItem *a, GraphicsPillarItem *b,float int
         point=this->rotatePoint(posA,QPointF(posA.x()-distance*countObject,posA.y()),angle);
         point.setX(point.x()-b->boundingRect().width()/2);
         point.setY(point.y()-b->boundingRect().height()/2);
-        b->setPos(point);
+        b->setPosition(point);
         if(!groupItem->types().isEmpty())
-            groupItem->setPosItem(b->centre(),b);
+            groupItem->setOffsetPos(b->centre(),distance);
         this->lineWall=new QGraphicsLineItem(QLineF(a->centre(),b->centre()));
         GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(this->AppendItem(ITEM_WALL,QPointF(0,0)));
         wall->setGirthRail(true);
@@ -372,9 +372,9 @@ void DiagramView::Filling(GraphicsPillarItem *a, GraphicsPillarItem *b,float int
         point=this->rotatePoint(posA,QPointF(posA.x()-distance*(countObject+1),posA.y()),angle);
         point.setX(point.x()-b->boundingRect().width()/2);
         point.setY(point.y()-b->boundingRect().height()/2);
-        b->setPos(point);
+        b->setPosition(point);
         if(!groupItem->types().isEmpty())
-            groupItem->setPosItem(b->centre(),b);
+            groupItem->setOffsetPos(b->centre(),distance);
         this->lineWall=new QGraphicsLineItem(QLineF(a->centre(),b->centre()));
         GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(this->AppendItem(ITEM_WALL,QPointF(0,0)));
         wall->setGirthRail(true);
@@ -882,6 +882,25 @@ bool DiagramView::LoadDiagramScene(QString nameFile)
             }
         }
         xml.readNext();
+    }
+    foreach(QGraphicsItem *item,this->objectBackUp)
+    {
+        bool isGroup=false;
+        foreach(GroupItem *group,this->listGroup)
+            if(group->isItem(item))
+            {
+                QPointF pos=group->pos();
+                group->clearBackUp();
+                group->setPos(pos);
+                isGroup=true;
+                break;
+            }
+        if(isGroup)
+            continue;
+        GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(item);
+        QPointF pos=pillar->pos();
+        pillar->clearBackUp();
+        pillar->setPosition(pos);
     }
     return true;
 }

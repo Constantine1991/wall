@@ -26,10 +26,10 @@ void GraphicsLineItem::setPoints(QPointF p1, QPointF p2, QGraphicsScene *scene)
         return;
     this->setLine(QLineF(p1,p2));
     QPointF point=this->rotatePoint(pillar1->centre(),QPointF(pillar1->centre().x()+50,pillar1->y()),
-                                    this->rotationLocalCoords()+90);
+                                    this->rotationLocalCoords()+100);
     this->line1->setLine(QLineF(pillar1->centre(),point));
     point=this->rotatePoint(pillar2->centre(),QPointF(pillar2->centre().x()+50,pillar2->y()),
-                            this->rotationLocalCoords()+90);
+                            this->rotationLocalCoords()+100);
     this->line2->setLine(QLineF(pillar2->centre(),point));
     this->setLine(QLineF(this->line1->line().p2(),this->line2->line().p2()));
     this->text->setPlainText(QString::number(this->width(pillar1,pillar2,scene)));
@@ -59,9 +59,13 @@ float GraphicsLineItem::rotationLocalCoords()
 
 void GraphicsLineItem::updatePosText()
 {
-
-    QPointF centreLine=this->center();
     this->text->setRotation(this->rotationLocalCoords()+180);
+    int offsetX=qAbs(this->line().p1().x()-this->center().x());
+    QPointF centreLine=this->rotatePoint(QPointF(this->line().p1().x(),
+                                                 this->line().p1().y()-this->text->boundingRect().height()),
+                                         QPointF(this->line().p1().x()-offsetX,
+                                                 this->line().p1().y()-this->text->boundingRect().height()),
+                                         this->rotationLocalCoords());
     this->text->setPos(centreLine);
 }
 

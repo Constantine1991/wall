@@ -152,6 +152,11 @@ void GroupItem::backUp()
     this->isBackUp=false;
 }
 
+void GroupItem::clearBackUp()
+{
+    this->lastPos.clear();
+}
+
 void GroupItem::setBoundingLine(QLineF line)
 {
     this->boundingLine.setP1(line.p1());
@@ -179,14 +184,14 @@ void GroupItem::setPos(QPointF point)
     angle=angle<0?angle+360:angle;
     angle=angle==0?180:angle;
     GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(this->group.first());
-    pillar->setPos(this->boundingLine.p1());
+    pillar->setPosition(this->boundingLine.p1());
     pillar=qgraphicsitem_cast<GraphicsPillarItem*>(this->group.last());
-    pillar->setPos(this->boundingLine.p2());
+    pillar->setPosition(this->boundingLine.p2());
     QPointF p=this->boundingLine.p1();
     for(int i=2;i<this->group.count()-1;i+=2)
     {
         pillar=qgraphicsitem_cast<GraphicsPillarItem*>(this->group.at(i));
-        pillar->setPos(this->rotatePoint(p,QPointF(p.x()-80,p.y()),angle));
+        pillar->setPosition(this->rotatePoint(p,QPointF(p.x()-80,p.y()),angle));
         p=pillar->pos();
     }
     QLineF line;
@@ -217,17 +222,19 @@ void GroupItem::setPos(QPointF point)
     }
 }
 
-void GroupItem::setPosItem(QPointF point,QGraphicsItem *item)
+void GroupItem::setOffsetPos(QPointF point,int offset)
 {
-    if(this->group.first()==item)
-        this->boundingLine.setP1(point);
-    if(this->group.last()==item)
-        this->boundingLine.setP2(point);
-    this->setPos(this->centre());
+    int lengthLineX=qAbs(this->boundingLine.p1().x()-this->boundingLine.p2().x());
+    int lengthLineY=qAbs(this->boundingLine.p1().y()-this->boundingLine.p2().y());
+    QLineF line;
+    line.setP1(point);
+    line.setP2(this->rotatePoint(point,QPointF(point.x()+lengthLineX+offset,
+                                               point.y()),this->rotation));
+    this->setPos(this->centreLine(line));
 }
 
 QPointF GroupItem::pos()
-{
+{    
     return this->centre();
 }
 

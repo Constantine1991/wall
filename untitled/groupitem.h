@@ -24,13 +24,13 @@ public:
     QList<TYPEGROUP> types();
     QList<QGraphicsItem*> items();
     void setPos(QPointF point);
-    void setPosItem(QPointF point, QGraphicsItem *item);
+    void setOffsetPos(QPointF point,int offset);
     QPointF pos();
     bool isItem(QGraphicsItem *item);
-
     void setRotate(int angle);
     int rot();
     void backUp();
+    void clearBackUp();
 public slots:
     void itemMoveScene(QPointF point);
     void mouseRelease();

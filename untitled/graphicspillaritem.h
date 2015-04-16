@@ -68,6 +68,7 @@ public:
        COLOR colorPazzle(int number);
        QMenu *menuitem();
        void backUp();
+       void clearBackUp();
        void setEnabledBackUp(bool value);
        void setPosition(QPointF pos);
 protected:

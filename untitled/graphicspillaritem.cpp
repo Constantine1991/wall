@@ -303,6 +303,11 @@ void GraphicsPillarItem::backUp()
     }
 }
 
+void GraphicsPillarItem::clearBackUp()
+{
+    this->lastPos.clear();
+}
+
 void GraphicsPillarItem::setEnabledBackUp(bool value)
 {
     this->enabledBackUp=value;
@@ -315,6 +320,12 @@ void GraphicsPillarItem::setPosition(QPointF pos)
         this->lastPos.append(pos);
     }
     this->setPos(pos);
+    foreach(GraphicsWallItem *changeline,this->listWall.keys())
+    {
+        if(this->listWall.value(changeline))
+            changeline->setLinePoint(this->centre(),changeline->line().p2());
+        else changeline->setLinePoint(changeline->line().p1(),this->centre());
+    }
 }
 
 void GraphicsPillarItem::setGraphicsPillarItem(GraphicsPillarItem *graphicsItem)
