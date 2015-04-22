@@ -17,7 +17,7 @@ class PropertiesWallWindow : public QMainWindow
 public:
     explicit PropertiesWallWindow(QWidget *parent = 0);
     ~PropertiesWallWindow();
-    void SetPropertiesWall(GraphicsWallItem *item, SETTINGS *itemSetting,GraphicsPillarItem *itemPillar);
+    void SetPropertiesWall(GraphicsWallItem *item, SETTINGS *itemSetting,GraphicsPillarItem *itemPillar,bool fundament=false);
 signals:
     void closeProperties(TYPEITEM itemType,bool all);
 private slots:

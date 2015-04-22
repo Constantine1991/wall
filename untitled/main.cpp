@@ -1,4 +1,4 @@
-#include <QApplication>
+/*#include <QApplication>
 #include "mainwindow.h"
 
 int main(int argc, char *argv[])
@@ -8,7 +8,7 @@ int main(int argc, char *argv[])
     w.showMaximized();
     return a.exec();
 }
-/*
+*/
 #include <QApplication>
 #include "activationwindow.h"
 #include "mainwindow.h"
@@ -58,4 +58,4 @@ int main(int argc, char *argv[])
     f.show();
 
     return a.exec();
-}*/
+}

@@ -49,6 +49,8 @@ private slots:
 
     void on_pushButton_8_clicked();
     void isTypeComponent(TYPEITEM type,int width);
+    void on_checkBox_2_clicked();
+
 protected:
     void closeEvent(QCloseEvent *event);
 private:

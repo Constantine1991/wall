@@ -282,3 +282,8 @@ void MainWindow::on_pushButton_8_clicked()
 {
 
 }
+
+void MainWindow::on_checkBox_2_clicked()
+{
+    ui->widget->setFundament(ui->checkBox_2->isChecked());
+}

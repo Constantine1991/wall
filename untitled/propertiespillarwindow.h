@@ -19,7 +19,7 @@ class PropertiesPillarWindow : public QMainWindow
 public:
     explicit PropertiesPillarWindow(QWidget *parent = 0);
     ~PropertiesPillarWindow();
-    void SetPropertiesPillar(GraphicsPillarItem *item,QList<COLOR*> listColor);
+    void SetPropertiesPillar(GraphicsPillarItem *item,QList<COLOR*> listColor,bool fundament=false);
     int heightBrick;
 signals:
     void closeProperties(TYPEITEM itemType,bool all);

@@ -77,4 +77,7 @@ FORMS    += \
 RESOURCES += \
     res.qrc
 
-OTHER_FILES +=
+RC_FILE = myapp.rc
+
+OTHER_FILES += \
+    myapp.rc

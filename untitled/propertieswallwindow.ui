@@ -523,11 +523,12 @@
       <x>620</x>
       <y>540</y>
       <width>157</width>
-      <height>17</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>Применить ко всем стенам</string>
+     <string>Применить ко всем 
+стенам</string>
     </property>
    </widget>
    <widget class="QCheckBox" name="checkBox_4">
@@ -565,11 +566,12 @@
       <x>620</x>
       <y>250</y>
       <width>158</width>
-      <height>17</height>
+      <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>Применить ко всем блокам</string>
+     <string>Применить ко всем 
+блокам</string>
     </property>
    </widget>
    <widget class="DiagramViewWall" name="widget" native="true">

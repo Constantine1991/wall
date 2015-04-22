@@ -1351,7 +1351,7 @@ void DiagramView::mouseDoubleClickEvent(QMouseEvent *event)
             connect(PillarWindow,SIGNAL(closeProperties(TYPEITEM,bool)),this,SLOT(closeProperties(TYPEITEM,bool)));
             this->itemGraphicsChange=itemGraphics.at(0);
             GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(this->itemGraphicsChange);
-            PillarWindow->SetPropertiesPillar(pillar,this->itemSetting->color);
+            PillarWindow->SetPropertiesPillar(pillar,this->itemSetting->color,this->Fundament);
             PillarWindow->show();
         }
         if(itemGraphics.at(0)->type()==GraphicsWallItem::Type)
@@ -1369,7 +1369,7 @@ void DiagramView::mouseDoubleClickEvent(QMouseEvent *event)
                 {
                     PropertiesWallWindow *wallWindow=new PropertiesWallWindow(this);
                     connect(wallWindow,SIGNAL(closeProperties(TYPEITEM,bool)),this,SLOT(closeProperties(TYPEITEM,bool)));
-                    wallWindow->SetPropertiesWall(wall,this->itemSetting,pillar);
+                    wallWindow->SetPropertiesWall(wall,this->itemSetting,pillar,this->Fundament);
                     wallWindow->show();
                 }
             }
@@ -1512,4 +1512,27 @@ void DiagramView::setLastPosObject()
         pillar->backUp();
     }
     this->objectBackUp.removeLast();
+}
+
+
+void DiagramView::setFundament(bool Fundament)
+{
+    this->Fundament=Fundament;
+    foreach(QGraphicsItem *item,this->pDiagramScene->items())
+    {
+        if(item->type()==GraphicsPillarItem::Type)
+        {
+            GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(item);
+            if(pillar->isBottomTypeEnable())
+                pillar->setBottomTypeEnable(!this->Fundament);
+            continue;
+        }
+        if(item->type()==GraphicsWallItem::Type)
+        {
+            GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(item);
+            if(wall->isGirthRail())
+                wall->setGirthRail(!this->Fundament);
+            continue;
+        }
+    }
 }

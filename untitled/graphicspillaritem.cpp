@@ -126,6 +126,34 @@ void GraphicsPillarItem::setBottomTypeEnable(bool enable)
     this->bottomTypeEnablePillar=enable;
 }
 
+void GraphicsPillarItem::setBottomType(int type)
+{
+    switch(type)
+    {
+        case 0:{
+            this->bottomTypePillar=GraphicsPillarItem::BOTTOM_DEAF;
+            break;
+        }
+        case 1:{
+            this->bottomTypePillar=GraphicsPillarItem::BOTTOM_BEGINEND;
+            break;
+        }
+        case 2:{
+            this->bottomTypePillar=GraphicsPillarItem::BOTTOM_PASSAGE;
+            break;
+        }
+        case 3:{
+            this->bottomTypePillar=GraphicsPillarItem::BOTTOM_ANGLETWO;
+            break;
+        }
+        case 4:{
+            this->bottomTypePillar=GraphicsPillarItem::BOTTOM_ANGLETHREE;
+            break;
+        }
+        default:break;
+    }
+}
+
 int GraphicsPillarItem::heightSide(SIDETYPE sideType)
 {
     return this->heightSide((int)sideType);
@@ -133,14 +161,10 @@ int GraphicsPillarItem::heightSide(SIDETYPE sideType)
 
 int GraphicsPillarItem::heightSide(int side)
 {
-     if(this->heightSidePillar[side]>this->heightPillar)
-        return 0;
-     else if(this->heightSidePillar[side]<0)
-            return 0;
      return this->heightSidePillar[side];
 }
 
-int GraphicsPillarItem::isBottomType()
+int GraphicsPillarItem::isAutoBottomType()
 {
     int front=this->heightSide(GraphicsPillarItem::SIDE_FRONT)>0?1:0;
     int back=this->heightSide(GraphicsPillarItem::SIDE_BACK)>0?1:0;
@@ -178,6 +202,11 @@ int GraphicsPillarItem::isBottomType()
             break;
         }
     }
+    return (int)this->bottomTypePillar;
+}
+
+int GraphicsPillarItem::isBottomType()
+{
     return (int)this->bottomTypePillar;
 }
 
@@ -334,6 +363,8 @@ void GraphicsPillarItem::setGraphicsPillarItem(GraphicsPillarItem *graphicsItem)
     for(int i=0;i<4;i++)
         this->setHeightSide(i,graphicsItem->heightSide(i));
     this->setBottomTypeEnable(graphicsItem->isBottomTypeEnable());
+    if(this->isBottomTypeEnable())
+        this->setBottomType(graphicsItem->isBottomType());
     this->setText(graphicsItem->text());
     this->setTop(graphicsItem->isTop());
     this->setPazzle(graphicsItem->isPazzle());

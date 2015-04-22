@@ -15,7 +15,7 @@ PropertiesWallWindow::~PropertiesWallWindow()
     delete ui;
 }
 
-void PropertiesWallWindow::SetPropertiesWall(GraphicsWallItem *item, SETTINGS *itemSetting,GraphicsPillarItem *itemPillar)
+void PropertiesWallWindow::SetPropertiesWall(GraphicsWallItem *item, SETTINGS *itemSetting,GraphicsPillarItem *itemPillar,bool fundament)
 {
     ui->widget->setSetting(itemSetting);
     ui->widget->setHeightPillar(itemPillar->height());
@@ -26,7 +26,9 @@ void PropertiesWallWindow::SetPropertiesWall(GraphicsWallItem *item, SETTINGS *i
     this->itemSetting=itemSetting;
     this->itemPillar=itemPillar;
 
-    ui->checkBox_5->setChecked(this->wall->isGirthRail());
+    qDebug()<<this->wall->isGirthRail();
+
+    ui->checkBox_5->setChecked(this->wall->isGirthRail()|| !fundament);
     ui->lineEdit_2->setText(QString::number(this->wall->height()));
     ui->lineEdit->setText(QString::number(this->wall->width()));
     ui->checkBox_3->setChecked(this->wall->isTop());

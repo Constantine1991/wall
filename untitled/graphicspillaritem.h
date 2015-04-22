@@ -43,6 +43,7 @@ public:
        void setHeightSide(SIDETYPE sideType,int height);
        void setHeightSide(int side,int height);
        void setBottomTypeEnable(bool enable);
+       void setBottomType(int type);
        void clearColorRow();
        void addColorRow(COLOR color);
        void setCountColorRow(int count);
@@ -57,6 +58,7 @@ public:
        QPointF centre();
        int heightSide(SIDETYPE sideType);
        int heightSide(int side);
+       int isAutoBottomType();
        int isBottomType();
        bool isBottomTypeEnable();
        bool isTop();

@@ -92,6 +92,7 @@ public:
     void setSettingItem(SETTINGS *itemSetting);
     void SaveSettingItem();
     SETTINGS *LoadSettingItem();
+    void setFundament(bool Fundament);
     bool pillarBottom;
     bool Rigel;
     bool Fundament;
