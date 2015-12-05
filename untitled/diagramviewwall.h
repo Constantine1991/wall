@@ -18,7 +18,7 @@ public:
     void setGraphicsWall(int width,int height,bool topWall=false);
     void setWidthWall(int width);
     void setHeightWall(int height);
-    void setSetting(SETTINGS *itemSetting);
+    void setSetting(SettingItem *itemSetting);
     // Показать крышку полотна
     void setEnableTopWall(bool enable,QColor color);
     //задать цвет ряду стены
@@ -40,9 +40,9 @@ public:
     int widthBrickRD;
     ///////////////////////////////////////////////
     void setHeightPillar(int height);
-    void setTopPillar(bool top,COLOR color);
-    void setPazzlePillar(bool pazzle,COLOR color1,COLOR color2);
-    void setColorListPillar(QList<COLOR> colorList);
+    void setTopPillar(bool top,QString color);
+    void setPazzlePillar(bool pazzle,QString color1,QString color2);
+    void setColorListPillar(QList<QString> colorList);
 private:
     void clearScene();// очистка сцены
     void createWall();// создание обычной стены
@@ -69,11 +69,11 @@ private:
     Calculate *calc;
     int heightPillar;
     bool topPillar;
-    COLOR colorTopPillar;
+    QString colorTopPillar;
     bool pazzlePillar;
-    COLOR colorPazzle1Pillar;
-    COLOR colorPazzle2Pillar;
-    QList<COLOR> colorList;
+    QString colorPazzle1Pillar;
+    QString colorPazzle2Pillar;
+    QList<QString> colorList;
 };
 
 #endif // DIAGRAMVIEWWALL_H

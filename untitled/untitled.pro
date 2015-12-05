@@ -36,7 +36,15 @@ SOURCES += \
     component.cpp \
     graphicslineitem.cpp \
     about.cpp \
-    activationwindow.cpp
+    activationwindow.cpp \
+    rectallocation.cpp \
+    graphicssizewall.cpp \
+    alignment.cpp \
+    title.cpp \
+    propertiesitem.cpp \
+    diagrampillar.cpp \
+    diagrambrick.cpp \
+    settingcolor.cpp
 
 HEADERS  += \
     settingswindow.h \
@@ -62,7 +70,14 @@ HEADERS  += \
     component.h \
     graphicslineitem.h \
     about.h \
-    activationwindow.h
+    activationwindow.h \
+    rectallocation.h \
+    graphicssizewall.h \
+    alignment.h \
+    title.h \
+    diagrampillar.h \
+    diagrambrick.h \
+    settingcolor.h
 
 FORMS    += \
     settingswindow.ui \
@@ -72,7 +87,8 @@ FORMS    += \
     interval.ui \
     component.ui \
     about.ui \
-    activationwindow.ui
+    activationwindow.ui \
+    graphicssizewall.ui
 
 RESOURCES += \
     res.qrc

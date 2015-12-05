@@ -16,11 +16,18 @@ PropertiesPillarWindow::~PropertiesPillarWindow()
     delete ui;
 }
 
-void PropertiesPillarWindow::SetPropertiesPillar(GraphicsPillarItem *item, QList<COLOR *> listColor, bool fundament)
+void PropertiesPillarWindow::setColorCommboBox(QComboBox *comboBox, QList<SettingColor::COLOR_BRICK *> listColor)
 {
-    ui->widget->heightBrick=this->heightBrick;
+    comboBox->setFocusPolicy(Qt::NoFocus);
+    foreach(SettingItem::COLOR_BRICK *color,listColor)
+        comboBox->addItem(QIcon(QPixmap::fromImage(color->image1)),color->nameColor);
+}
+
+void PropertiesPillarWindow::SetPropertiesPillar(GraphicsPillarItem *item, SettingItem *itemSetting, bool fundament)
+{
+    //ui->widget->heightBrick=this->itemSetting->heightBrickAngle;
     this->Pillar=item;
-    this->listColor=listColor;
+    this->itemSetting=itemSetting;
     ui->lineEdit->setText(QString::number(this->Pillar->height()));
     if(this->Pillar->height()==0)
     {
@@ -41,66 +48,47 @@ void PropertiesPillarWindow::SetPropertiesPillar(GraphicsPillarItem *item, QList
     ui->checkBox_6->setChecked(this->Pillar->isBottomTypeEnable() || !fundament);
     ui->comboBox_6->setCurrentIndex(this->Pillar->isBottomType());
     ui->comboBox_6->setEnabled(this->Pillar->isBottomTypeEnable() || !fundament);
-    ui->comboBox_2->setFocusPolicy(Qt::NoFocus);
-    int size = ui->comboBox_2 ->style()->pixelMetric(QStyle::PM_IconViewIconSize);
-    QPixmap pixmap(size,size-5);
-    int con=0;
-    foreach (COLOR* color,listColor) {
-        ui->comboBox_5 ->addItem(color->caption);
-        ui->comboBox_2->addItem(color->caption);
-        ui->comboBox_3->addItem(color->caption);
-        ui->comboBox_4->addItem(color->caption);
-        pixmap.fill(color->color);
-
-        QRect rBorder(0,0,size,size);
-        QPainter p(&pixmap);
-        QPen pen(Qt::lightGray, 1, Qt::SolidLine);
-        p.setPen(pen);
-        p.drawRect(rBorder);
-
-        ui->comboBox_5->setItemData(con, pixmap, Qt::DecorationRole);
-        ui->comboBox_2->setItemData(con, pixmap, Qt::DecorationRole);
-        ui->comboBox_3->setItemData(con, pixmap, Qt::DecorationRole);
-        ui->comboBox_4->setItemData(con, pixmap, Qt::DecorationRole);
-        con=con+1;
-    }
-    foreach(COLOR *color,this->listColor)
-    {
-        if(this->Pillar->isPazzle())
-        {
-            if(*color==this->Pillar->colorPazzle(0))
-                ui->comboBox_4->setCurrentIndex(this->listColor.indexOf(color));
-            if(*color==this->Pillar->colorPazzle(1))
-                ui->comboBox_5->setCurrentIndex(this->listColor.indexOf(color));
-        }
-        if(this->Pillar->isTop())
-            if(*color==this->Pillar->topColor())
-                ui->comboBox_2->setCurrentIndex(this->listColor.indexOf(color));
-        if(!this->Pillar->isPazzle()&& this->Pillar->countColorRow()!=0)
-            if(*color==this->Pillar->colorRow(0))
-                ui->comboBox_3->setCurrentIndex(this->listColor.indexOf(color));
-    }
-    if(this->Pillar->height()<this->heightBrick)
-        return;
-    ui->widget->setHeight(this->Pillar->height());
-    ui->widget->setInsertBottom(this->Pillar->heightSide(GraphicsPillarItem::SIDE_FRONT));
-    if(ui->widget->row()==0)
-        ui->spinBox->setMaximum(0);
-    else{
-        ui->spinBox->setMaximum(ui->widget->row());
-        ui->spinBox->setMinimum(1);
-        ui->spinBox->setSingleStep(1);
-    }
-    if(ui->widget->row()!=0)
-    {
-        ui->widget->setEnabledTop(this->Pillar->isTop());
-        ui->widget->setColorTop(this->Pillar->topColor().color);
-        ui->widget->setEnabledPazzle(this->Pillar->isPazzle(),this->Pillar->colorPazzle(0).color,
-                                     this->Pillar->colorPazzle(1).color);
-        if(!this->Pillar->isPazzle()&& this->Pillar->countColorRow()!=0)
-            for(int i=0;i<ui->widget->row();i++)
-                ui->widget->setColorRow(i+1,this->Pillar->colorRow(i).color);
-    }
+    /*this->setColorCommboBox(ui->comboBox_2,this->itemSetting->listColor(SettingItem::COLOR_BRICK_PILLAR_TOP));
+    this->setColorCommboBox(ui->comboBox_3,this->itemSetting->listColor(SettingItem::COLOR_BRICK_PILLAR_BIG));
+    this->setColorCommboBox(ui->comboBox_4,this->itemSetting->listColor(SettingItem::COLOR_BRICK_PILLAR_BIG));
+    this->setColorCommboBox(ui->comboBox_5,this->itemSetting->listColor(SettingItem::COLOR_BRICK_PILLAR_BIG));*/
+//    foreach(COLOR *color,this->listColor)
+//    {
+//        if(this->Pillar->isPazzle())
+//        {
+//            if(*color==this->Pillar->colorPazzle(0))
+//                ui->comboBox_4->setCurrentIndex(this->listColor.indexOf(color));
+//            if(*color==this->Pillar->colorPazzle(1))
+//                ui->comboBox_5->setCurrentIndex(this->listColor.indexOf(color));
+//        }
+//        if(this->Pillar->isTop())
+//            if(*color==this->Pillar->topColor())
+//                ui->comboBox_2->setCurrentIndex(this->listColor.indexOf(color));
+//        if(!this->Pillar->isPazzle()&& this->Pillar->countColorRow()!=0)
+//            if(*color==this->Pillar->colorRow(0))
+//                ui->comboBox_3->setCurrentIndex(this->listColor.indexOf(color));
+//    }
+//    if(this->Pillar->height()<this->heightBrick)
+//        return;
+//    ui->widget->setHeight(this->Pillar->height());
+//    ui->widget->setInsertBottom(this->Pillar->heightSide(GraphicsPillarItem::SIDE_FRONT));
+//    if(ui->widget->row()==0)
+//        ui->spinBox->setMaximum(0);
+//    else{
+//        ui->spinBox->setMaximum(ui->widget->row());
+//        ui->spinBox->setMinimum(1);
+//        ui->spinBox->setSingleStep(1);
+//    }
+//    if(ui->widget->row()!=0)
+//    {
+//        ui->widget->setEnabledTop(this->Pillar->isTop());
+//        ui->widget->setColorTop(this->Pillar->topColor().color);
+//        ui->widget->setEnabledPazzle(this->Pillar->isPazzle(),this->Pillar->colorPazzle(0).color,
+//                                     this->Pillar->colorPazzle(1).color);
+//        if(!this->Pillar->isPazzle()&& this->Pillar->countColorRow()!=0)
+//            for(int i=0;i<ui->widget->row();i++)
+//                ui->widget->setColorRow(i+1,this->Pillar->colorRow(i).color);
+//    }
 
 }
 
@@ -166,59 +154,59 @@ void PropertiesPillarWindow::on_checkBox_clicked()
 
 void PropertiesPillarWindow::on_comboBox_2_activated(int index)
 {
-    if(ui->checkBox->isChecked())
-        ui->widget->setColorTop(this->listColor.at(index)->color);
+//    if(ui->checkBox->isChecked())
+//        ui->widget->setColorTop(this->listColor.at(index)->color);
 }
 
 void PropertiesPillarWindow::on_spinBox_valueChanged(int arg1)
 {
-    foreach(COLOR * color,this->listColor)
+    /*foreach(COLOR * color,this->listColor)
         if(color->color==ui->widget->colorRow(arg1))
         {
             ui->comboBox_3->setCurrentIndex(this->listColor.indexOf(color));
             break;
-        }
+        }*/
 }
 
 void PropertiesPillarWindow::on_comboBox_3_activated(int index)
 {
-   if(!ui->checkBox_3->isChecked())
-        ui->widget->setColorRow(ui->spinBox->value(),this->listColor.at(index)->color);
-    else ui->widget->setColorAllRow(this->listColor.at(index)->color);
+//   if(!ui->checkBox_3->isChecked())
+//        ui->widget->setColorRow(ui->spinBox->value(),this->listColor.at(index)->color);
+//    else ui->widget->setColorAllRow(this->listColor.at(index)->color);
 }
 
 void PropertiesPillarWindow::on_checkBox_5_clicked()
 {
-    ui->spinBox->setEnabled(!ui->checkBox_5->isChecked());
-    ui->comboBox_3->setEnabled(!ui->checkBox_5->isChecked());
-    ui->checkBox_3->setEnabled(!ui->checkBox_5->isChecked());
-    ui->widget->setEnabledPazzle(ui->checkBox_5->isChecked(),this->listColor.at(ui->comboBox_4->currentIndex())->color,
-                                 this->listColor.at(ui->comboBox_5->currentIndex())->color);
-    ui->comboBox_4->setEnabled(ui->checkBox_5->isChecked());
-    ui->comboBox_5->setEnabled(ui->checkBox_5->isChecked());
+//    ui->spinBox->setEnabled(!ui->checkBox_5->isChecked());
+//    ui->comboBox_3->setEnabled(!ui->checkBox_5->isChecked());
+//    ui->checkBox_3->setEnabled(!ui->checkBox_5->isChecked());
+//    ui->widget->setEnabledPazzle(ui->checkBox_5->isChecked(),this->listColor.at(ui->comboBox_4->currentIndex())->color,
+//                                 this->listColor.at(ui->comboBox_5->currentIndex())->color);
+//    ui->comboBox_4->setEnabled(ui->checkBox_5->isChecked());
+//    ui->comboBox_5->setEnabled(ui->checkBox_5->isChecked());
 }
 
 void PropertiesPillarWindow::on_checkBox_3_clicked()
 {
-    if(ui->checkBox_3->isChecked())
-         ui->widget->setColorAllRow(this->listColor.at(ui->comboBox_3->currentIndex())->color);
+//    if(ui->checkBox_3->isChecked())
+//         ui->widget->setColorAllRow(this->listColor.at(ui->comboBox_3->currentIndex())->color);
 }
 
 void PropertiesPillarWindow::on_comboBox_4_activated(int index)
 {
-    ui->widget->setEnabledPazzle(ui->checkBox_5->isChecked(),this->listColor.at(index)->color,
-                                 this->listColor.at(ui->comboBox_5->currentIndex())->color);
+//    ui->widget->setEnabledPazzle(ui->checkBox_5->isChecked(),this->listColor.at(index)->color,
+//                                 this->listColor.at(ui->comboBox_5->currentIndex())->color);
 }
 
 void PropertiesPillarWindow::on_comboBox_5_activated(int index)
 {
-    ui->widget->setEnabledPazzle(ui->checkBox_5->isChecked(),this->listColor.at(ui->comboBox_4->currentIndex())->color,
-                                 this->listColor.at(index)->color);
+//    ui->widget->setEnabledPazzle(ui->checkBox_5->isChecked(),this->listColor.at(ui->comboBox_4->currentIndex())->color,
+//                                 this->listColor.at(index)->color);
 }
 
 void PropertiesPillarWindow::saveSetting()
 {
-    if(ui->lineEdit->text().toInt()>=this->heightBrick)
+    /*if(ui->lineEdit->text().toInt()>=this->heightBrick)
     {
         this->Pillar->setHeight(ui->lineEdit->text().toInt());
         this->Pillar->setHeightSide(ui->comboBox->currentIndex(),ui->lineEdit_3->text().toInt());
@@ -234,7 +222,7 @@ void PropertiesPillarWindow::saveSetting()
         this->Pillar->setBottomType(ui->comboBox_6->currentIndex());
         /*if(ui->checkBox_6->isChecked())
             this->Pillar->setBottomType(ui->comboBox_6->currentIndex());
-        else this->Pillar->setBottomType(GraphicsPillarItem::BOTTOM_NONE);*/
+        else this->Pillar->setBottomType(GraphicsPillarItem::BOTTOM_NONE);
         this->Pillar->clearColorRow();
         if(!this->Pillar->isPazzle())
         {
@@ -244,7 +232,7 @@ void PropertiesPillarWindow::saveSetting()
                         this->Pillar->addColorRow(*color);
         }
         emit this->closeProperties(ITEM_PILLAR,ui->checkBox_4->isChecked());
-    }
+    }*/
 }
 
 void PropertiesPillarWindow::closeEvent(QCloseEvent *event)

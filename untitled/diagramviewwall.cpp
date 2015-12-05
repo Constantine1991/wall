@@ -36,7 +36,7 @@ void DiagramViewWall::setHeightWall(int height)
     this->rendering();
 }
 
-void DiagramViewWall::setSetting(SETTINGS *itemSetting)
+void DiagramViewWall::setSetting(SettingItem *itemSetting)
 {
     this->calc=new Calculate(itemSetting);
     this->heightBrick=itemSetting->heightBrickAngle;
@@ -298,15 +298,15 @@ void DiagramViewWall::setHeightPillar(int height)
     this->heightPillar=height;
 }
 
-void DiagramViewWall::setTopPillar(bool top, COLOR color)
+void DiagramViewWall::setTopPillar(bool top, QString color)
 {
     this->topPillar=top;
     if(this->topPillar)
         this->colorTopPillar=color;
-    else this->colorTopPillar=COLOR();
+    else this->colorTopPillar=QString();
 }
 
-void DiagramViewWall::setPazzlePillar(bool pazzle, COLOR color1, COLOR color2)
+void DiagramViewWall::setPazzlePillar(bool pazzle, QString color1, QString color2)
 {
     this->pazzlePillar=pazzle;
     if(this->pazzlePillar)
@@ -314,12 +314,12 @@ void DiagramViewWall::setPazzlePillar(bool pazzle, COLOR color1, COLOR color2)
         this->colorPazzle1Pillar=color1;
         this->colorPazzle2Pillar=color2;
     }else{
-        this->colorPazzle1Pillar=COLOR();
-        this->colorPazzle2Pillar=COLOR();
+        this->colorPazzle1Pillar=QString();
+        this->colorPazzle2Pillar=QString();
     }
 }
 
-void DiagramViewWall::setColorListPillar(QList<COLOR> colorList)
+void DiagramViewWall::setColorListPillar(QList<QString> colorList)
 {
     if(!colorList.isEmpty())
         this->colorList=colorList;
@@ -327,7 +327,7 @@ void DiagramViewWall::setColorListPillar(QList<COLOR> colorList)
 
 void DiagramViewWall::createPillar()
 {
-    int y=this->GraphicsSceneWall->height()-50;
+    /*int y=this->GraphicsSceneWall->height()-50;
     int heightop=10;
     if(this->topWall)
         heightop=5;
@@ -446,7 +446,7 @@ void DiagramViewWall::createPillar()
         itemTopGraphics->setPen(QPen(Qt::black, 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
         itemTopGraphics->setPos(50,y+5);
         this->GraphicsSceneWall->addItem(itemTopGraphics);
-    }
+    }**/
 }
 
 void DiagramViewWall::rendering()

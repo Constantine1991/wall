@@ -14,7 +14,7 @@ class GraphicsWallItem:public QGraphicsLineItem
 {
 public:
     enum { Type = UserType + 2 };
-    GraphicsWallItem(QMenu *menuItem,QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
+    GraphicsWallItem(QMenu *menuItem=0,QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
     int type() const{
         return Type;
     }
@@ -29,24 +29,24 @@ public:
     int width();
     void setTop(bool top);
     bool isTop();
-    void setColorTop(COLOR color);
-    COLOR colorTop();
+    void setColorTop(QString color);
+    QString colorTop();
     void setPazzle(bool pazzle);
     bool isPazzle();
-    void setColorPazzle(int pazzle,COLOR color);
-    COLOR colorPazzle(int pazzle);
-    void addColorRow(COLOR color);
-    void setColorRow(int row,COLOR color);
-    void setColorRowList(QList<COLOR> colorList);
-    COLOR colorRow(int row);
-    QList<COLOR> colorListRow();
+    void setColorPazzle(int pazzle,QString color);
+    QString colorPazzle(int pazzle);
+    void addColorRow(QString color);
+    void setColorRow(int row,QString color);
+    void setColorRowList(QList<QString> colorList);
+    QString colorRow(int row);
+    QList<QString> colorListRow();
     bool isEmptyColorRow();
     int countColorRow();
     void clearColorRow();
     void setDecoreid(int decoreid);
     int isDecoreid();
-    void setColorDecoreid(COLOR color);
-    COLOR colorDecoreid();
+    void setColorDecoreid(QString color);
+    QString colorDecoreid();
     void setGirthRail(bool girth);
     bool isGirthRail();
     void setGraphicsWallItem(GraphicsWallItem *wall);
@@ -59,12 +59,12 @@ private:
     int wallHeight;
     int wallWidth;
     bool wallTop;
-    COLOR wallColorTop;
+    QString wallColorTop;
     bool wallPazzle;
-    COLOR wallColorPazzle[2];
-    QList<COLOR> wallColorRow;
+    QString wallColorPazzle[2];
+    QList<QString> wallColorRow;
     int wallDecoreid;
-    COLOR wallColorDecoreid;
+    QString wallColorDecoreid;
     bool wallGirthRail;
 };
 

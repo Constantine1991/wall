@@ -23,8 +23,12 @@ DiagramView::DiagramView(QWidget *parent):QGraphicsView(parent)
     this->Rigel=false;
     this->mousePrees=false;
     this->centerOn(0,0);
-    this->typeITEM=ITEM_NONE;
+    this->typeITEM=SettingItem::ITEM_NONE;
     this->keyPressA=false;
+    this->RectA=NULL;
+    this->alignment.setScene(this->pDiagramScene);
+    this->lock=false;
+    this->title.setDiagramScene(this->pDiagramScene);
 }
 
 DiagramView::~DiagramView()
@@ -51,7 +55,7 @@ void DiagramView::CreateMenuItem()
     this->MenuItem->addAction(this->DeleteItem);
 }
 
-QGraphicsItem *DiagramView::itemToScene(TYPEITEM typeItem, QPointF point)
+QGraphicsItem *DiagramView::itemToScene(SettingItem::TYPEITEM typeItem, QPointF point)
 {
     QList<QGraphicsItem*> listItem=this->pDiagramScene->items(point);
     if(!listItem.isEmpty())
@@ -59,7 +63,7 @@ QGraphicsItem *DiagramView::itemToScene(TYPEITEM typeItem, QPointF point)
         foreach(QGraphicsItem *item,listItem)
             switch(typeItem)
             {
-                case ITEM_PILLAR:{
+                case SettingItem::ITEM_PILLAR:{
                     if(item->type()==GraphicsPillarItem::Type)
                         return item;
                 }
@@ -69,11 +73,11 @@ QGraphicsItem *DiagramView::itemToScene(TYPEITEM typeItem, QPointF point)
     return NULL;
 }
 
-QGraphicsItem* DiagramView::AppendItem(TYPEITEM typeItem, QPointF point)
+QGraphicsItem* DiagramView::AppendItem(SettingItem::TYPEITEM typeItem, QPointF point)
 {
     switch(typeItem)
     {
-        case ITEM_PILLAR:{
+        case SettingItem::ITEM_PILLAR:{
             GraphicsPillarItem *PillarItem=new GraphicsPillarItem(this->MenuItem);
             PillarItem->setEnabledBackUp(true);
             PillarItem->setPosition(point);
@@ -81,10 +85,10 @@ QGraphicsItem* DiagramView::AppendItem(TYPEITEM typeItem, QPointF point)
             this->pDiagramScene->addItem(PillarItem);
             return PillarItem;
         }
-        case ITEM_WALL:{
+        case SettingItem::ITEM_WALL:{
             GraphicsWallItem *wall=new GraphicsWallItem(this->MenuItem);
-            QGraphicsItem *item1=this->itemToScene(ITEM_PILLAR,this->lineWall->line().p1());
-            QGraphicsItem *item2=this->itemToScene(ITEM_PILLAR,this->lineWall->line().p2());
+            QGraphicsItem *item1=this->itemToScene(SettingItem::ITEM_PILLAR,this->lineWall->line().p1());
+            QGraphicsItem *item2=this->itemToScene(SettingItem::ITEM_PILLAR,this->lineWall->line().p2());
             if(item1!=NULL && item2!=NULL)
             {
                 GraphicsPillarItem *pillar1=qgraphicsitem_cast<GraphicsPillarItem*>(item1);
@@ -99,7 +103,7 @@ QGraphicsItem* DiagramView::AppendItem(TYPEITEM typeItem, QPointF point)
             this->lineWall=NULL;
             return wall;
         }
-        case ITEM_GATE_A:{
+        case SettingItem::ITEM_GATE_A:{
             group=new GroupItem();
             connect(this,SIGNAL(itemMoveScene(QPointF)),group,SLOT(itemMoveScene(QPointF)));
             connect(this,SIGNAL(mouseRelease()),group,SLOT(mouseRelease()));
@@ -111,7 +115,7 @@ QGraphicsItem* DiagramView::AppendItem(TYPEITEM typeItem, QPointF point)
             this->listGroup.append(group);
             return NULL;
         }
-        case ITEM_GATE_B:{
+        case SettingItem::ITEM_GATE_B:{
             group=new GroupItem();
             connect(this,SIGNAL(itemMoveScene(QPointF)),group,SLOT(itemMoveScene(QPointF)));
             connect(this,SIGNAL(mouseRelease()),group,SLOT(mouseRelease()));
@@ -123,7 +127,7 @@ QGraphicsItem* DiagramView::AppendItem(TYPEITEM typeItem, QPointF point)
             this->listGroup.append(group);
             return NULL;
         }
-        case ITEM_WICKET:{
+        case SettingItem::ITEM_WICKET:{
             group=new GroupItem();
             connect(this,SIGNAL(itemMoveScene(QPointF)),group,SLOT(itemMoveScene(QPointF)));
             connect(this,SIGNAL(mouseRelease()),group,SLOT(mouseRelease()));
@@ -135,7 +139,7 @@ QGraphicsItem* DiagramView::AppendItem(TYPEITEM typeItem, QPointF point)
             this->listGroup.append(group);
             return NULL;
         }
-        case ITEM_LINE:{
+        case SettingItem::ITEM_LINE:{
             GraphicsLineItem *line=new GraphicsLineItem();
             line->setPoints(this->linePoint1->pos(),this->linePoint2->pos(),this->pDiagramScene);
             this->pDiagramScene->removeItem(this->linePoint1);
@@ -172,8 +176,11 @@ void DiagramView::RotateItem(int Angle)
         if(group->isItem(this->pDiagramScene->selectedItems().at(0)))
         {
             group->setRotate(Angle);
-            break;
+            return;
         }
+    if(this->pDiagramScene->selectedItems().at(0)->type()==GraphicsPillarItem::Type)
+        this->pDiagramScene->selectedItems().at(0)->setRotation(this->pDiagramScene->selectedItems().at(0)->rotation()+
+                                                                Angle);
 }
 
 QPointF DiagramView::centerItem(QGraphicsItem *itemGraphics)
@@ -242,8 +249,8 @@ void DiagramView::Delete_Item()
             if(parentItem->type()==GraphicsWallItem::Type)
             {
                 GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(parentItem);
-                GraphicsPillarItem *pillar1=qgraphicsitem_cast<GraphicsPillarItem*>(this->itemToScene(ITEM_PILLAR,wall->line().p1()));
-                GraphicsPillarItem *pillar2=qgraphicsitem_cast<GraphicsPillarItem*>(this->itemToScene(ITEM_PILLAR,wall->line().p2()));
+                GraphicsPillarItem *pillar1=qgraphicsitem_cast<GraphicsPillarItem*>(this->itemToScene(SettingItem::ITEM_PILLAR,wall->line().p1()));
+                GraphicsPillarItem *pillar2=qgraphicsitem_cast<GraphicsPillarItem*>(this->itemToScene(SettingItem::ITEM_PILLAR,wall->line().p2()));
                 if(pillar1!=NULL)
                     pillar1->removeWall(wall);
                 if(pillar2!=NULL)
@@ -268,8 +275,8 @@ void DiagramView::setInterval(float interval, bool empty)
         return;
     }
     QGraphicsItem *ObjectA,*ObjectB;
-    ObjectA=this->itemToScene(ITEM_PILLAR,this->lineFilling->line().p1());
-    ObjectB=this->itemToScene(ITEM_PILLAR,this->lineFilling->line().p2());
+    ObjectA=this->itemToScene(SettingItem::ITEM_PILLAR,this->lineFilling->line().p1());
+    ObjectB=this->itemToScene(SettingItem::ITEM_PILLAR,this->lineFilling->line().p2());
     this->deleteFilling();
     if(ObjectA!=NULL && ObjectB!=NULL)
         this->Filling(qgraphicsitem_cast<GraphicsPillarItem*>(ObjectA),
@@ -321,9 +328,9 @@ void DiagramView::Filling(GraphicsPillarItem *a, GraphicsPillarItem *b,float int
         point=this->rotatePoint(posA,QPointF(posA.x()-(distance*(i+1)),posA.y()),angle);
         point.setX(point.x()-b->boundingRect().width()/2);
         point.setY(point.y()-b->boundingRect().height()/2);
-        GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(this->AppendItem(ITEM_PILLAR,point));
+        GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(this->AppendItem(SettingItem::ITEM_PILLAR,point));
         this->lineWall=new QGraphicsLineItem(QLineF(a->centre(),pillar->centre()));
-        GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(this->AppendItem(ITEM_WALL,QPointF(0,0)));
+        GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(this->AppendItem(SettingItem::ITEM_WALL,QPointF(0,0)));
         wall->setGirthRail(true);
         wall->setWidth(this->itemSetting->maxWidthGirth);
         a=pillar;
@@ -337,7 +344,7 @@ void DiagramView::Filling(GraphicsPillarItem *a, GraphicsPillarItem *b,float int
         if(!groupItem->types().isEmpty())
             groupItem->setOffsetPos(b->centre(),distance);
         this->lineWall=new QGraphicsLineItem(QLineF(a->centre(),b->centre()));
-        GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(this->AppendItem(ITEM_WALL,QPointF(0,0)));
+        GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(this->AppendItem(SettingItem::ITEM_WALL,QPointF(0,0)));
         wall->setGirthRail(true);
         wall->setWidth(this->itemSetting->maxWidthGirth);
         return;
@@ -347,9 +354,9 @@ void DiagramView::Filling(GraphicsPillarItem *a, GraphicsPillarItem *b,float int
         point=this->rotatePoint(posA,QPointF(posA.x()-distance*countObject,posA.y()),angle);
         point.setX(point.x()-b->boundingRect().width()/2);
         point.setY(point.y()-b->boundingRect().height()/2);
-        GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(this->AppendItem(ITEM_PILLAR,point));
+        GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(this->AppendItem(SettingItem::ITEM_PILLAR,point));
         this->lineWall=new QGraphicsLineItem(QLineF(a->centre(),pillar->centre()));
-        GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(this->AppendItem(ITEM_WALL,QPointF(0,0)));
+        GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(this->AppendItem(SettingItem::ITEM_WALL,QPointF(0,0)));
         wall->setGirthRail(true);
         wall->setWidth(this->itemSetting->maxWidthGirth);
         a=pillar;
@@ -376,14 +383,14 @@ void DiagramView::Filling(GraphicsPillarItem *a, GraphicsPillarItem *b,float int
         if(!groupItem->types().isEmpty())
             groupItem->setOffsetPos(b->centre(),distance);
         this->lineWall=new QGraphicsLineItem(QLineF(a->centre(),b->centre()));
-        GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(this->AppendItem(ITEM_WALL,QPointF(0,0)));
+        GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(this->AppendItem(SettingItem::ITEM_WALL,QPointF(0,0)));
         wall->setGirthRail(true);
         wall->setWidth(grith-35);
     }
 }
 /*-----------------------------------------public-------------------------------------------*/
 
-void DiagramView::setTypeItem(TYPEITEM type)
+void DiagramView::setTypeItem(SettingItem::TYPEITEM type)
 {
     this->typeITEM=type;
     if(this->linePoint1!=NULL)
@@ -400,7 +407,7 @@ void DiagramView::setTypeItem(TYPEITEM type)
     }
 }
 
-void DiagramView::setTypeItem(TYPEITEM type, int interval)
+void DiagramView::setTypeItem(SettingItem::TYPEITEM type, int interval)
 {
     this->setTypeItem(type);
     this->widthGroup=interval;
@@ -426,7 +433,7 @@ void DiagramView::ClearScene()
 
 void DiagramView::savePillar(QDomDocument *document,QDomElement *parent, GraphicsPillarItem *pillar)
 {
-    QDomElement object=document->createElement("Object");
+    /*QDomElement object=document->createElement("Object");
     object.setAttribute("type",pillar->type());
     QDomElement point=document->createElement("Point");
     point.setAttribute("x",pillar->pos().x());
@@ -480,12 +487,12 @@ void DiagramView::savePillar(QDomDocument *document,QDomElement *parent, Graphic
     QDomElement bottomType=document->createElement("Bottom");
     bottomType.setAttribute("type",pillar->isBottomTypeEnable());
     object.appendChild(bottomType);
-    parent->appendChild(object);
+    parent->appendChild(object);*/
 }
 
 void DiagramView::SaveDiagramScene(QString nameFile)
 {
-    QDomDocument document;
+   /* QDomDocument document;
     QDomElement root=document.createElement("data");
     document.appendChild(root);
     QDomElement f=document.createElement("Fundament");
@@ -630,12 +637,12 @@ void DiagramView::SaveDiagramScene(QString nameFile)
         return;
     QTextStream outFile(&saveFile);
     outFile<<document.toString();
-    saveFile.close();
+    saveFile.close();*/
 }
 
 void DiagramView::loadPillar(QXmlStreamReader *xml, GraphicsPillarItem *pillar)
 {
-    while(!(xml->isEndElement()&&xml->name()=="Object"))
+   /* while(!(xml->isEndElement()&&xml->name()=="Object"))
     {
         if(xml->isStartElement())
         {
@@ -700,12 +707,12 @@ void DiagramView::loadPillar(QXmlStreamReader *xml, GraphicsPillarItem *pillar)
     COLUMN p=calc.GetCountOnColumn(pillar->height(),insert,4);
     pillar->setText(QString(QString::number(p.count_brick_angle)+" | "+
                             QString::number(p.count_brick_angle_1+p.count_brick_angle_2+
-                                            p.count_brick_angle_3+p.count_brick_angle_4)));
+                                            p.count_brick_angle_3+p.count_brick_angle_4)));*/
 }
 
 bool DiagramView::LoadDiagramScene(QString nameFile)
 {
-    this->ClearScene();
+   /* this->ClearScene();
     QFile loadFile(nameFile);
     if(!loadFile.open(QIODevice::ReadOnly|QIODevice::Text))
         return false;
@@ -902,12 +909,19 @@ bool DiagramView::LoadDiagramScene(QString nameFile)
         pillar->clearBackUp();
         pillar->setPosition(pos);
     }
-    return true;
+    return true;*/
 }
 
 void DiagramView::PrintDiagram()
 {
+    if(this->pDiagramScene->items().isEmpty())
+    {
+        QMessageBox::about(this,QString::fromLocal8Bit("Сообщение!"),
+                           QString::fromLocal8Bit("Необходимо построить чертеж, чтобы расспечатать!"));
+        return;
+    }
     this->pDiagramScene->setBackgroundBrush(QBrush(Qt::lightGray, Qt::NoBrush));
+    this->title.show();
     this->pDiagramScene->clearSelection();
     QString fileName = QFileDialog::getSaveFileName(this, "Export PDF",
                                                 QString(), "*.pdf");
@@ -933,6 +947,7 @@ void DiagramView::PrintDiagram()
                 newPage=true;
             }
     }
+    this->title.hide();
     this->pDiagramScene->setBackgroundBrush(QBrush(Qt::lightGray, Qt::CrossPattern));
 }
 
@@ -958,7 +973,7 @@ void DiagramView::AppendBrickColorPazzle(QList<COLORBRICK*> *colorBrick,int coun
 
 void DiagramView::PrintContract()
 {
-   Calculate calc(this->itemSetting);
+   /*Calculate calc(this->itemSetting);
    FENCE allFence;
    COLUMN allColumn;
    QList<COLORBRICK*> colorBrick[6];
@@ -1125,18 +1140,18 @@ void DiagramView::PrintContract()
                                      calc.GetCountCoverOnPallet(allFence.count_cover)+
                                      calc.GetCountBaseOnPallet(countBasePillar[0]+countBasePillar[1]+
                                                                countBasePillar[2]+countBasePillar[3]+
-                                                               countBasePillar[4])));
+                                                               countBasePillar[4])));*/
 }
 
 
-void DiagramView::setSettingItem(SETTINGS *itemSetting)
+void DiagramView::setSettingItem(SettingItem *itemSetting)
 {
     this->itemSetting=itemSetting;
 }
 
-void DiagramView::closeProperties(TYPEITEM itemType,bool all)
+void DiagramView::closeProperties(SettingItem::TYPEITEM itemType,bool all)
 {
-    Calculate calc(this->itemSetting);
+    /*Calculate calc(this->itemSetting);
     if(itemType==ITEM_PILLAR)
     {
         GraphicsPillarItem *changePillar=qgraphicsitem_cast<GraphicsPillarItem*>(this->itemGraphicsChange);
@@ -1182,7 +1197,7 @@ void DiagramView::closeProperties(TYPEITEM itemType,bool all)
                 changeWall->setText(QString(QString::number(f.count_brick)+" | "+QString::number(f.count_brick_dob)));
             }
         }
-    }
+    }*/
 }
 
 void DiagramView::collidingGroup(QPointF point)
@@ -1246,9 +1261,9 @@ void DiagramView::mousePressEvent(QMouseEvent *event)
     this->keyPressA=false;
     this->mousePrees=true;
     QApplication::setOverrideCursor(Qt::PointingHandCursor);
-    if(this->typeITEM==ITEM_PILLAR)
-        this->AppendItem(ITEM_PILLAR,this->mapToScene(event->pos()));
-    if(this->typeITEM==ITEM_WALL)
+    if(this->typeITEM==SettingItem::ITEM_PILLAR)
+        this->AppendItem(SettingItem::ITEM_PILLAR,this->mapToScene(event->pos()));
+    if(this->typeITEM==SettingItem::ITEM_WALL)
     {
         this->lineWall=new QGraphicsLineItem(QLineF(this->mapToScene(event->pos()),this->mapToScene(event->pos())));
         this->lineWall->setPen(QPen(Qt::black, 2, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
@@ -1256,13 +1271,13 @@ void DiagramView::mousePressEvent(QMouseEvent *event)
         this->pDiagramScene->addItem(this->lineWall);
         this->pDiagramScene->clearSelection();
     }
-    if(this->typeITEM==ITEM_WICKET)
-        this->AppendItem(ITEM_WICKET,this->mapToScene(event->pos()));
-    if(this->typeITEM==ITEM_GATE_A)
-        this->AppendItem(ITEM_GATE_A,this->mapToScene(event->pos()));
-    if(this->typeITEM==ITEM_GATE_B)
-        this->AppendItem(ITEM_GATE_B,this->mapToScene(event->pos()));
-    if(this->typeITEM==ITEM_FILLING)
+    if(this->typeITEM==SettingItem::ITEM_WICKET)
+        this->AppendItem(SettingItem::ITEM_WICKET,this->mapToScene(event->pos()));
+    if(this->typeITEM==SettingItem::ITEM_GATE_A)
+        this->AppendItem(SettingItem::ITEM_GATE_A,this->mapToScene(event->pos()));
+    if(this->typeITEM==SettingItem::ITEM_GATE_B)
+        this->AppendItem(SettingItem::ITEM_GATE_B,this->mapToScene(event->pos()));
+    if(this->typeITEM==SettingItem::ITEM_FILLING)
     {
         this->lineFilling=new QGraphicsLineItem(QLineF(this->mapToScene(event->pos()),this->mapToScene(event->pos())));
         this->lineFilling->setPen(QPen(Qt::green, 2, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
@@ -1270,7 +1285,7 @@ void DiagramView::mousePressEvent(QMouseEvent *event)
         this->pDiagramScene->addItem(this->lineFilling);
         this->pDiagramScene->clearSelection();
     }
-    if(this->typeITEM==ITEM_LINE)
+    if(this->typeITEM==SettingItem::ITEM_LINE)
     {
         QGraphicsEllipseItem *ellipse=new QGraphicsEllipseItem();
         ellipse->setBrush(QBrush(Qt::blue));
@@ -1282,12 +1297,22 @@ void DiagramView::mousePressEvent(QMouseEvent *event)
         else this->linePoint2=ellipse;
         this->pDiagramScene->addItem(ellipse);
     }
+    QGraphicsPolygonItem *p=new QGraphicsPolygonItem();
+    QPolygonF a;
+    a<<this->mapToScene(event->pos());
+    p->setPolygon(a);
+    if(this->typeITEM==SettingItem::ITEM_NONE && this->pDiagramScene->collidingItems(p).isEmpty())
+    {
+        this->RectA=new RectAllocation();
+        this->RectA->setPosArea(this->mapToScene(event->pos()));
+        this->pDiagramScene->addItem(this->RectA);
+    }
     QGraphicsView::mousePressEvent(event);
 }
 
 void DiagramView::mouseMoveEvent(QMouseEvent *event)
-{
-    if(this->mousePrees)
+{/*
+    if(this->mousePrees && !this->lock)
     {
         emit this->itemMoveScene(this->mapToScene(event->pos()));
         this->collidingGroup(this->mapToScene(event->pos()));
@@ -1298,12 +1323,14 @@ void DiagramView::mouseMoveEvent(QMouseEvent *event)
     if(this->typeITEM==ITEM_FILLING)
         if(this->lineFilling!=NULL)
             this->lineFilling->setLine(QLineF(this->lineFilling->line().p1(),this->mapToScene(event->pos())));
+    if(this->RectA!=NULL)
+        this->RectA->setArea(this->RectA->posArea(),this->mapToScene(event->pos()));*/
     QGraphicsView::mouseMoveEvent(event);
 }
 
 void DiagramView::mouseReleaseEvent(QMouseEvent *event)
 {
-    if(event->button()!=Qt::LeftButton)
+    /*if(event->button()!=Qt::LeftButton)
         return;
     if(!this->pDiagramScene->selectedItems().isEmpty())
         if(this->pDiagramScene->selectedItems().at(0)->type()==GraphicsPillarItem::Type)
@@ -1331,8 +1358,18 @@ void DiagramView::mouseReleaseEvent(QMouseEvent *event)
             this->AppendItem(ITEM_LINE,QPointF(0,0));
             this->typeITEM=ITEM_NONE;
         }
-    }
-    else this->typeITEM=ITEM_NONE;
+    }else
+        if(this->typeITEM!=ITEM_PILLAR && this->typeITEM!=ITEM_WALL)
+            this->typeITEM=ITEM_NONE;
+    if(this->RectA!=NULL)
+    {
+        QList<QGraphicsItem*> list=this->pDiagramScene->collidingItems(this->RectA);
+        foreach(QGraphicsItem *item,list)
+            item->setSelected(true);
+        this->pDiagramScene->removeItem(this->RectA);
+        delete this->RectA;
+        this->RectA=NULL;
+    }*/
     QApplication::restoreOverrideCursor();
     QGraphicsView::mouseReleaseEvent(event);
 }
@@ -1347,13 +1384,13 @@ void DiagramView::mouseDoubleClickEvent(QMouseEvent *event)
         if(itemGraphics.at(0)->type()==GraphicsPillarItem::Type)
         {
             PropertiesPillarWindow *PillarWindow=new PropertiesPillarWindow(this);
-            PillarWindow->heightBrick=this->itemSetting->heightBrickAngle;
-            connect(PillarWindow,SIGNAL(closeProperties(TYPEITEM,bool)),this,SLOT(closeProperties(TYPEITEM,bool)));
+            connect(PillarWindow,SIGNAL(closeProperties(SettingItem::TYPEITEM,bool)),
+                    this,SLOT(closeProperties(SettingItem::TYPEITEM,bool)));
             this->itemGraphicsChange=itemGraphics.at(0);
             GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(this->itemGraphicsChange);
-            PillarWindow->SetPropertiesPillar(pillar,this->itemSetting->color,this->Fundament);
+            PillarWindow->SetPropertiesPillar(pillar,this->itemSetting,this->Fundament);
             PillarWindow->show();
-        }
+        }/*
         if(itemGraphics.at(0)->type()==GraphicsWallItem::Type)
         {
             this->itemGraphicsChange=itemGraphics.at(0);
@@ -1373,7 +1410,7 @@ void DiagramView::mouseDoubleClickEvent(QMouseEvent *event)
                     wallWindow->show();
                 }
             }
-        }
+        }*/
     }
 
     QGraphicsView::mouseDoubleClickEvent(event);
@@ -1381,7 +1418,7 @@ void DiagramView::mouseDoubleClickEvent(QMouseEvent *event)
 
 void DiagramView::isValidateObject()
 {
-    QList<QGraphicsItem*>itemGraphics=this->pDiagramScene->items();
+    /*QList<QGraphicsItem*>itemGraphics=this->pDiagramScene->items();
     foreach(QGraphicsItem* item,itemGraphics)
     {
         if(item->type()==GraphicsWallItem::Type)
@@ -1431,7 +1468,7 @@ void DiagramView::isValidateObject()
                 }
             }
         }
-    }
+    }*//////
    /*if(!itemGraphics.isEmpty())
     {
         if(itemGraphics.at(0)->type()==GraphicsPillarItem::Type)
@@ -1535,4 +1572,44 @@ void DiagramView::setFundament(bool Fundament)
             continue;
         }
     }
+}
+
+
+float DiagramView::normalVector2D(QPointF vector2d)
+{
+    return qSqrt((vector2d.x()*vector2d.x())+(vector2d.y()*vector2d.y()));
+}
+
+/*
+void DiagramView::alignmentWall(int width, GraphicsPillarItem *pillar1, GraphicsPillarItem *pillar2)
+{
+    float angle=::atan2(pillar1->pos().y()-pillar2->pos().y(),pillar1->pos().x()-pillar2->pos().x())/PI*180;
+    angle=angle<0?angle+360:angle;
+    QPointF point=this->rotatePoint(pillar1->pos(),QPointF(pillar1->pos().x()-width,pillar1->pos().y()),angle);
+    pillar2->setPosition(point);
+}*/
+
+void DiagramView::alignmentSelectedWall(int width)
+{
+    if(this->pDiagramScene->selectedItems().isEmpty())
+        return;
+    foreach(GroupItem *group,this->listGroup)
+        foreach(QGraphicsItem *item,this->pDiagramScene->selectedItems())
+            if(group->isItem(item))
+                return;
+    this->alignment.alignmentAnglePillar(width,this->pDiagramScene->selectedItems());
+    //this->alignment.alignmentLengthPillar(width,this->pDiagramScene->selectedItems());
+}
+
+void DiagramView::setLockingScene(bool lock)
+{
+    this->lock=lock;
+    foreach(QGraphicsItem *itemGraphic,this->pDiagramScene->items())
+        if(itemGraphic->type()==GraphicsPillarItem::Type)
+            itemGraphic->setFlag(QGraphicsItem::ItemIsMovable,!this->lock);
+}
+
+bool DiagramView::locking()
+{
+    return this->lock;
 }

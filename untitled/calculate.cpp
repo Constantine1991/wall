@@ -1,7 +1,7 @@
 #include "calculate.h"
 #include "QDebug"
 
-Calculate::Calculate(SETTINGS *itemSetting)
+Calculate::Calculate(SettingItem *itemSetting)
 {
     this->itemSetting=itemSetting;
 }

@@ -15,7 +15,7 @@ public:
     explicit Component(QWidget *parent = 0);
     ~Component();
 signals:
-    void isTypeComponent(TYPEITEM type,int width);
+    void isTypeComponent(SettingItem::TYPEITEM type,int width);
 private slots:
     void on_pushButton_clicked();
 

@@ -17,9 +17,9 @@ class PropertiesWallWindow : public QMainWindow
 public:
     explicit PropertiesWallWindow(QWidget *parent = 0);
     ~PropertiesWallWindow();
-    void SetPropertiesWall(GraphicsWallItem *item, SETTINGS *itemSetting,GraphicsPillarItem *itemPillar,bool fundament=false);
+    void SetPropertiesWall(GraphicsWallItem *item, SettingItem *itemSetting,GraphicsPillarItem *itemPillar,bool fundament=false);
 signals:
-    void closeProperties(TYPEITEM itemType,bool all);
+    void closeProperties(SettingItem::TYPEITEM itemType,bool all);
 private slots:
     void on_pushButton_4_clicked();
     void on_lineEdit_textChanged(const QString &arg1);
@@ -67,7 +67,7 @@ private:
     void saveSetting();
     Ui::PropertiesWallWindow *ui;
     GraphicsWallItem *wall;
-    SETTINGS *itemSetting;
+    SettingItem *itemSetting;
     GraphicsPillarItem *itemPillar;
     void changeRowWall();
     bool saveFlag;

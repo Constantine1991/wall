@@ -15,19 +15,19 @@ Component::~Component()
 
 void Component::on_pushButton_clicked()
 {
-    TYPEITEM type;
+    SettingItem::TYPEITEM type;
     if(ui->radioButton->isChecked())
-        type=ITEM_WICKET;
+        type=SettingItem::ITEM_WICKET;
     if(ui->radioButton_2->isChecked())
-        type=ITEM_GATE_A;
+        type=SettingItem::ITEM_GATE_A;
     if(ui->radioButton_3->isChecked())
-        type=ITEM_GATE_B;
+        type=SettingItem::ITEM_GATE_B;
     emit this->isTypeComponent(type,ui->lineEdit->text().toInt());
     this->close();
 }
 
 void Component::on_pushButton_2_clicked()
 {
-    this->isTypeComponent(ITEM_NONE,0);
+    this->isTypeComponent(SettingItem::ITEM_NONE,0);
     this->close();
 }

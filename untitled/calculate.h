@@ -42,7 +42,7 @@ typedef COLORBRICKWALL COLORBRICKPILLAR;
 class Calculate
 {
 public:
-    Calculate(SETTINGS *itemSetting);
+    Calculate(SettingItem *itemSetting);
     //Количество материала на забор
     FENCE GetCountOnFence(int WidthWall, int HeightWall, bool topWall);
     int coverWall(int widthWall);
@@ -76,7 +76,7 @@ public:
     int GetCountCoverOnPallet(int Count);
     int GetCountBaseOnPallet(int Count);
 private:
-    SETTINGS *itemSetting;
+    SettingItem *itemSetting;
 
 };
 

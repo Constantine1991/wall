@@ -13,7 +13,7 @@ GraphicsPillarItem::GraphicsPillarItem(QMenu *menuItem, QGraphicsItem *parent, Q
     this->setPen(QPen(Qt::black, 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
     this->setText("0|0");
     this->setRect(0,0,16,16);
-    this->itemText->setPos(8-this->itemText->boundingRect().width()/2,0-this->itemText->boundingRect().height());
+    this->itemText->setPos(16/*-this->itemText->boundingRect().width()/2*/,0-this->itemText->boundingRect().height());
     this->itemText->setParentItem(this);
     this->setFlag(QGraphicsItem::ItemIsMovable,true);
     this->setFlag(QGraphicsItem::ItemIsSelectable, true);
@@ -54,6 +54,16 @@ void GraphicsPillarItem::addWall(GraphicsWallItem *lineWall, bool point)
 void GraphicsPillarItem::removeWall(GraphicsWallItem *item)
 {
     this->listWall.remove(item);
+}
+
+int GraphicsPillarItem::isWall()
+{
+    return this->listWall.count();
+}
+
+QList<GraphicsWallItem*> GraphicsPillarItem::itemsWall()
+{
+    return this->listWall.keys();
 }
 
 QVariant GraphicsPillarItem::itemChange(GraphicsItemChange change, const QVariant &value)
@@ -220,7 +230,7 @@ void GraphicsPillarItem::clearColorRow()
     this->colorRowPillar.clear();
 }
 
-void GraphicsPillarItem::addColorRow(COLOR color)
+void GraphicsPillarItem::addColorRow(QString color)
 {
     this->colorRowPillar.append(color);
 }
@@ -229,11 +239,11 @@ void GraphicsPillarItem::setCountColorRow(int count)
 {
     if(this->colorRowPillar.isEmpty())
         for(int i=0;i<count;i++)
-            this->colorRowPillar.append(COLOR());
+            this->colorRowPillar.append(QString(""));
      else{
         if(this->colorRowPillar.count()<count)
             for(int i=this->colorRowPillar.count()-1;i<count;i++)
-                this->colorRowPillar.append(COLOR());
+                this->colorRowPillar.append(QString(""));
         else
             if(this->colorRowPillar.count()>count)
                 for(int i=this->colorRowPillar.count()-1;i<count-1;i--)
@@ -241,13 +251,13 @@ void GraphicsPillarItem::setCountColorRow(int count)
     }
 }
 
-void GraphicsPillarItem::setColorRow(int row, COLOR color)
+void GraphicsPillarItem::setColorRow(int row, QString color)
 {
     this->colorRowPillar.removeAt(row-1);
     this->colorRowPillar.insert(row-1,color);
 }
 
-void GraphicsPillarItem::setColorRow(QList<COLOR> color)
+void GraphicsPillarItem::setColorRow(QList<QString> color)
 {
     this->colorRowPillar.clear();
     this->colorRowPillar.append(color);
@@ -258,12 +268,12 @@ int GraphicsPillarItem::countColorRow()
     return this->colorRowPillar.count();
 }
 
-COLOR GraphicsPillarItem::colorRow(int row)
+QString GraphicsPillarItem::colorRow(int row)
 {
     return this->colorRowPillar.at(row);
 }
 
-QList<COLOR> GraphicsPillarItem::colorListRow()
+QList<QString> GraphicsPillarItem::colorListRow()
 {
     return this->colorRowPillar;
 }
@@ -273,7 +283,7 @@ void GraphicsPillarItem::setTop(bool top)
     this->topPillar=top;
 }
 
-void GraphicsPillarItem::setTopColor(COLOR color)
+void GraphicsPillarItem::setTopColor(QString color)
 {
     if(this->topPillar)
         this->colorTopPillar=color;
@@ -284,7 +294,7 @@ bool GraphicsPillarItem::isTop()
     return this->topPillar;
 }
 
-COLOR GraphicsPillarItem::topColor()
+QString GraphicsPillarItem::topColor()
 {
     return this->colorTopPillar;
 }
@@ -294,7 +304,7 @@ void GraphicsPillarItem::setPazzle(bool pazzle)
     this->pazzlePillar=pazzle;
 }
 
-void GraphicsPillarItem::setColorPazzle(int number, COLOR color)
+void GraphicsPillarItem::setColorPazzle(int number, QString color)
 {
     if(this->pazzlePillar)
         this->colorPazzlePillar[number]=color;
@@ -305,7 +315,7 @@ bool GraphicsPillarItem::isPazzle()
     return this->pazzlePillar;
 }
 
-COLOR GraphicsPillarItem::colorPazzle(int number)
+QString GraphicsPillarItem::colorPazzle(int number)
 {
     return this->colorPazzlePillar[number];
 }

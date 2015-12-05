@@ -37,6 +37,8 @@ public:
        }
        void addWall(GraphicsWallItem *lineWall,bool point);
        void removeWall(GraphicsWallItem *item);
+       int isWall();
+       QList<GraphicsWallItem*> itemsWall();
        void setText(QString caption);
        QString text();
        void setHeight(int height);
@@ -45,14 +47,14 @@ public:
        void setBottomTypeEnable(bool enable);
        void setBottomType(int type);
        void clearColorRow();
-       void addColorRow(COLOR color);
+       void addColorRow(QString color);
        void setCountColorRow(int count);
-       void setColorRow(int row,COLOR color);
-       void setColorRow(QList<COLOR> color);
+       void setColorRow(int row,QString color);
+       void setColorRow(QList<QString> color);
        void setTop(bool top);
-       void setTopColor(COLOR color);
+       void setTopColor(QString color);
        void setPazzle(bool pazzle);
-       void setColorPazzle(int number,COLOR color);
+       void setColorPazzle(int number,QString color);
        void setGraphicsPillarItem(GraphicsPillarItem *graphicsItem);
        int height();
        QPointF centre();
@@ -63,11 +65,11 @@ public:
        bool isBottomTypeEnable();
        bool isTop();
        int countColorRow();
-       COLOR colorRow(int row);
-       QList<COLOR> colorListRow();
-       COLOR topColor();
+       QString colorRow(int row);
+       QList<QString> colorListRow();
+       QString topColor();
        bool isPazzle();
-       COLOR colorPazzle(int number);
+       QString colorPazzle(int number);
        QMenu *menuitem();
        void backUp();
        void clearBackUp();
@@ -84,10 +86,10 @@ private:
     int heightPillar;
     bool topPillar;
     int heightSidePillar[4];
-    COLOR colorTopPillar;
-    QList<COLOR> colorRowPillar;
+    QString colorTopPillar;
+    QList<QString> colorRowPillar;
     bool pazzlePillar;
-    COLOR colorPazzlePillar[2];
+    QString colorPazzlePillar[2];
     BOTTOMTYPE bottomTypePillar;
     bool bottomTypeEnablePillar;
     QHash<GraphicsWallItem*,bool> listWall;

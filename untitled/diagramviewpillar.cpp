@@ -30,14 +30,14 @@ void DiagramViewPillar::setInsertTop(int insertTop)
     this->rendering();
 }
 
-void DiagramViewPillar::setColorRow(int index, QColor color)
+void DiagramViewPillar::setColorRow(int index, QBrush color)
 {
     this->color.removeAt(index-1);
     this->color.insert(index-1,color);
     this->rendering();
 }
 
-void DiagramViewPillar::setColorAllRow(QColor color)
+void DiagramViewPillar::setColorAllRow(QBrush color)
 {
     this->color.clear();
     for(int i=0;i<this->row();i++)
@@ -57,13 +57,13 @@ void DiagramViewPillar::setEnabledBottom(bool enable)
     this->rendering();
 }
 
-void DiagramViewPillar::setColorTop(QColor color)
+void DiagramViewPillar::setColorTop(QBrush color)
 {
     this->colorTop=color;
     this->rendering();
 }
 
-void DiagramViewPillar::setEnabledPazzle(bool enable, QColor color1, QColor color2)
+void DiagramViewPillar::setEnabledPazzle(bool enable, QBrush color1, QBrush color2)
 {
     this->pazzle=enable;
     this->colorPazzle1=color1;
@@ -71,7 +71,7 @@ void DiagramViewPillar::setEnabledPazzle(bool enable, QColor color1, QColor colo
     this->rendering();
 }
 
-QColor DiagramViewPillar::colorRow(int index)
+QBrush DiagramViewPillar::colorRow(int index)
 {
     return this->color.at(index);
 }
@@ -229,11 +229,11 @@ void DiagramViewPillar::rendering()
     int rowPillar=this->row();
     if(!this->color.isEmpty())
         for(int i=0;i<rowPillar;i++)
-            this->color.append(QColor(Qt::white));
+            this->color.append(QBrush(QColor(Qt::white)));
     if(this->color.count()-1<rowPillar)
     {
         for(int i=this->color.count()-1;i<rowPillar;i++)
-            this->color.append(QColor(Qt::white));
+            this->color.append(QBrush(QColor(Qt::white)));
     }
     else for(int i=this->color.count()-1;i>rowPillar;i--)
             this->color.removeAt(i);

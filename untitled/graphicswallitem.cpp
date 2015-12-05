@@ -94,12 +94,12 @@ bool GraphicsWallItem::isTop()
     return this->wallTop;
 }
 
-void GraphicsWallItem::setColorTop(COLOR color)
+void GraphicsWallItem::setColorTop(QString color)
 {
     this->wallColorTop=color;
 }
 
-COLOR GraphicsWallItem::colorTop()
+QString GraphicsWallItem::colorTop()
 {
     return this->wallColorTop;
 }
@@ -114,17 +114,17 @@ bool GraphicsWallItem::isPazzle()
     return this->wallPazzle;
 }
 
-void GraphicsWallItem::setColorPazzle(int pazzle, COLOR color)
+void GraphicsWallItem::setColorPazzle(int pazzle, QString color)
 {
     this->wallColorPazzle[pazzle]=color;
 }
 
-COLOR GraphicsWallItem::colorPazzle(int pazzle)
+QString GraphicsWallItem::colorPazzle(int pazzle)
 {
     return this->wallColorPazzle[pazzle];
 }
 
-void GraphicsWallItem::addColorRow(COLOR color)
+void GraphicsWallItem::addColorRow(QString color)
 {
     this->wallColorRow.append(color);
 }
@@ -134,24 +134,24 @@ void GraphicsWallItem::clearColorRow()
     this->wallColorRow.clear();
 }
 
-void GraphicsWallItem::setColorRow(int row, COLOR color)
+void GraphicsWallItem::setColorRow(int row, QString color)
 {
     this->wallColorRow.removeAt(row-1);
     this->wallColorRow.insert(row-1,color);
 }
 
-void GraphicsWallItem::setColorRowList(QList<COLOR> colorList)
+void GraphicsWallItem::setColorRowList(QList<QString> colorList)
 {
     this->clearColorRow();
     this->wallColorRow=colorList;
 }
 
-COLOR GraphicsWallItem::colorRow(int row)
+QString GraphicsWallItem::colorRow(int row)
 {
     return this->wallColorRow.at(row);
 }
 
-QList<COLOR> GraphicsWallItem::colorListRow()
+QList<QString> GraphicsWallItem::colorListRow()
 {
     return this->wallColorRow;
 }
@@ -176,12 +176,12 @@ int GraphicsWallItem::isDecoreid()
     return this->wallDecoreid;
 }
 
-void GraphicsWallItem::setColorDecoreid(COLOR color)
+void GraphicsWallItem::setColorDecoreid(QString color)
 {
    this->wallColorDecoreid=color;
 }
 
-COLOR GraphicsWallItem::colorDecoreid()
+QString GraphicsWallItem::colorDecoreid()
 {
     return this->wallColorDecoreid;
 }

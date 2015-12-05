@@ -26,6 +26,9 @@
 #include "interval.h"
 #include "groupitem.h"
 #include "graphicslineitem.h"
+#include "rectallocation.h"
+#include "alignment.h"
+#include "title.h"
 //---------WINDOW FORMS---------------//
 #include "propertiespillarwindow.h"
 #include "propertieswallwindow.h"
@@ -37,28 +40,32 @@ Q_OBJECT
 private:
     QGraphicsScene *pDiagramScene;
     GroupItem *group;
+    Title title;
     QList<GroupItem*> listGroup;
     QList<QGraphicsItem*> objectBackUp;
-    TYPEITEM typeITEM;
+    RectAllocation *RectA;
+    Alignment alignment;
+    SettingItem::TYPEITEM typeITEM;
     int currentIdItem;
     bool mousePrees;
     bool keyPressA;
     int widthGroup;
+    bool lock;
     QGraphicsItem *itemGraphicsChange;
     QGraphicsLineItem *lineWall;
     QGraphicsLineItem *lineFilling;
     QGraphicsEllipseItem *linePoint1;
     QGraphicsEllipseItem *linePoint2;
-    SETTINGS *itemSetting;
+    SettingItem *itemSetting;
     QMenu *MenuItem;
     QAction *Rotate_45Action;
     QAction *Rotate_90Action;
     QAction *Rotate_180Action;
     QAction *DeleteItem;
     void CreateMenuItem();
-    QGraphicsItem *itemToScene(TYPEITEM typeItem,QPointF point);
+    QGraphicsItem *itemToScene(SettingItem::TYPEITEM typeItem,QPointF point);
    // void AppendItem(GroupItem::TYPEGROUP typeGroup, QPointF point);
-    QGraphicsItem *AppendItem(TYPEITEM typeItem,QPointF point);
+    QGraphicsItem *AppendItem(SettingItem::TYPEITEM typeItem,QPointF point);
     float distancePointToPoint(QPointF point1,QPointF point2);
     void itemChangeScene(int idItem);
     void RotateItem(int Angle);
@@ -73,6 +80,7 @@ private:
     void loadPillar(QXmlStreamReader *xml,GraphicsPillarItem *pillar);
     void setLastPosObject();
     void isValidateObject();
+    float normalVector2D(QPointF vector2d);
 private slots:
     void RotateItem_45();
     void RotateItem_90();
@@ -82,22 +90,25 @@ private slots:
 public:
     DiagramView(QWidget *parent=0);
     ~DiagramView();
-    void setTypeItem(TYPEITEM type);
-    void setTypeItem(TYPEITEM type, int interval);
+    void setTypeItem(SettingItem::TYPEITEM type);
+    void setTypeItem(SettingItem::TYPEITEM type, int interval);
     void ClearScene();
     void SaveDiagramScene(QString nameFile);
     bool LoadDiagramScene(QString nameFile);
     void PrintDiagram();
     void PrintContract();
-    void setSettingItem(SETTINGS *itemSetting);
+    void setSettingItem(SettingItem *itemSetting);
     void SaveSettingItem();
-    SETTINGS *LoadSettingItem();
+    SettingItem *LoadSettingItem();
     void setFundament(bool Fundament);
+    void alignmentSelectedWall(int width);//Выравнивание длинны стен
+    void setLockingScene(bool lock);//Блокирование сцены на перетаскивание объектов
+    bool locking();//Блокирована ли сцена
     bool pillarBottom;
     bool Rigel;
     bool Fundament;
 public slots:
-    void closeProperties(TYPEITEM itemType, bool all);
+    void closeProperties(SettingItem::TYPEITEM itemType, bool all);
 signals:
     void itemMoveScene(QPointF point);
     void mouseRelease();

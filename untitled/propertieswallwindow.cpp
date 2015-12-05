@@ -15,9 +15,9 @@ PropertiesWallWindow::~PropertiesWallWindow()
     delete ui;
 }
 
-void PropertiesWallWindow::SetPropertiesWall(GraphicsWallItem *item, SETTINGS *itemSetting,GraphicsPillarItem *itemPillar,bool fundament)
+void PropertiesWallWindow::SetPropertiesWall(GraphicsWallItem *item, SettingItem *itemSetting,GraphicsPillarItem *itemPillar,bool fundament)
 {
-    ui->widget->setSetting(itemSetting);
+    /*ui->widget->setSetting(itemSetting);
     ui->widget->setHeightPillar(itemPillar->height());
     ui->widget->setTopPillar(itemPillar->isTop(),itemPillar->topColor());
     ui->widget->setPazzlePillar(itemPillar->isPazzle(),itemPillar->colorPazzle(0),itemPillar->colorPazzle(1));
@@ -130,7 +130,7 @@ void PropertiesWallWindow::SetPropertiesWall(GraphicsWallItem *item, SETTINGS *i
             ui->radioButton_3->setChecked(true);
             break;
         }
-    }
+    }*/
 }
 
 void PropertiesWallWindow::on_pushButton_4_clicked()
@@ -188,42 +188,42 @@ void PropertiesWallWindow::on_lineEdit_2_textChanged(const QString &arg1)
 
 void PropertiesWallWindow::on_checkBox_3_clicked()
 {
-    ui->comboBox_4->setEnabled(ui->checkBox_3->isChecked());
-    ui->widget->setEnableTopWall(ui->checkBox_3->isChecked(),this->itemSetting->color.at(ui->comboBox_4->currentIndex())->color);
+//    ui->comboBox_4->setEnabled(ui->checkBox_3->isChecked());
+//    ui->widget->setEnableTopWall(ui->checkBox_3->isChecked(),this->itemSetting->color.at(ui->comboBox_4->currentIndex())->color);
 }
 
 void PropertiesWallWindow::on_spinBox_valueChanged(int arg1)
 {
-    foreach(COLOR * color,this->itemSetting->color)
+    /*foreach(COLOR * color,this->itemSetting->color)
         if(color->color==ui->widget->getColorRow(arg1-1))
         {
             ui->comboBox->setCurrentIndex(this->itemSetting->color.indexOf(color));
             break;
-        }
+        }*/
 }
 
 void PropertiesWallWindow::on_comboBox_currentIndexChanged(int index)
 {
-    if(!ui->checkBox->isChecked())
-        ui->widget->setColorRowWall(ui->spinBox->value(),this->itemSetting->color.at(index)->color);
-    else ui->widget->setColorAllRawWall(this->itemSetting->color.at(index)->color);
+//    if(!ui->checkBox->isChecked())
+//        ui->widget->setColorRowWall(ui->spinBox->value(),this->itemSetting->color.at(index)->color);
+//    else ui->widget->setColorAllRawWall(this->itemSetting->color.at(index)->color);
 }
 
 void PropertiesWallWindow::on_checkBox_clicked()
 {
-    if(ui->checkBox->isChecked())
-        ui->widget->setColorAllRawWall(this->itemSetting->color.at(ui->comboBox->currentIndex())->color);
+//    if(ui->checkBox->isChecked())
+//        ui->widget->setColorAllRawWall(this->itemSetting->color.at(ui->comboBox->currentIndex())->color);
 }
 
 void PropertiesWallWindow::on_checkBox_4_clicked()
 {
-    ui->comboBox_2->setEnabled(ui->checkBox_4->isChecked());
-    ui->comboBox_3->setEnabled(ui->checkBox_4->isChecked());
-    ui->spinBox->setEnabled(!ui->checkBox_4->isChecked());
-    ui->comboBox->setEnabled(!ui->checkBox_4->isChecked());
-    ui->checkBox->setEnabled(!ui->checkBox_4->isChecked());
-    ui->widget->setEnableColorPazzle(ui->checkBox_4->isChecked(),this->itemSetting->color.at(ui->comboBox_2->currentIndex())->color,
-                                     this->itemSetting->color.at(ui->comboBox_3->currentIndex())->color);
+//    ui->comboBox_2->setEnabled(ui->checkBox_4->isChecked());
+//    ui->comboBox_3->setEnabled(ui->checkBox_4->isChecked());
+//    ui->spinBox->setEnabled(!ui->checkBox_4->isChecked());
+//    ui->comboBox->setEnabled(!ui->checkBox_4->isChecked());
+//    ui->checkBox->setEnabled(!ui->checkBox_4->isChecked());
+//    ui->widget->setEnableColorPazzle(ui->checkBox_4->isChecked(),this->itemSetting->color.at(ui->comboBox_2->currentIndex())->color,
+//                                     this->itemSetting->color.at(ui->comboBox_3->currentIndex())->color);
 }
 
 void PropertiesWallWindow::on_comboBox_2_currentIndexChanged(int index)
@@ -236,24 +236,24 @@ void PropertiesWallWindow::on_comboBox_3_currentIndexChanged(int index)
 
 void PropertiesWallWindow::on_comboBox_2_activated(int index)
 {
-    ui->widget->setEnableColorPazzle(ui->checkBox_4->isChecked(),this->itemSetting->color.at(index)->color,
-                                     this->itemSetting->color.at(ui->comboBox_3->currentIndex())->color);
+//    ui->widget->setEnableColorPazzle(ui->checkBox_4->isChecked(),this->itemSetting->color.at(index)->color,
+//                                     this->itemSetting->color.at(ui->comboBox_3->currentIndex())->color);
 }
 
 void PropertiesWallWindow::on_comboBox_3_activated(int index)
 {
-    ui->widget->setEnableColorPazzle(ui->checkBox_4->isChecked(),this->itemSetting->color.at(ui->comboBox_2->currentIndex())->color,
-                                     this->itemSetting->color.at(index)->color);
+//    ui->widget->setEnableColorPazzle(ui->checkBox_4->isChecked(),this->itemSetting->color.at(ui->comboBox_2->currentIndex())->color,
+//                                     this->itemSetting->color.at(index)->color);
 }
 
 void PropertiesWallWindow::on_comboBox_4_activated(int index)
 {
-    ui->widget->setEnableTopWall(ui->checkBox_3->isChecked(),this->itemSetting->color.at(index)->color);
+//    ui->widget->setEnableTopWall(ui->checkBox_3->isChecked(),this->itemSetting->color.at(index)->color);
 }
 
 void PropertiesWallWindow::saveSetting()
 {
-    if((ui->lineEdit_2->text().toInt()<this->itemSetting->heightBrickR)||
+    /*if((ui->lineEdit_2->text().toInt()<this->itemSetting->heightBrickR)||
        (ui->lineEdit_2->text().toInt()<this->itemSetting->minWidthBrickR))
         return;
     this->wall->setHeight(ui->lineEdit_2->text().toInt());
@@ -293,7 +293,7 @@ void PropertiesWallWindow::saveSetting()
         this->wall->setDecoreid(3);
         this->wall->setColorDecoreid(*this->itemSetting->color.at(ui->comboBox_7->currentIndex()));
     }
-    emit this->closeProperties(ITEM_WALL,ui->checkBox_2->isChecked());
+    emit this->closeProperties(ITEM_WALL,ui->checkBox_2->isChecked());*/
 }
 
 void PropertiesWallWindow::closeEvent(QCloseEvent *event)
@@ -315,32 +315,32 @@ void PropertiesWallWindow::on_pushButton_5_clicked()
 
 void PropertiesWallWindow::on_radioButton_clicked()
 {
-    ui->widget->setEnableDecoreit(true,this->itemSetting->color.at(ui->comboBox_5->currentIndex())->color,false,QColor(),false,QColor());
+//    ui->widget->setEnableDecoreit(true,this->itemSetting->color.at(ui->comboBox_5->currentIndex())->color,false,QColor(),false,QColor());
 }
 
 void PropertiesWallWindow::on_comboBox_5_activated(int index)
 {
-    ui->widget->setEnableDecoreit(ui->radioButton->isChecked(),this->itemSetting->color.at(index)->color,false,QColor(),false,QColor());
+//    ui->widget->setEnableDecoreit(ui->radioButton->isChecked(),this->itemSetting->color.at(index)->color,false,QColor(),false,QColor());
 }
 
 void PropertiesWallWindow::on_radioButton_2_clicked()
 {
-    ui->widget->setEnableDecoreit(false,QColor(),true,this->itemSetting->color.at(ui->comboBox_6->currentIndex())->color,false,QColor());
+//    ui->widget->setEnableDecoreit(false,QColor(),true,this->itemSetting->color.at(ui->comboBox_6->currentIndex())->color,false,QColor());
 }
 
 void PropertiesWallWindow::on_comboBox_6_activated(int index)
 {
-   ui->widget->setEnableDecoreit(false,QColor(),ui->radioButton_2->isChecked(),this->itemSetting->color.at(index)->color,false,QColor());
+//   ui->widget->setEnableDecoreit(false,QColor(),ui->radioButton_2->isChecked(),this->itemSetting->color.at(index)->color,false,QColor());
 }
 
 void PropertiesWallWindow::on_radioButton_3_clicked()
 {
-    ui->widget->setEnableDecoreit(false,QColor(),false,QColor(),true,this->itemSetting->color.at(ui->comboBox_7->currentIndex())->color);
+//    ui->widget->setEnableDecoreit(false,QColor(),false,QColor(),true,this->itemSetting->color.at(ui->comboBox_7->currentIndex())->color);
 }
 
 void PropertiesWallWindow::on_comboBox_7_activated(int index)
 {
-    ui->widget->setEnableDecoreit(false,QColor(),false,QColor(),ui->radioButton_3->isChecked(),this->itemSetting->color.at(index)->color);
+//    ui->widget->setEnableDecoreit(false,QColor(),false,QColor(),ui->radioButton_3->isChecked(),this->itemSetting->color.at(index)->color);
 }
 
 void PropertiesWallWindow::on_radioButton_4_clicked()

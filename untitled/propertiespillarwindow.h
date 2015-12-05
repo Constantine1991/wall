@@ -5,6 +5,7 @@
 #include <Qt/qmessagebox.h>
 #include <QDesktopWidget>
 #include <QDir>
+#include <QComboBox>
 #include "propertiesitem.h"
 #include "graphicspillaritem.h"
 
@@ -19,10 +20,10 @@ class PropertiesPillarWindow : public QMainWindow
 public:
     explicit PropertiesPillarWindow(QWidget *parent = 0);
     ~PropertiesPillarWindow();
-    void SetPropertiesPillar(GraphicsPillarItem *item,QList<COLOR*> listColor,bool fundament=false);
+    void SetPropertiesPillar(GraphicsPillarItem *item,SettingItem *itemSetting,bool fundament=false);
     int heightBrick;
 signals:
-    void closeProperties(TYPEITEM itemType,bool all);
+    void closeProperties(SettingItem::TYPEITEM itemType,bool all);
 private slots:
     void on_pushButton_clicked();
 
@@ -65,10 +66,11 @@ protected:
     void closeEvent(QCloseEvent *event);
 private:
     void saveSetting();
+    void setColorCommboBox(QComboBox *comboBox,QList<SettingItem::COLOR_BRICK*> listColor);
     Ui::PropertiesPillarWindow *ui;
     GraphicsPillarItem *Pillar;
     int lastIndexCheckBox;
-    QList<COLOR*> listColor;
+    SettingItem *itemSetting;
     bool saveFlag;
 };
 

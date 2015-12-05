@@ -7,10 +7,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    this->settingItem=new SETTINGS();
-    ui->widget->setSettingItem(this->settingItem);
-    this->LoadSettingItem();
+    this->settingItem.load();
+    ui->widget->setSettingItem(&this->settingItem);
     this->nameFile="";
+    this->saveFlag=false;
     ////////////////////////
     QPixmap pixmap(250, 250);
     pixmap.fill(Qt::transparent);
@@ -99,87 +99,84 @@ MainWindow::MainWindow(QWidget *parent) :
     QIcon iconLine(pixmap5);
     ui->pushButton_5->setIcon(iconLine);
     ui->pushButton_5->setIconSize(QSize(32,32));
+    this->checkedPushButton=false;
+    this->checkedPushButton_2=false;
 }
 
 MainWindow::~MainWindow()
 {
-    this->SaveSettingItem();
     delete ui;
+}
+
+void MainWindow::resetPushButton()
+{
+    ui->pushButton->setChecked(false);
+    this->checkedPushButton=false;
+    ui->widget->setTypeItem(SettingItem::ITEM_NONE);
 }
 
 void MainWindow::on_pushButton_clicked()
 {
-    ui->widget->setTypeItem(ITEM_PILLAR);
+    this->resetPushButton_2();
+    ui->pushButton->setChecked(!this->checkedPushButton);
+    this->checkedPushButton=!this->checkedPushButton;
+    if(this->checkedPushButton)
+        ui->widget->setTypeItem(SettingItem::ITEM_PILLAR);
+    else ui->widget->setTypeItem(SettingItem::ITEM_NONE);
+}
+
+void MainWindow::resetPushButton_2()
+{
+    ui->pushButton_2->setChecked(false);
+    this->checkedPushButton_2=false;
+    ui->widget->setTypeItem(SettingItem::ITEM_NONE);
 }
 
 void MainWindow::on_pushButton_2_clicked()
 {
-    ui->widget->setTypeItem(ITEM_WALL);
+    this->resetPushButton();
+    ui->pushButton_2->setChecked(!this->checkedPushButton_2);
+    this->checkedPushButton_2=!this->checkedPushButton_2;
+    if(this->checkedPushButton_2)
+        ui->widget->setTypeItem(SettingItem::ITEM_WALL);
+    else ui->widget->setTypeItem(SettingItem::ITEM_NONE);
 }
 
-void MainWindow::isTypeComponent(TYPEITEM type, int width)
+void MainWindow::isTypeComponent(SettingItem::TYPEITEM type, int width)
 {
-    if(type==ITEM_NONE || width==0)
+    if(type==SettingItem::ITEM_NONE || width==0)
         return;
     ui->widget->setTypeItem(type,width);
 }
 
 void MainWindow::on_pushButton_3_clicked()
 {
+    this->resetPushButton();
+    this->resetPushButton_2();
     Component *c=new Component(this);
-    connect(c,SIGNAL(isTypeComponent(TYPEITEM,int)),this,SLOT(isTypeComponent(TYPEITEM,int)));
+    connect(c,SIGNAL(isTypeComponent(SettingItem::TYPEITEM,int)),this,SLOT(isTypeComponent(SettingItem::TYPEITEM,int)));
     c->show();
 }
 
 void MainWindow::on_pushButton_4_clicked()
 {
-    ui->widget->setTypeItem(ITEM_LINE);
+    this->resetPushButton();
+    this->resetPushButton_2();
+    ui->widget->setTypeItem(SettingItem::ITEM_LINE);
 }
 
 void MainWindow::on_pushButton_5_clicked()
 {
-        ui->widget->setTypeItem(ITEM_FILLING);
+    this->resetPushButton();
+    this->resetPushButton_2();
+    ui->widget->setTypeItem(SettingItem::ITEM_FILLING);
 }
 
 void MainWindow::on_action_6_activated()
 {
     SettingsWindow *Setting=new SettingsWindow(this);
-    Setting->SetSettingItem(this->settingItem);
+    Setting->SetSettingItem(&this->settingItem);
     Setting->show();
-}
-
-void MainWindow::SaveSettingItem() // Сохранение структуры настроек компонентов
-{
-    QFile saveFile("setting.dat");
-    if(!saveFile.open(QIODevice::WriteOnly))
-        return;
-    QDataStream outFile(&saveFile);
-    outFile<<this->settingItem->minWidthBrickR<<this->settingItem->maxWidthBrickR<<this->settingItem->heightBrickR
-          <<this->settingItem->heightBrickAngle<<this->settingItem->minWidthGirth<<this->settingItem->maxWidthGirth
-          <<this->settingItem->widthWallTop<<this->settingItem->color.count();
-    foreach(COLOR* color,this->settingItem->color)
-        outFile<<color->color.name()<<color->caption;
-    this->settingItem->color.clear();
-    delete this->settingItem;
-}
-
-void MainWindow::LoadSettingItem() // Загрузка структуры настроек компонентов
-{
-    QFile loadFile("setting.dat");
-    if(!loadFile.open(QIODevice::ReadOnly))
-        return;
-    QDataStream inFile(&loadFile);
-    int sizeColor=0;
-    inFile>>this->settingItem->minWidthBrickR>>this->settingItem->maxWidthBrickR>>this->settingItem->heightBrickR
-         >>this->settingItem->heightBrickAngle>>this->settingItem->minWidthGirth>>this->settingItem->maxWidthGirth
-         >>this->settingItem->widthWallTop>>sizeColor;
-    for(int i=0;i<sizeColor;i++)
-    {
-        QString nameColor;
-        QString captionColor;
-        inFile>>nameColor>>captionColor;
-        this->settingItem->color.append(new COLOR(QColor(nameColor),captionColor));
-    }
 }
 
 void MainWindow::on_action_3_activated()// Сохранить проект
@@ -286,4 +283,24 @@ void MainWindow::on_pushButton_8_clicked()
 void MainWindow::on_checkBox_2_clicked()
 {
     ui->widget->setFundament(ui->checkBox_2->isChecked());
+}
+
+void MainWindow::on_pushButton_6_clicked()
+{
+    this->resetPushButton();
+    this->resetPushButton_2();
+    GraphicsSizeWall *sizeWall=new GraphicsSizeWall(ui->widget);
+    sizeWall->show();
+}
+
+void MainWindow::on_pushButton_7_clicked()
+{
+    this->resetPushButton();
+    this->resetPushButton_2();
+    ui->widget->setLockingScene(!ui->widget->locking());
+    ui->pushButton_7->setChecked(ui->widget->locking());
+    ui->pushButton->setEnabled(!ui->widget->locking());
+    ui->pushButton_2->setEnabled(!ui->widget->locking());
+    ui->pushButton_3->setEnabled(!ui->widget->locking());
+    ui->pushButton_5->setEnabled(!ui->widget->locking());
 }

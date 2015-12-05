@@ -11,6 +11,7 @@
 #include "settingswindow.h"
 #include "about.h"
 #include "component.h"
+#include "graphicssizewall.h"
 
 namespace Ui {
 class MainWindow;
@@ -48,18 +49,23 @@ private slots:
     void on_action_8_activated();
 
     void on_pushButton_8_clicked();
-    void isTypeComponent(TYPEITEM type,int width);
+    void isTypeComponent(SettingItem::TYPEITEM type,int width);
     void on_checkBox_2_clicked();
 
+    void on_pushButton_6_clicked();
+
+    void on_pushButton_7_clicked();
 protected:
     void closeEvent(QCloseEvent *event);
 private:
     Ui::MainWindow *ui;
-    SETTINGS * settingItem;
-    void SaveSettingItem();
-    void LoadSettingItem();
+    SettingItem  settingItem;
+    void resetPushButton();
+    void resetPushButton_2();
     QString nameFile;
     bool saveFlag;
+    bool checkedPushButton;
+    bool checkedPushButton_2;
 };
 
 #endif // MAINWINDOW_H
