@@ -31,17 +31,7 @@ void SettingsWindow::SetSettingItem(SettingItem *settingItem)
     ui->lineEdit_3->setText(QString::number(this->settingItem->maxWidthGirth));
     ui->lineEdit_8->setText(QString::number(this->settingItem->widthWallTop));
     for(int i=0;i<(int)SettingItem::COLOR_BRICK_TYPE_ALL;i++)
-    {
         ui->comboBox->addItem(this->settingItem->nameType(i));
-//        foreach(SettingItem::COLOR *color,this->settingItem->listColor(this->settingItem->colorType(i)))
-//        {
-//            ui->tableWidget->setRowCount(ui->tableWidget->rowCount()+1);
-//            ui->tableWidget->setItem(ui->tableWidget->rowCount()-1,0,new QTableWidgetItem(this->settingItem->nameType(i)));
-//            ui->tableWidget->setItem(ui->tableWidget->rowCount()-1,1,new QTableWidgetItem(""));
-//            ui->tableWidget->item(ui->tableWidget->rowCount()-1,1)->setBackground(QBrush(color->img));
-//            ui->tableWidget->setItem(ui->tableWidget->rowCount()-1,2,new QTableWidgetItem(color->caption));
-//        }
-    }
     this->setHeaderTable(this->settingItem->colorType(ui->comboBox->currentIndex()));
     this->setBlockLoadImage(this->settingItem->colorType(ui->comboBox->currentIndex()));
 }
@@ -95,6 +85,11 @@ void SettingsWindow::on_pushButton_4_clicked()//Добавление цвета в таблицу
     }else{
         if(!this->isValidateBlockImage1() || !this->isValidateBlockImage2())
             return;
+        if(ui->lineEdit_2->text()==ui->lineEdit_10->text())
+        {
+            QMessageBox::about(this,QString::fromLocal8Bit("Сообщение!"),QString::fromLocal8Bit("Название изображений должны быть уникальными"));
+            return;
+        }
         if(!this->settingItem->append(type,SettingItem::COLOR_BRICK(ui->lineEdit_9->text(),
                                                                     ui->lineEdit_2->text(),
                                                                     this->img1,
@@ -124,13 +119,19 @@ void SettingsWindow::on_pushButton_4_clicked()//Добавление цвета в таблицу
     ui->label_16->clear();
     this->isLoadImg2=false;
     ui->lineEdit_10->clear();
+    this->setHeaderTable(this->settingItem->colorType(ui->comboBox->currentIndex()));
 }
 
 void SettingsWindow::on_pushButton_5_clicked()//Удаление цвета из таблицы
 {
-    /*this->settingItem->removeColorBrick(this->settingItem->colorType(ui->tableWidget->item(ui->tableWidget->currentRow(),0)->text()),
-                                        ui->tableWidget->item(ui->tableWidget->currentRow(),2)->text());
-    ui->tableWidget->removeRow(ui->tableWidget->currentRow());*/
+    if(ui->tableWidget->currentRow()==-1)
+    {
+        QMessageBox::about(this,QString::fromLocal8Bit("Сообщение!"),QString::fromLocal8Bit("Выделите запись в таблице"));
+        return;
+    }
+    this->settingItem->remove(this->settingItem->colorType(ui->comboBox->currentIndex()),
+                              ui->tableWidget->item(ui->tableWidget->currentRow(),0)->text());
+    ui->tableWidget->removeRow(ui->tableWidget->currentRow());
 }
 
 void SettingsWindow::on_pushButton_2_clicked()//Закрыть окно настроек
@@ -169,7 +170,6 @@ bool SettingsWindow::eventFilter(QObject *obj, QEvent *event)
 
 void SettingsWindow::save()
 {
-    //this->settingItem->color.clear();
     this->settingItem->minWidthBrickR=ui->lineEdit_5->text().toInt()>0?ui->lineEdit_5->text().toInt():1;
     this->settingItem->maxWidthBrickR=ui->lineEdit_6->text().toInt()>0?ui->lineEdit_6->text().toInt():1;
     this->settingItem->heightBrickR=ui->lineEdit_7->text().toInt()>0?ui->lineEdit_7->text().toInt():1;
@@ -177,10 +177,7 @@ void SettingsWindow::save()
     this->settingItem->minWidthGirth=ui->lineEdit->text().toInt()>0?ui->lineEdit->text().toInt():1;
     this->settingItem->maxWidthGirth=ui->lineEdit_3->text().toInt()>0?ui->lineEdit_3->text().toInt():1;
     this->settingItem->widthWallTop=ui->lineEdit_8->text().toInt()>0?ui->lineEdit_8->text().toInt():1;
-    //this->settingItem->save();
-    /*for (int i=0;i<ui->tableWidget->rowCount();i++)
-        this->settingItem->color.append(new COLOR(ui->tableWidget->item(i,0)->text(),ui->tableWidget->item(i,2)->text()));
-    this->settingItem=NULL;*/
+    this->settingItem->save();
 }
 
 void SettingsWindow::closeEvent(QCloseEvent *event)
@@ -223,7 +220,7 @@ void SettingsWindow::setHeaderTable(SettingColor::COLOR_BRICK_TYPE type)
             ui->tableWidget->setHorizontalHeaderItem(0,new QTableWidgetItem(QString::fromLocal8Bit("Название цвета")));
             ui->tableWidget->setHorizontalHeaderItem(1,new QTableWidgetItem(QString::fromLocal8Bit("Название картинки")));
             ui->tableWidget->setHorizontalHeaderItem(2,new QTableWidgetItem(QString::fromLocal8Bit("Брик угловой большой")));
-            ui->tableWidget->setHorizontalHeaderItem(3,new QTableWidgetItem(QString::fromLocal8Bit("Название кртинки")));
+            ui->tableWidget->setHorizontalHeaderItem(3,new QTableWidgetItem(QString::fromLocal8Bit("Название картинки")));
             ui->tableWidget->setHorizontalHeaderItem(4,new QTableWidgetItem(QString::fromLocal8Bit("Брик угловой маленький")));
             break;
         }
@@ -232,7 +229,7 @@ void SettingsWindow::setHeaderTable(SettingColor::COLOR_BRICK_TYPE type)
             ui->tableWidget->setHorizontalHeaderItem(0,new QTableWidgetItem(QString::fromLocal8Bit("Название цвета")));
             ui->tableWidget->setHorizontalHeaderItem(1,new QTableWidgetItem(QString::fromLocal8Bit("Название картинки")));
             ui->tableWidget->setHorizontalHeaderItem(2,new QTableWidgetItem(QString::fromLocal8Bit("Брик угловой вставка правый")));
-            ui->tableWidget->setHorizontalHeaderItem(3,new QTableWidgetItem(QString::fromLocal8Bit("Название кртинки")));
+            ui->tableWidget->setHorizontalHeaderItem(3,new QTableWidgetItem(QString::fromLocal8Bit("Название картинки")));
             ui->tableWidget->setHorizontalHeaderItem(4,new QTableWidgetItem(QString::fromLocal8Bit("Брик угловой вставка левый")));
             break;
         }
@@ -241,7 +238,7 @@ void SettingsWindow::setHeaderTable(SettingColor::COLOR_BRICK_TYPE type)
             ui->tableWidget->setHorizontalHeaderItem(0,new QTableWidgetItem(QString::fromLocal8Bit("Название цвета")));
             ui->tableWidget->setHorizontalHeaderItem(1,new QTableWidgetItem(QString::fromLocal8Bit("Название картинки")));
             ui->tableWidget->setHorizontalHeaderItem(2,new QTableWidgetItem(QString::fromLocal8Bit("Основание столба с вставкой")));
-            ui->tableWidget->setHorizontalHeaderItem(3,new QTableWidgetItem(QString::fromLocal8Bit("Название кртинки")));
+            ui->tableWidget->setHorizontalHeaderItem(3,new QTableWidgetItem(QString::fromLocal8Bit("Название картинки")));
             ui->tableWidget->setHorizontalHeaderItem(4,new QTableWidgetItem(QString::fromLocal8Bit("Основание столба без вставки")));
             break;
         }
@@ -282,6 +279,9 @@ void SettingsWindow::showDataTable(SettingColor::COLOR_BRICK_TYPE type)
 {
     foreach(SettingItem::COLOR_BRICK *brick,this->settingItem->colorBrick(type))
     {
+        qDebug()<<brick->change;
+        if(brick->change==SettingColor::CHANGE_REMOVE)
+            continue;
         ui->tableWidget->setRowCount(ui->tableWidget->rowCount()+1);
         ui->tableWidget->setItem(ui->tableWidget->rowCount()-1,0,new QTableWidgetItem(brick->nameColor));
         ui->tableWidget->setItem(ui->tableWidget->rowCount()-1,1,new QTableWidgetItem(brick->nameImage1));
@@ -293,7 +293,7 @@ void SettingsWindow::showDataTable(SettingColor::COLOR_BRICK_TYPE type)
             ui->tableWidget->setItem(ui->tableWidget->rowCount()-1,3,new QTableWidgetItem(brick->nameImage2));
             ui->tableWidget->setItem(ui->tableWidget->rowCount()-1,4,new QTableWidgetItem(""));
             ui->tableWidget->item(ui->tableWidget->rowCount()-1,
-                                  5)->setBackground(QBrush(brick->image2.scaled(128,64)));
+                                  4)->setBackground(QBrush(brick->image2.scaled(128,64)));
         }
     }
 
@@ -367,12 +367,12 @@ bool SettingsWindow::isValidateBlockImage1()
 {
     if(!this->isLoadImg1)
     {
-        QMessageBox::about(this,"","");
+        QMessageBox::about(this,QString::fromLocal8Bit("Сообщение!"),QString::fromLocal8Bit("Загрузите картинку №1"));
         return false;
     }
     if(ui->lineEdit_2->text().isEmpty())
     {
-        QMessageBox::about(this,"","");
+        QMessageBox::about(this,QString::fromLocal8Bit("Сообщение!"),QString::fromLocal8Bit("Дайте имя картинке №1"));
         return false;
     }
     return true;
@@ -382,12 +382,12 @@ bool SettingsWindow::isValidateBlockImage2()
 {
     if(!this->isLoadImg2)
     {
-        QMessageBox::about(this,"","");
+        QMessageBox::about(this,QString::fromLocal8Bit("Сообщение!"),QString::fromLocal8Bit("Загрузите картинку №2"));
         return false;
     }
     if(ui->lineEdit_10->text().isEmpty())
     {
-        QMessageBox::about(this,"","");
+        QMessageBox::about(this,QString::fromLocal8Bit("Сообщение!"),QString::fromLocal8Bit("Дайте имя картинке №2"));
         return false;
     }
     return true;

@@ -9,6 +9,11 @@ PropertiesPillarWindow::PropertiesPillarWindow(QWidget *parent) :
     ui->setupUi(this);
     this->lastIndexCheckBox=0;
     this->saveFlag=false;
+    ui->widget->graphicPillar.setSizeTopTile(100,50);
+    ui->widget->graphicPillar.setSizeBrickTile(50,50);
+    ui->widget->graphicPillar.setSizeBottomTile(100,50);
+    ui->widget->setRectScene(480,550);
+    ui->widget->graphicPillar.setPos(225,500);
 }
 
 PropertiesPillarWindow::~PropertiesPillarWindow()
@@ -26,6 +31,7 @@ void PropertiesPillarWindow::setColorCommboBox(QComboBox *comboBox, QList<Settin
 void PropertiesPillarWindow::SetPropertiesPillar(GraphicsPillarItem *item, SettingItem *itemSetting, bool fundament)
 {
     //ui->widget->heightBrick=this->itemSetting->heightBrickAngle;
+    ui->widget->graphicPillar.setSettingItem(itemSetting);
     this->Pillar=item;
     this->itemSetting=itemSetting;
     ui->lineEdit->setText(QString::number(this->Pillar->height()));
@@ -48,10 +54,10 @@ void PropertiesPillarWindow::SetPropertiesPillar(GraphicsPillarItem *item, Setti
     ui->checkBox_6->setChecked(this->Pillar->isBottomTypeEnable() || !fundament);
     ui->comboBox_6->setCurrentIndex(this->Pillar->isBottomType());
     ui->comboBox_6->setEnabled(this->Pillar->isBottomTypeEnable() || !fundament);
-    /*this->setColorCommboBox(ui->comboBox_2,this->itemSetting->listColor(SettingItem::COLOR_BRICK_PILLAR_TOP));
-    this->setColorCommboBox(ui->comboBox_3,this->itemSetting->listColor(SettingItem::COLOR_BRICK_PILLAR_BIG));
-    this->setColorCommboBox(ui->comboBox_4,this->itemSetting->listColor(SettingItem::COLOR_BRICK_PILLAR_BIG));
-    this->setColorCommboBox(ui->comboBox_5,this->itemSetting->listColor(SettingItem::COLOR_BRICK_PILLAR_BIG));*/
+    this->setColorCommboBox(ui->comboBox_2,this->itemSetting->colorBrick(SettingItem::COLOR_BRICK_PILLAR_TOP));
+    this->setColorCommboBox(ui->comboBox_3,this->itemSetting->colorBrick(SettingItem::COLOR_BRICK_PILLAR_BIG));
+    this->setColorCommboBox(ui->comboBox_4,this->itemSetting->colorBrick(SettingItem::COLOR_BRICK_PILLAR_BIG));
+    this->setColorCommboBox(ui->comboBox_5,this->itemSetting->colorBrick(SettingItem::COLOR_BRICK_PILLAR_BIG));
 //    foreach(COLOR *color,this->listColor)
 //    {
 //        if(this->Pillar->isPazzle())
@@ -111,7 +117,7 @@ void PropertiesPillarWindow::on_comboBox_activated(const QString &arg1)
 void PropertiesPillarWindow::on_comboBox_activated(int index)
 {
    // this->Pillar->setHeightSide(this->lastIndexCheckBox,ui->lineEdit_3->text().toInt());
-    ui->widget->setRenderingSide(index);
+    //ui->widget->setRenderingSide(index);
     ui->lineEdit_3->setText(QString::number(this->Pillar->heightSide(index)));
    // this->lastIndexCheckBox=index;
 
@@ -119,15 +125,17 @@ void PropertiesPillarWindow::on_comboBox_activated(int index)
 
 void PropertiesPillarWindow::on_lineEdit_textChanged(const QString &arg1)
 {
-    if(arg1.toInt()<this->heightBrick)
+    if(arg1.toInt()<this->itemSetting->heightBrickAngle)
         return;
-    ui->widget->setHeight(arg1.toInt());
-    if(ui->widget->row()>0)
-    {
-        ui->spinBox->setMaximum(ui->widget->row());
-        ui->spinBox->setMinimum(1);
-        ui->spinBox->setSingleStep(1);
-    }else ui->spinBox->setMaximum(0);
+    ui->widget->graphicPillar.setHeight(arg1.toInt());
+    ui->widget->draw(DiagramViewFrontItem::ITEM_PILLAR);
+//    ui->widget->setHeight(arg1.toInt());
+//    if(ui->widget->row()>0)
+//    {
+//        ui->spinBox->setMaximum(ui->widget->row());
+//        ui->spinBox->setMinimum(1);
+//        ui->spinBox->setSingleStep(1);
+//    }else ui->spinBox->setMaximum(0);
 }
 
 void PropertiesPillarWindow::on_lineEdit_2_textChanged(const QString &arg1)
@@ -136,20 +144,22 @@ void PropertiesPillarWindow::on_lineEdit_2_textChanged(const QString &arg1)
 
 void PropertiesPillarWindow::on_lineEdit_3_textChanged(const QString &arg1)
 {
-    if(arg1.toInt()<=ui->lineEdit->text().toInt())
-    {
-        ui->widget->setInsertBottom(arg1.toInt());
-        this->Pillar->setHeightSide(ui->comboBox->currentIndex(),arg1.toInt());
-        if(ui->checkBox_6->isChecked())
-            ui->comboBox_6->setCurrentIndex(this->Pillar->isAutoBottomType());
-    }
-    else ui->lineEdit_3->setText(ui->lineEdit->text());
+//    if(arg1.toInt()<=ui->lineEdit->text().toInt())
+//    {
+//        ui->widget->setInsertBottom(arg1.toInt());
+//        this->Pillar->setHeightSide(ui->comboBox->currentIndex(),arg1.toInt());
+//        if(ui->checkBox_6->isChecked())
+//            ui->comboBox_6->setCurrentIndex(this->Pillar->isAutoBottomType());
+//    }
+//    else ui->lineEdit_3->setText(ui->lineEdit->text());
 }
 
 void PropertiesPillarWindow::on_checkBox_clicked()
 {
-    ui->widget->setEnabledTop(ui->checkBox->isChecked());
+   // ui->widget->setEnabledTop(ui->checkBox->isChecked());
+    ui->widget->graphicPillar.setTop(ui->checkBox->isChecked());
     ui->comboBox_2->setEnabled(ui->checkBox->isChecked());
+    ui->widget->draw(DiagramViewFrontItem::ITEM_PILLAR);
 }
 
 void PropertiesPillarWindow::on_comboBox_2_activated(int index)
@@ -260,7 +270,9 @@ void PropertiesPillarWindow::on_checkBox_2_clicked()
 void PropertiesPillarWindow::on_checkBox_6_clicked()
 {
     ui->comboBox_6->setEnabled(ui->checkBox_6->isChecked());
-    ui->widget->setEnabledBottom(ui->checkBox_6->isChecked());
+    ui->widget->graphicPillar.setBottom(ui->checkBox_6->isChecked());
+    ui->widget->draw(DiagramViewFrontItem::ITEM_PILLAR);
+    //ui->widget->setEnabledBottom(ui->checkBox_6->isChecked());
 }
 
 void PropertiesPillarWindow::on_lineEdit_3_textEdited(const QString &arg1)

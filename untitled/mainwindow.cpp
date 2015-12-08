@@ -7,7 +7,7 @@ MainWindow::MainWindow(QWidget *parent) :
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    this->settingItem.load();
+    qDebug()<<"Load Setting:"<<this->settingItem.load();
     ui->widget->setSettingItem(&this->settingItem);
     this->nameFile="";
     this->saveFlag=false;

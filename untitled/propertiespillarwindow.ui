@@ -445,7 +445,7 @@
     <normaloff>:/new/prefix1/logoImg.png</normaloff>:/new/prefix1/logoImg.png</iconset>
   </property>
   <widget class="QWidget" name="centralwidget">
-   <widget class="DiagramViewPillar" name="widget" native="true">
+   <widget class="DiagramViewFrontItem" name="widget" native="true">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -884,9 +884,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>DiagramViewPillar</class>
+   <class>DiagramViewFrontItem</class>
    <extends>QWidget</extends>
-   <header>diagramviewpillar.h</header>
+   <header>diagramviewfrontitem.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

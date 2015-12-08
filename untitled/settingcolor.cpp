@@ -13,7 +13,7 @@ SettingColor::COLOR_BRICK::COLOR_BRICK(QString nameColor, QString nameImage1, QI
     this->nameColor=nameColor;
     this->nameImage1=nameImage1;
     this->image1=image1;
-    this->change=SettingColor::CHANGE_APPEND;
+    this->change=SettingColor::CHANGE_NONE;
 }
 
 SettingColor::COLOR_BRICK::COLOR_BRICK(QString nameColor, QString nameImage1, QImage image1, QString nameImage2, QImage image2)
@@ -23,7 +23,7 @@ SettingColor::COLOR_BRICK::COLOR_BRICK(QString nameColor, QString nameImage1, QI
     this->image1=image1;
     this->nameImage2=nameImage2;
     this->image2=image2;
-    this->change=SettingColor::CHANGE_APPEND;
+    this->change=SettingColor::CHANGE_NONE;
 }
 
 SettingColor::COLOR_BRICK::COLOR_BRICK(const COLOR_BRICK &brick)
@@ -96,7 +96,8 @@ SettingColor::SettingColor()
 }
 
 SettingColor::~SettingColor()
-{}
+{
+}
 
 SettingColor::COLOR_BRICK_TYPE SettingColor::colorType(QString name)
 {
@@ -183,6 +184,8 @@ void SettingColor::dontSave()
     {
         foreach(SettingColor::COLOR_BRICK *brick,this->allColorBrick[i])
         {
+            if(brick->change==SettingColor::CHANGE_NONE)
+                continue;
             if(brick->change==SettingColor::CHANGE_REMOVE)
                 brick->change=SettingColor::CHANGE_NONE;
             if(brick->change==SettingColor::CHANGE_APPEND)
@@ -200,16 +203,19 @@ bool SettingColor::saveImage()
         foreach(SettingColor::COLOR_BRICK *brick,this->allColorBrick[i])
         {
             if(brick->change==SettingColor::CHANGE_REMOVE)
-                this->allColorBrick[i].removeAt(this->allColorBrick[i].indexOf(brick));
-            if(brick->change==SettingColor::CHANGE_APPEND)
             {
+                QFile::remove(this->pathColorBrick[i]+brick->nameImage1+".png");
                 if((i==(int)SettingColor::COLOR_BRICK_PILLAR_BIG) || (i==(int)SettingColor::COLOR_BRICK_PILLAR_SMALL)||
                    (i==(int)SettingColor::COLOR_BRICK_PILLAR_BOTTOM))
-                {
-                    brick->image1.save(this->pathColorBrick[i]+brick->nameImage1+".png");
+                    QFile::remove(this->pathColorBrick[i]+brick->nameImage2+".png");
+                this->allColorBrick[i].removeAt(this->allColorBrick[i].indexOf(brick));
+            }
+            if(brick->change==SettingColor::CHANGE_APPEND)
+            {
+                brick->image1.save(this->pathColorBrick[i]+brick->nameImage1+".png");
+                if((i==(int)SettingColor::COLOR_BRICK_PILLAR_BIG) || (i==(int)SettingColor::COLOR_BRICK_PILLAR_SMALL)||
+                   (i==(int)SettingColor::COLOR_BRICK_PILLAR_BOTTOM))
                     brick->image2.save(this->pathColorBrick[i]+brick->nameImage2+".png");
-                }
-                else brick->image1.save(this->pathColorBrick[i]+brick->nameImage1+".png");
             }
 
         }
@@ -247,12 +253,14 @@ void SettingColor::loadColorBrick(QDataStream *inFile)
             {
                 QString nameImage2;
                 *inFile>>nameColor>>nameImage1>>nameImage2;
+                qDebug()<<"Load Image:"<<nameColor<<nameImage1<<nameImage2;
                 this->allColorBrick[i].append(new SettingColor::COLOR_BRICK(nameColor,nameImage1,
                                                                             QImage(this->pathColorBrick[i]+nameImage1+".png"),
                                                                             nameImage2,
                                                                             QImage(this->pathColorBrick[i]+nameImage2+".png")));
             } else {
                 *inFile>>nameColor>>nameImage1;
+                qDebug()<<"Load Image:"<<nameColor<<nameImage1;
                 this->allColorBrick[i].append(new SettingColor::COLOR_BRICK(nameColor,nameImage1,
                                                                             QImage(this->pathColorBrick[i]+nameImage1+".png")));
             }
