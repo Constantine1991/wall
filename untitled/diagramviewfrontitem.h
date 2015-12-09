@@ -20,6 +20,9 @@ public:
     void draw(DRAWITEM drawItem);
 private:
     QGraphicsScene *scene;
+    void resizeRectScene(int width,int height);
+    int widthScene;
+    int heightScene;
 };
 
 #endif // DIAGRAMVIEWFRONTITEM_H

@@ -35,7 +35,12 @@ void DiagramPillar::setSettingItem(SettingItem *settingItem)
 void DiagramPillar::setPos(int x, int y)
 {
     this->x=x;
-    this->y=y;
+    this->y=y-40;//Смещение столба в вверх на 40
+}
+
+QPoint DiagramPillar::pos()
+{
+    return QPoint(this->x,this->y);
 }
 
 void DiagramPillar::setSizeBrickTile(int w, int h)
@@ -59,19 +64,19 @@ void DiagramPillar::setSizeBottomTile(int w, int h)
 void DiagramPillar::setHeight(int h)
 {
     this->height=h;
-//    if(this->row()==0)
-//    {
-//        this->graphicsTileBricks.clear();
-//        return;
-//    }
-//    if((this->graphicsTileBricks.count()/2)>this->row())
-//    {
-//        for(int i=0;i<(this->graphicsTileBricks.count()/2-this->row());i++)
-//            this->graphicsTileBricks.removeLast();
-//        return;
-//    }
-    this->clearGraphicsTileBricks();
-    for(int i=0;i<this->row();i++)
+    if(this->graphicsTileBricks.count()>(this->row()*2))
+    {
+//        qDebug()<<"count object list:"<<this->graphicsTileBricks.count();
+//        qDebug()<<"count row:"<<this->row();
+        for(int i=this->graphicsTileBricks.count()-1;i>=(this->row()*2);i--)
+        {
+//            qDebug()<<"delete object i:"<<i;
+            delete this->graphicsTileBricks.last();
+            this->graphicsTileBricks.removeLast();
+        }
+        return;
+    }
+    for(int i=(this->graphicsTileBricks.count()/2);i<this->row();i++)
     {
         this->graphicsTileBricks.append(this->createItem(this->tileBrickWidth,this->tileBrickHeight));
         this->graphicsTileBricks.append(this->createItem(this->tileBrickWidth/2,this->tileBrickHeight));
@@ -120,6 +125,11 @@ int DiagramPillar::row()
     return this->height/this->settingItem->heightBrickAngle;
 }
 
+int DiagramPillar::boundingRectHeight()
+{
+    return this->tileBottomHeight+this->row()*this->tileBrickHeight+this->tileTopHeight*2+40;
+}
+
 void DiagramPillar::showSide(SIDE side)
 {
     this->side=side;
@@ -160,7 +170,7 @@ void DiagramPillar::setPosGraphicTileTop(int x, int y)
 {
     if(this->graphicTileTop==NULL)
         return;
-    y=y-(this->tileBottomHeight+(this->tileBrickHeight*this->row()));
+    y=y-(this->tileBottomHeight+(this->tileBrickHeight*this->row())+this->tileTopHeight);
     x=x-(this->tileTopWidth-(this->tileBrickWidth+this->tileBrickWidth/2))/2;
     this->graphicTileTop->setPos(x,y);
 }
@@ -170,6 +180,7 @@ void DiagramPillar::setPosGraphicTileBricks(int x, int y)
     y=y-this->tileBottomHeight;
     for(int i=0;i<this->row()*2;i+=2)
     {
+        y=y-this->tileBrickHeight;
         if(i % 2 == 0)
         {
             this->graphicsTileBricks.at(i)->setPos(x,y);
@@ -178,8 +189,6 @@ void DiagramPillar::setPosGraphicTileBricks(int x, int y)
             this->graphicsTileBricks.at(i)->setPos(x+this->tileBrickWidth/2,y);
             this->graphicsTileBricks.at(i+1)->setPos(x,y);
         }
-        y=y-this->tileBrickHeight;
-        qDebug()<<"i:"<<i;
     }
 }
 
@@ -187,7 +196,7 @@ void DiagramPillar::setPosGraphicTileBottom(int x, int y)
 {
     if(this->graphicTileBottom==NULL)
         return;
-    y=y;
+    y=y-this->tileBottomHeight;
     x=x-(this->tileBottomWidth-(this->tileBrickWidth+this->tileBrickWidth/2))/2;
     this->graphicTileBottom->setPos(x,y);
 }

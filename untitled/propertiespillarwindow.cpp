@@ -9,11 +9,11 @@ PropertiesPillarWindow::PropertiesPillarWindow(QWidget *parent) :
     ui->setupUi(this);
     this->lastIndexCheckBox=0;
     this->saveFlag=false;
-    ui->widget->graphicPillar.setSizeTopTile(100,50);
+    ui->widget->graphicPillar.setSizeTopTile(100,80);
     ui->widget->graphicPillar.setSizeBrickTile(50,50);
-    ui->widget->graphicPillar.setSizeBottomTile(100,50);
+    ui->widget->graphicPillar.setSizeBottomTile(100,80);
     ui->widget->setRectScene(480,550);
-    ui->widget->graphicPillar.setPos(225,500);
+    ui->widget->graphicPillar.setPos(225,550);
 }
 
 PropertiesPillarWindow::~PropertiesPillarWindow()

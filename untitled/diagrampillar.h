@@ -3,6 +3,7 @@
 #include <QGraphicsRectItem>
 #include <QPen>
 #include <QRect>
+#include <QPoint>
 #include "propertiesitem.h"
 
 
@@ -19,6 +20,7 @@ public:
     ~DiagramPillar();
     void setSettingItem(SettingItem *settingItem);
     void setPos(int x,int y);
+    QPoint pos();
     void setSizeBrickTile(int w,int h);
     void setSizeTopTile(int w,int h);
     void setSizeBottomTile(int w,int h);
@@ -32,6 +34,7 @@ public:
     //void setColor(QString nameColor);//+
     void clear();
     int row();
+    int boundingRectHeight();
     QList<QGraphicsRectItem*> graphics();
 private:
     SettingItem *settingItem;
