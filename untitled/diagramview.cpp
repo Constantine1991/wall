@@ -1311,26 +1311,26 @@ void DiagramView::mousePressEvent(QMouseEvent *event)
 }
 
 void DiagramView::mouseMoveEvent(QMouseEvent *event)
-{/*
+{
     if(this->mousePrees && !this->lock)
     {
         emit this->itemMoveScene(this->mapToScene(event->pos()));
         this->collidingGroup(this->mapToScene(event->pos()));
     }
-    if(this->typeITEM==ITEM_WALL)
+    if(this->typeITEM==SettingItem::ITEM_WALL)
         if(this->lineWall!=NULL)
             this->lineWall->setLine(QLineF(this->lineWall->line().p1(),this->mapToScene(event->pos())));
-    if(this->typeITEM==ITEM_FILLING)
+    if(this->typeITEM==SettingItem::ITEM_FILLING)
         if(this->lineFilling!=NULL)
             this->lineFilling->setLine(QLineF(this->lineFilling->line().p1(),this->mapToScene(event->pos())));
     if(this->RectA!=NULL)
-        this->RectA->setArea(this->RectA->posArea(),this->mapToScene(event->pos()));*/
+        this->RectA->setArea(this->RectA->posArea(),this->mapToScene(event->pos()));
     QGraphicsView::mouseMoveEvent(event);
 }
 
 void DiagramView::mouseReleaseEvent(QMouseEvent *event)
 {
-    /*if(event->button()!=Qt::LeftButton)
+    if(event->button()!=Qt::LeftButton)
         return;
     if(!this->pDiagramScene->selectedItems().isEmpty())
         if(this->pDiagramScene->selectedItems().at(0)->type()==GraphicsPillarItem::Type)
@@ -1339,28 +1339,28 @@ void DiagramView::mouseReleaseEvent(QMouseEvent *event)
         }
     emit this->mouseRelease();
     this->mousePrees=false;
-    if(this->typeITEM==ITEM_WALL)
+    if(this->typeITEM==SettingItem::ITEM_WALL)
     {
         this->lineWall->setLine(QLineF(this->lineWall->line().p1(),this->mapToScene(event->pos())));
-        this->AppendItem(ITEM_WALL,QPointF(0,0));
+        this->AppendItem(SettingItem::ITEM_WALL,QPointF(0,0));
     }
-    if(this->typeITEM==ITEM_FILLING)
+    if(this->typeITEM==SettingItem::ITEM_FILLING)
     {
         this->lineFilling->setLine(QLineF(this->lineFilling->line().p1(),this->mapToScene(event->pos())));
         Interval *setIntervalWindow=new Interval(this);
         connect(setIntervalWindow,SIGNAL(setInterval(float,bool)),this,SLOT(setInterval(float,bool)));
         setIntervalWindow->show();
     }
-    if(this->typeITEM==ITEM_LINE)
+    if(this->typeITEM==SettingItem::ITEM_LINE)
     {
         if(this->linePoint1!=NULL && this->linePoint2!=NULL)
         {
-            this->AppendItem(ITEM_LINE,QPointF(0,0));
-            this->typeITEM=ITEM_NONE;
+            this->AppendItem(SettingItem::ITEM_LINE,QPointF(0,0));
+            this->typeITEM=SettingItem::ITEM_NONE;
         }
     }else
-        if(this->typeITEM!=ITEM_PILLAR && this->typeITEM!=ITEM_WALL)
-            this->typeITEM=ITEM_NONE;
+        if(this->typeITEM!=SettingItem::ITEM_PILLAR && this->typeITEM!=SettingItem::ITEM_WALL)
+            this->typeITEM=SettingItem::ITEM_NONE;
     if(this->RectA!=NULL)
     {
         QList<QGraphicsItem*> list=this->pDiagramScene->collidingItems(this->RectA);
@@ -1369,7 +1369,7 @@ void DiagramView::mouseReleaseEvent(QMouseEvent *event)
         this->pDiagramScene->removeItem(this->RectA);
         delete this->RectA;
         this->RectA=NULL;
-    }*/
+    }
     QApplication::restoreOverrideCursor();
     QGraphicsView::mouseReleaseEvent(event);
 }

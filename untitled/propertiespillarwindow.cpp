@@ -14,6 +14,7 @@ PropertiesPillarWindow::PropertiesPillarWindow(QWidget *parent) :
     ui->widget->graphicPillar.setSizeBottomTile(100,80);
     ui->widget->setRectScene(480,550);
     ui->widget->graphicPillar.setPos(225,550);
+    ui->widget->graphicPillar.showSide(DiagramPillar::FRONT);
 }
 
 PropertiesPillarWindow::~PropertiesPillarWindow()
@@ -117,10 +118,10 @@ void PropertiesPillarWindow::on_comboBox_activated(const QString &arg1)
 void PropertiesPillarWindow::on_comboBox_activated(int index)
 {
    // this->Pillar->setHeightSide(this->lastIndexCheckBox,ui->lineEdit_3->text().toInt());
-    //ui->widget->setRenderingSide(index);
     ui->lineEdit_3->setText(QString::number(this->Pillar->heightSide(index)));
    // this->lastIndexCheckBox=index;
-
+    ui->widget->graphicPillar.showSide(index);
+    ui->widget->draw(DiagramViewFrontItem::ITEM_PILLAR);
 }
 
 void PropertiesPillarWindow::on_lineEdit_textChanged(const QString &arg1)
@@ -128,14 +129,13 @@ void PropertiesPillarWindow::on_lineEdit_textChanged(const QString &arg1)
     if(arg1.toInt()<this->itemSetting->heightBrickAngle)
         return;
     ui->widget->graphicPillar.setHeight(arg1.toInt());
+    if(ui->widget->graphicPillar.row()>0)
+    {
+        ui->spinBox->setMaximum(ui->widget->graphicPillar.row());
+        ui->spinBox->setMinimum(1);
+        ui->spinBox->setSingleStep(1);
+    }else ui->spinBox->setMaximum(0);
     ui->widget->draw(DiagramViewFrontItem::ITEM_PILLAR);
-//    ui->widget->setHeight(arg1.toInt());
-//    if(ui->widget->row()>0)
-//    {
-//        ui->spinBox->setMaximum(ui->widget->row());
-//        ui->spinBox->setMinimum(1);
-//        ui->spinBox->setSingleStep(1);
-//    }else ui->spinBox->setMaximum(0);
 }
 
 void PropertiesPillarWindow::on_lineEdit_2_textChanged(const QString &arg1)
@@ -144,28 +144,33 @@ void PropertiesPillarWindow::on_lineEdit_2_textChanged(const QString &arg1)
 
 void PropertiesPillarWindow::on_lineEdit_3_textChanged(const QString &arg1)
 {
-//    if(arg1.toInt()<=ui->lineEdit->text().toInt())
-//    {
-//        ui->widget->setInsertBottom(arg1.toInt());
+    if(arg1.toInt()<=ui->lineEdit->text().toInt())
+    {
+        ui->widget->graphicPillar.setInsert(ui->comboBox->currentIndex(),arg1.toInt());
+        ui->widget->draw(DiagramViewFrontItem::ITEM_PILLAR);
 //        this->Pillar->setHeightSide(ui->comboBox->currentIndex(),arg1.toInt());
 //        if(ui->checkBox_6->isChecked())
 //            ui->comboBox_6->setCurrentIndex(this->Pillar->isAutoBottomType());
-//    }
-//    else ui->lineEdit_3->setText(ui->lineEdit->text());
+    }
+    else ui->lineEdit_3->setText(ui->lineEdit->text());
 }
 
 void PropertiesPillarWindow::on_checkBox_clicked()
 {
    // ui->widget->setEnabledTop(ui->checkBox->isChecked());
-    ui->widget->graphicPillar.setTop(ui->checkBox->isChecked());
     ui->comboBox_2->setEnabled(ui->checkBox->isChecked());
+    ui->widget->graphicPillar.setTop(ui->checkBox->isChecked());
+    ui->widget->graphicPillar.setTopColor(ui->comboBox_2->currentText());
     ui->widget->draw(DiagramViewFrontItem::ITEM_PILLAR);
 }
 
 void PropertiesPillarWindow::on_comboBox_2_activated(int index)
 {
-//    if(ui->checkBox->isChecked())
-//        ui->widget->setColorTop(this->listColor.at(index)->color);
+    if(ui->checkBox->isChecked())
+    {
+        ui->widget->graphicPillar.setTopColor(ui->comboBox_2->currentText());
+        ui->widget->draw(DiagramViewFrontItem::ITEM_PILLAR);
+    }
 }
 
 void PropertiesPillarWindow::on_spinBox_valueChanged(int arg1)
@@ -180,38 +185,45 @@ void PropertiesPillarWindow::on_spinBox_valueChanged(int arg1)
 
 void PropertiesPillarWindow::on_comboBox_3_activated(int index)
 {
-//   if(!ui->checkBox_3->isChecked())
-//        ui->widget->setColorRow(ui->spinBox->value(),this->listColor.at(index)->color);
-//    else ui->widget->setColorAllRow(this->listColor.at(index)->color);
+   if(!ui->checkBox_3->isChecked())
+   {
+       ui->widget->graphicPillar.setRowColor(ui->spinBox->value(),ui->comboBox_3->currentText());
+       ui->widget->draw(DiagramViewFrontItem::ITEM_PILLAR);
+   }
+    //else ui->widget->setColorAllRow(this->listColor.at(index)->color);
 }
 
 void PropertiesPillarWindow::on_checkBox_5_clicked()
 {
-//    ui->spinBox->setEnabled(!ui->checkBox_5->isChecked());
-//    ui->comboBox_3->setEnabled(!ui->checkBox_5->isChecked());
-//    ui->checkBox_3->setEnabled(!ui->checkBox_5->isChecked());
-//    ui->widget->setEnabledPazzle(ui->checkBox_5->isChecked(),this->listColor.at(ui->comboBox_4->currentIndex())->color,
-//                                 this->listColor.at(ui->comboBox_5->currentIndex())->color);
-//    ui->comboBox_4->setEnabled(ui->checkBox_5->isChecked());
-//    ui->comboBox_5->setEnabled(ui->checkBox_5->isChecked());
+      ui->spinBox->setEnabled(!ui->checkBox_5->isChecked());
+      ui->comboBox_3->setEnabled(!ui->checkBox_5->isChecked());
+      ui->checkBox_3->setEnabled(!ui->checkBox_5->isChecked());
+      ui->comboBox_4->setEnabled(ui->checkBox_5->isChecked());
+      ui->comboBox_5->setEnabled(ui->checkBox_5->isChecked());
+      ui->widget->graphicPillar.setPazzleColor(ui->checkBox_5->isChecked());
+      ui->widget->graphicPillar.setRowPazzleColor(ui->comboBox_4->currentText(),ui->comboBox_5->currentText());
+      ui->widget->draw(DiagramViewFrontItem::ITEM_PILLAR);
 }
 
 void PropertiesPillarWindow::on_checkBox_3_clicked()
 {
-//    if(ui->checkBox_3->isChecked())
-//         ui->widget->setColorAllRow(this->listColor.at(ui->comboBox_3->currentIndex())->color);
+    if(ui->checkBox_3->isChecked())
+    {
+         ui->widget->graphicPillar.setRowColorAll(ui->comboBox_3->currentText());
+         ui->widget->draw(DiagramViewFrontItem::ITEM_PILLAR);
+    }
 }
 
 void PropertiesPillarWindow::on_comboBox_4_activated(int index)
 {
-//    ui->widget->setEnabledPazzle(ui->checkBox_5->isChecked(),this->listColor.at(index)->color,
-//                                 this->listColor.at(ui->comboBox_5->currentIndex())->color);
+    ui->widget->graphicPillar.setRowPazzleColor(ui->comboBox_4->currentText(),ui->comboBox_5->currentText());
+    ui->widget->draw(DiagramViewFrontItem::ITEM_PILLAR);
 }
 
 void PropertiesPillarWindow::on_comboBox_5_activated(int index)
 {
-//    ui->widget->setEnabledPazzle(ui->checkBox_5->isChecked(),this->listColor.at(ui->comboBox_4->currentIndex())->color,
-//                                 this->listColor.at(index)->color);
+    ui->widget->graphicPillar.setRowPazzleColor(ui->comboBox_4->currentText(),ui->comboBox_5->currentText());
+    ui->widget->draw(DiagramViewFrontItem::ITEM_PILLAR);
 }
 
 void PropertiesPillarWindow::saveSetting()

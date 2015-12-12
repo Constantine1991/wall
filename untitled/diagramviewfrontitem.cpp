@@ -30,7 +30,8 @@ void DiagramViewFrontItem::draw(DiagramViewFrontItem::DRAWITEM drawItem)
     if(drawItem==DiagramViewFrontItem::ITEM_PILLAR)
     {
         this->resizeRectScene(this->scene->sceneRect().width(),this->graphicPillar.boundingRectHeight());
-        foreach(QGraphicsRectItem *item,this->graphicPillar.graphics())
+        this->graphicPillar.setPos(this->graphicPillar.pos().x(),this->scene->sceneRect().height());
+        foreach(QGraphicsRectItem *item,this->graphicPillar.update())
             this->scene->addItem(item);
     }
 }
@@ -39,9 +40,7 @@ void DiagramViewFrontItem::resizeRectScene(int width, int height)
 {
     if(this->heightScene<height)
         this->scene->setSceneRect(0,0,this->scene->sceneRect().width(),height);
-    else
-        this->scene->setSceneRect(0,0,this->scene->sceneRect().width(),this->heightScene);
-    this->graphicPillar.setPos(this->graphicPillar.pos().x(),this->scene->sceneRect().height());
+    else this->scene->setSceneRect(0,0,this->scene->sceneRect().width(),this->heightScene);
     if(this->scene->sceneRect().width()<width)
         this->scene->setSceneRect(0,0,width,this->scene->sceneRect().height());
     else this->scene->setSceneRect(0,0,width,this->scene->sceneRect().height());

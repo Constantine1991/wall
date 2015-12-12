@@ -6,6 +6,7 @@ DiagramPillar::DiagramPillar()
     this->graphicTileTop=NULL;
     this->graphicTileBottom=NULL;
     this->settingItem=NULL;
+    this->enablePazzle=false;
 }
 
 DiagramPillar::~DiagramPillar()
@@ -66,13 +67,15 @@ void DiagramPillar::setHeight(int h)
     this->height=h;
     if(this->graphicsTileBricks.count()>(this->row()*2))
     {
-//        qDebug()<<"count object list:"<<this->graphicsTileBricks.count();
-//        qDebug()<<"count row:"<<this->row();
         for(int i=this->graphicsTileBricks.count()-1;i>=(this->row()*2);i--)
         {
-//            qDebug()<<"delete object i:"<<i;
             delete this->graphicsTileBricks.last();
             this->graphicsTileBricks.removeLast();
+        }
+        for(int i=this->colorTileBricks.count();i>this->row();i--)
+        {
+            qDebug()<<"color count:"<<this->colorTileBricks.count()<<" row cout:"<<this->row();
+            this->colorTileBricks.removeLast();
         }
         return;
     }
@@ -80,12 +83,13 @@ void DiagramPillar::setHeight(int h)
     {
         this->graphicsTileBricks.append(this->createItem(this->tileBrickWidth,this->tileBrickHeight));
         this->graphicsTileBricks.append(this->createItem(this->tileBrickWidth/2,this->tileBrickHeight));
+        this->colorTileBricks.append(QString(""));
     }
 }
 
-void DiagramPillar::setInsert(SIDE side, int insert)
+void DiagramPillar::setInsert(int side, int insert)
 {
-    this->insert[(int)side]=insert;
+    this->insert[side]=insert;
 }
 
 void DiagramPillar::setTop(bool enable)
@@ -102,6 +106,30 @@ void DiagramPillar::setTop(bool enable)
             this->graphicTileTop=NULL;
         }
     }
+}
+
+void DiagramPillar::setTopColor(QString nameColor)
+{
+    if(this->graphicTileTop==NULL)
+    {
+        qDebug()<<QString::fromLocal8Bit("Неудалось применить цвет к крышке столба т.к./n не выделанна память");
+        return;
+    }
+    if(nameColor.isEmpty())
+    {
+        qDebug()<<QString::fromLocal8Bit("Неудалось применить цвет к крышке столба т.к./n не заданно имя цвета");
+        return;
+    }
+    if(this->colorTileTop==nameColor)
+        return;
+    this->colorTileTop=nameColor;
+    SettingItem::COLOR_BRICK *color=this->settingItem->colorBrick(SettingItem::COLOR_BRICK_PILLAR_TOP,this->colorTileTop);
+    if(color==NULL)
+    {
+        qDebug()<<QString::fromLocal8Bit("Неудалось применить цвет к крышке столба т.к./n заданного цвета не существует");
+        return;
+    }
+    this->graphicTileTop->setBrush(QBrush(color->image1.scaled(this->tileTopWidth,this->tileTopHeight)));
 }
 
 void DiagramPillar::setBottom(bool enable)
@@ -130,32 +158,92 @@ int DiagramPillar::boundingRectHeight()
     return this->tileBottomHeight+this->row()*this->tileBrickHeight+this->tileTopHeight*2+40;
 }
 
-void DiagramPillar::showSide(SIDE side)
+void DiagramPillar::showSide(int side)
 {
-    this->side=side;
+    switch(side)
+    {
+        case 0:this->side=DiagramPillar::FRONT; break;
+        case 1:this->side=DiagramPillar::BACK;break;
+        case 2:this->side=DiagramPillar::LEFT;break;
+        case 3:this->side=DiagramPillar::RIGHT;break;
+    }
 }
 
-QList<QGraphicsRectItem*> DiagramPillar::graphics()
+void DiagramPillar::setRowColor(int indexRow, QString nameColor)
+{
+    if(nameColor.isEmpty())
+    {
+        qDebug()<<QString::fromLocal8Bit("Не удалось применить цвет к ряду столба/n т.к. цвет не указан");
+        return;
+    }
+    if(indexRow<0 || indexRow>this->row())
+    {
+        qDebug()<<QString::fromLocal8Bit("Указанный индекс ряда не входит в диапазон рядов столба");
+        return;
+    }
+    if(this->colorTileBricks.count()>=indexRow)
+    {
+        qDebug()<<"Insert color row";
+        this->colorTileBricks.removeAt(indexRow-1);
+        this->colorTileBricks.insert(indexRow-1,nameColor);
+    }
+//    qDebug()<<"setRowColor() count colors:"<<this->colorTileBricks.count();
+}
+
+void DiagramPillar::setRowColorAll(QString nameColor)
+{
+    if(nameColor.isEmpty())
+    {
+        qDebug()<<QString::fromLocal8Bit("Не удалось применить цвет к ряду столба/n т.к. цвет не указан");
+        return;
+    }
+    this->colorTileBricks.clear();
+    for(int i=0;i<this->row();i++)
+        this->colorTileBricks.append(nameColor);
+}
+
+void DiagramPillar::setPazzleColor(bool enable)
+{
+    this->enablePazzle=enable;
+
+}
+
+void DiagramPillar::setRowPazzleColor(QString nameColorAngle1, QString nameColorAngle2)
+{
+    if(nameColorAngle1.isEmpty() && nameColorAngle2.isEmpty())
+    {
+        qDebug()<<QString::fromLocal8Bit("Не удалось применить цвет к ряду столба/n т.к. цвет не указан");
+        return;
+    }
+    this->namecolorPazzleAngle1=nameColorAngle1;
+    this->namecolorPazzleAngle2=nameColorAngle2;
+}
+
+QList<QGraphicsRectItem*> DiagramPillar::update()
 {
     QList<QGraphicsRectItem*> graphicItem;
+    if(!this->graphicsTileBricks.isEmpty())
+    {
+        this->updateColorsTileBricks();
+        this->setPosGraphicTileBricks(this->x,this->y);
+        graphicItem.append(this->graphicsTileBricks);
+    } else
+        return graphicItem;
     if(this->graphicTileBottom!=NULL)
     {
         this->setPosGraphicTileBottom(this->x,this->y);
         graphicItem.append(this->graphicTileBottom);
     }
-    if(!this->graphicsTileBricks.isEmpty())
-    {
-        this->setPosGraphicTileBricks(this->x,this->y);
-        graphicItem.append(this->graphicsTileBricks);
-    }
     if(this->graphicTileTop!=NULL)
     {
         this->setPosGraphicTileTop(this->x,this->y);
         graphicItem.append(this->graphicTileTop);
-    }
+    }else
+        this->colorTileTop.clear();
     return graphicItem;
 }
 /*-----------------------------------------------PRIVATE---------------------------------------------------*/
+
 
 QGraphicsRectItem *DiagramPillar::createItem(int width, int height)
 {
@@ -166,6 +254,143 @@ QGraphicsRectItem *DiagramPillar::createItem(int width, int height)
     return item;
 }
 
+void DiagramPillar::setRowColor(int indexRow, SettingColor::COLOR_BRICK *colorAngleBrick, SettingColor::COLOR_BRICK *colorAngleInsert)
+{
+    if(indexRow>this->row())
+    {
+        qDebug()<<QString::fromLocal8Bit("Указанный индекс ряда не входит в диапазон рядов столба");
+        return;
+    }
+    if(colorAngleBrick==NULL)
+        qDebug()<<QString::fromLocal8Bit("Не удалось найти указанный цвет, брик угловой");
+    if(this->insert[(int)this->side]!=0)
+    {
+        if(colorAngleInsert==NULL)
+            qDebug()<<QString::fromLocal8Bit("Не удалось найти указанный цвет, брик угловой вставка");
+    }
+    if(this->insert[(int)this->side]==0 ||
+        (this->insert[(int)this->side]/this->settingItem->heightBrickAngle)<indexRow)
+    {
+        if(colorAngleBrick!=NULL)
+        {
+            this->graphicsTileBricks.at(indexRow*2-2)->setBrush(QBrush(colorAngleBrick->image1.scaled(this->tileBrickWidth,
+                                                                                                      this->tileBrickHeight)));
+            this->graphicsTileBricks.at(indexRow*2-1)->setBrush(QBrush(colorAngleBrick->image2.scaled(this->tileBrickWidth/2,
+                                                                                                      this->tileBrickHeight)));
+        }
+        return;
+    }
+    if((this->insert[(int)this->side]/this->settingItem->heightBrickAngle)>=indexRow)
+    {
+        if(colorAngleBrick!=NULL)
+            this->graphicsTileBricks.at(indexRow*2-1)->setBrush(QBrush(colorAngleBrick->image2.scaled(this->tileBrickWidth/2,
+                                                                                                      this->tileBrickHeight)));
+        if(colorAngleInsert!=NULL)
+        {
+            if((indexRow-1) % 2 == 0)
+                this->graphicsTileBricks.at(indexRow*2-2)->setBrush(QBrush(colorAngleInsert->image1.scaled(this->tileBrickWidth,
+                                                                                                           this->tileBrickHeight)));
+            else this->graphicsTileBricks.at(indexRow*2-2)->setBrush(QBrush(colorAngleInsert->image2.scaled(this->tileBrickWidth,
+                                                                                                            this->tileBrickHeight)));
+        }
+        return;
+    }
+}
+
+void DiagramPillar::setPazzleColor(QString color1, QString color2)
+{
+    for(int i=1;i<this->row()+1;i++)
+    {
+        if(this->side==DiagramPillar::FRONT || this->side==DiagramPillar::BACK)
+        {
+            if(this->insert[(int)this->side]==0 ||
+                    (this->insert[(int)this->side]/this->settingItem->heightBrickAngle)<i)
+            {
+                SettingItem::COLOR_BRICK *colorAngle=this->settingItem->colorBrick(SettingItem::COLOR_BRICK_PILLAR_BIG,
+                                                                                    color1);
+                if(colorAngle!=NULL)
+                    this->graphicsTileBricks.at(i*2-2)->setBrush(QBrush(colorAngle->image1.scaled(this->tileBrickWidth,
+                                                                                                  this->tileBrickHeight)));
+                colorAngle=this->settingItem->colorBrick(SettingItem::COLOR_BRICK_PILLAR_BIG,color2);
+                if(colorAngle!=NULL)
+                    this->graphicsTileBricks.at(i*2-1)->setBrush(QBrush(colorAngle->image2.scaled(this->tileBrickWidth/2,
+                                                                                                  this->tileBrickHeight)));
+                continue;
+            }
+            if((this->insert[(int)this->side]/this->settingItem->heightBrickAngle)>=i)
+            {
+                SettingItem::COLOR_BRICK *colorAngle=this->settingItem->colorBrick(SettingItem::COLOR_BRICK_PILLAR_BIG,
+                                                                                   color2);
+                if(colorAngle!=NULL)
+                    this->graphicsTileBricks.at(i*2-1)->setBrush(QBrush(colorAngle->image2.scaled(this->tileBrickWidth/2,
+                                                                                                      this->tileBrickHeight)));
+                SettingItem::COLOR_BRICK *colorAngleInsert=this->settingItem->colorBrick(SettingItem::COLOR_BRICK_PILLAR_SMALL,
+                                                                                         color1);
+                if(colorAngleInsert!=NULL)
+                {
+                    if((i-1) % 2 == 0)
+                        this->graphicsTileBricks.at(i*2-2)->setBrush(QBrush(colorAngleInsert->image1.scaled(this->tileBrickWidth,
+                                                                                                            this->tileBrickHeight)));
+                    else this->graphicsTileBricks.at(i*2-2)->setBrush(QBrush(colorAngleInsert->image2.scaled(this->tileBrickWidth,
+                                                                                                             this->tileBrickHeight)));
+                }
+                continue;
+            }
+        }
+        if(this->side==DiagramPillar::LEFT || this->side==DiagramPillar::RIGHT)
+        {
+            if(this->insert[(int)this->side]==0 ||
+                    (this->insert[(int)this->side]/this->settingItem->heightBrickAngle)<i)
+            {
+                SettingItem::COLOR_BRICK *colorAngle=this->settingItem->colorBrick(SettingItem::COLOR_BRICK_PILLAR_BIG,
+                                                                                    color2);
+                if(colorAngle!=NULL)
+                    this->graphicsTileBricks.at(i*2-2)->setBrush(QBrush(colorAngle->image1.scaled(this->tileBrickWidth,
+                                                                                                  this->tileBrickHeight)));
+                colorAngle=this->settingItem->colorBrick(SettingItem::COLOR_BRICK_PILLAR_BIG,color1);
+                if(colorAngle!=NULL)
+                    this->graphicsTileBricks.at(i*2-1)->setBrush(QBrush(colorAngle->image2.scaled(this->tileBrickWidth/2,
+                                                                                                  this->tileBrickHeight)));
+                continue;
+            }
+            if((this->insert[(int)this->side]/this->settingItem->heightBrickAngle)>=i)
+            {
+                SettingItem::COLOR_BRICK *colorAngle=this->settingItem->colorBrick(SettingItem::COLOR_BRICK_PILLAR_BIG,
+                                                                                   color1);
+                if(colorAngle!=NULL)
+                    this->graphicsTileBricks.at(i*2-1)->setBrush(QBrush(colorAngle->image2.scaled(this->tileBrickWidth/2,
+                                                                                                      this->tileBrickHeight)));
+                SettingItem::COLOR_BRICK *colorAngleInsert=this->settingItem->colorBrick(SettingItem::COLOR_BRICK_PILLAR_SMALL,
+                                                                                         color2);
+                if(colorAngleInsert!=NULL)
+                {
+                    if((i-1) % 2 == 0)
+                        this->graphicsTileBricks.at(i*2-2)->setBrush(QBrush(colorAngleInsert->image1.scaled(this->tileBrickWidth,
+                                                                                                            this->tileBrickHeight)));
+                    else this->graphicsTileBricks.at(i*2-2)->setBrush(QBrush(colorAngleInsert->image2.scaled(this->tileBrickWidth,
+                                                                                                             this->tileBrickHeight)));
+                }
+                continue;
+            }
+        }
+    }
+}
+
+void DiagramPillar::updateColorsTileBricks()
+{
+    if(this->enablePazzle)
+        this->setPazzleColor(this->namecolorPazzleAngle1,this->namecolorPazzleAngle2);
+    else
+    {
+        qDebug()<<"updateColorsTileBricks() count colors:"<<this->colorTileBricks.count();
+        for(int i=0;i<this->row();i++)
+            this->setRowColor(i+1,
+                              this->settingItem->colorBrick(SettingItem::COLOR_BRICK_PILLAR_BIG,this->colorTileBricks.at(i)),
+                              this->settingItem->colorBrick(SettingItem::COLOR_BRICK_PILLAR_SMALL,this->colorTileBricks.at(i)));
+    }
+}
+
+
 void DiagramPillar::setPosGraphicTileTop(int x, int y)
 {
     if(this->graphicTileTop==NULL)
@@ -175,22 +400,24 @@ void DiagramPillar::setPosGraphicTileTop(int x, int y)
     this->graphicTileTop->setPos(x,y);
 }
 
+
 void DiagramPillar::setPosGraphicTileBricks(int x, int y)
 {
     y=y-this->tileBottomHeight;
-    for(int i=0;i<this->row()*2;i+=2)
+    for(int i=1;i<=this->row();i++)
     {
         y=y-this->tileBrickHeight;
-        if(i % 2 == 0)
+        if((i-1) % 2 == 0)
         {
-            this->graphicsTileBricks.at(i)->setPos(x,y);
-            this->graphicsTileBricks.at(i+1)->setPos(x+this->tileBrickWidth,y);
+            this->graphicsTileBricks.at((i-1)*2)->setPos(x,y);
+            this->graphicsTileBricks.at((i-1)*2+1)->setPos(x+this->tileBrickWidth,y);
         }else{
-            this->graphicsTileBricks.at(i)->setPos(x+this->tileBrickWidth/2,y);
-            this->graphicsTileBricks.at(i+1)->setPos(x,y);
+            this->graphicsTileBricks.at((i-1)*2)->setPos(x+this->tileBrickWidth/2,y);
+            this->graphicsTileBricks.at((i-1)*2+1)->setPos(x,y);
         }
     }
 }
+
 
 void DiagramPillar::setPosGraphicTileBottom(int x, int y)
 {
@@ -200,6 +427,7 @@ void DiagramPillar::setPosGraphicTileBottom(int x, int y)
     x=x-(this->tileBottomWidth-(this->tileBrickWidth+this->tileBrickWidth/2))/2;
     this->graphicTileBottom->setPos(x,y);
 }
+
 
 void DiagramPillar::clearGraphicsTileBricks()
 {

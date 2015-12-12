@@ -25,23 +25,27 @@ public:
     void setSizeTopTile(int w,int h);
     void setSizeBottomTile(int w,int h);
     void setHeight(int h);//+
-    void setInsert(SIDE side,int insert);
-    void setTop(bool enable=false);//+
+    void setInsert(int side, int insert);
+    void setTop(bool enable=false);//
     void setTopColor(QString nameColor);
-    void setBottom(bool enable=false);//+
-    void showSide(SIDE side);//+
-    //void setRowColor(int row,QString nameColor);//+
-    //void setColor(QString nameColor);//+
-    void clear();
+    void setBottom(bool enable=false);//
+    void showSide(int side);//+
+    void setRowColor(int indexRow, QString nameColor);//****
+    void setRowColorAll(QString nameColor);//
+    void setPazzleColor(bool enable=false);
+    void setRowPazzleColor(QString nameColorAngle1, QString nameColorAngle2);
     int row();
     int boundingRectHeight();
-    QList<QGraphicsRectItem*> graphics();
+    QList<QGraphicsRectItem*> update();
 private:
     SettingItem *settingItem;
     QGraphicsRectItem *graphicTileTop;
     QGraphicsRectItem *graphicTileBottom;
     QList<QGraphicsRectItem*> graphicsTileBricks;
-    QList<QString> colors;
+    QList<QString> colorTileBricks;
+    QString colorTileTop;
+    QString namecolorPazzleAngle1;
+    QString namecolorPazzleAngle2;
     int x;
     int y;
     int tileBrickWidth;
@@ -52,10 +56,13 @@ private:
     int tileBottomHeight;
     int height;
     int insert[4];
+    bool enablePazzle;
     SIDE side;
-    bool enableTop;
-    bool enableBottom;
     QGraphicsRectItem *createItem(int width,int height);
+    //****
+    void setRowColor(int indexRow,SettingItem::COLOR_BRICK *colorAngleBrick,SettingItem::COLOR_BRICK *colorAngleInsert);
+    void setPazzleColor(QString color1, QString color2);
+    void updateColorsTileBricks();
     void setPosGraphicTileTop(int x,int y);
     void setPosGraphicTileBricks(int x,int y);
     void setPosGraphicTileBottom(int x,int y);
