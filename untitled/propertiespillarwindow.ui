@@ -827,9 +827,6 @@
     <property name="checkable">
      <bool>true</bool>
     </property>
-    <property name="checked">
-     <bool>false</bool>
-    </property>
    </widget>
    <widget class="QComboBox" name="comboBox_6">
     <property name="enabled">

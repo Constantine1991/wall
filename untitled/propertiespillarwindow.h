@@ -66,6 +66,7 @@ protected:
     void closeEvent(QCloseEvent *event);
 private:
     void saveSetting();
+    void setCurrentTextComboBox(QComboBox *comboBox,QString text);
     void setColorCommboBox(QComboBox *comboBox,QList<SettingItem::COLOR_BRICK*> listColor);
     Ui::PropertiesPillarWindow *ui;
     GraphicsPillarItem *Pillar;

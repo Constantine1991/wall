@@ -31,11 +31,14 @@ public:
     void setBottom(bool enable=false);//
     void showSide(int side);//+
     void setRowColor(int indexRow, QString nameColor);//****
+    void setRowColor(QList<QString> colorsTile);
     void setRowColorAll(QString nameColor);//
     void setPazzleColor(bool enable=false);
     void setRowPazzleColor(QString nameColorAngle1, QString nameColorAngle2);
     int row();
     int boundingRectHeight();
+    QString rowColor(int indexRow);
+    QList<QString> rowColor();
     QList<QGraphicsRectItem*> update();
 private:
     SettingItem *settingItem;
@@ -66,6 +69,7 @@ private:
     void setPosGraphicTileTop(int x,int y);
     void setPosGraphicTileBricks(int x,int y);
     void setPosGraphicTileBottom(int x,int y);
+    void updateColorBottom();
     void clearGraphicsTileBricks();
 };
 

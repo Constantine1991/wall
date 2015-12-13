@@ -25,9 +25,10 @@ GraphicsPillarItem::GraphicsPillarItem(QMenu *menuItem, QGraphicsItem *parent, Q
     this->heightSidePillar[2]=0;
     this->heightSidePillar[3]=0;
     this->heightSidePillar[4]=0;
-    this->bottomTypePillar=GraphicsPillarItem::BOTTOM_DEAF;
+    this->bottomTypePillar=GraphicsPillarItem::BOTTOM_NONE;
     this->pazzlePillar=false;
     this->bottomTypeEnablePillar=false;
+    this->setTopColor("");
 }
 
 GraphicsPillarItem::~GraphicsPillarItem()
@@ -138,6 +139,8 @@ void GraphicsPillarItem::setBottomTypeEnable(bool enable)
 
 void GraphicsPillarItem::setBottomType(int type)
 {
+    if(!this->bottomTypeEnablePillar)
+        return;
     switch(type)
     {
         case 0:{
@@ -160,7 +163,7 @@ void GraphicsPillarItem::setBottomType(int type)
             this->bottomTypePillar=GraphicsPillarItem::BOTTOM_ANGLETHREE;
             break;
         }
-        default:break;
+        default:this->bottomTypePillar=GraphicsPillarItem::BOTTOM_NONE;
     }
 }
 
@@ -217,7 +220,7 @@ int GraphicsPillarItem::isAutoBottomType()
 
 int GraphicsPillarItem::isBottomType()
 {
-    return (int)this->bottomTypePillar;
+    return this->isAutoBottomType();
 }
 
 bool GraphicsPillarItem::isBottomTypeEnable()
@@ -286,7 +289,7 @@ void GraphicsPillarItem::setTop(bool top)
 void GraphicsPillarItem::setTopColor(QString color)
 {
     if(this->topPillar)
-        this->colorTopPillar=color;
+        this->nameColorTop=color;
 }
 
 bool GraphicsPillarItem::isTop()
@@ -296,7 +299,7 @@ bool GraphicsPillarItem::isTop()
 
 QString GraphicsPillarItem::topColor()
 {
-    return this->colorTopPillar;
+    return this->nameColorTop;
 }
 
 void GraphicsPillarItem::setPazzle(bool pazzle)

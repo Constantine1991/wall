@@ -10,6 +10,7 @@
 #include <QMenu>
 #include <QObject>
 #include <QHash>
+#include <QString>
 #include "propertiesitem.h"
 #include "graphicswallitem.h"
 
@@ -28,7 +29,8 @@ public:
            BOTTOM_BEGINEND     =   1, // Начальное/конечное
            BOTTOM_PASSAGE      =   2, // Проходное
            BOTTOM_ANGLETWO     =   3, //Угловое двойное
-           BOTTOM_ANGLETHREE   =   4 // Угловое тройное
+           BOTTOM_ANGLETHREE   =   4, // Угловое тройное
+           BOTTOM_NONE         =  -1
        };
        GraphicsPillarItem(QMenu *menuItem=0,QGraphicsItem *parent = 0, QGraphicsScene *scene = 0);
        ~GraphicsPillarItem();
@@ -86,7 +88,8 @@ private:
     int heightPillar;
     bool topPillar;
     int heightSidePillar[4];
-    QString colorTopPillar;
+    QString tmp;
+    QString nameColorTop;
     QList<QString> colorRowPillar;
     bool pazzlePillar;
     QString colorPazzlePillar[2];

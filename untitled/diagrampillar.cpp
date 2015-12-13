@@ -158,6 +158,18 @@ int DiagramPillar::boundingRectHeight()
     return this->tileBottomHeight+this->row()*this->tileBrickHeight+this->tileTopHeight*2+40;
 }
 
+QString DiagramPillar::rowColor(int indexRow)
+{
+    if(indexRow>this->colorTileBricks.count())
+        return QString("");
+    return this->colorTileBricks.at(indexRow);
+}
+
+QList<QString> DiagramPillar::rowColor()
+{
+    return this->colorTileBricks;
+}
+
 void DiagramPillar::showSide(int side)
 {
     switch(side)
@@ -188,6 +200,12 @@ void DiagramPillar::setRowColor(int indexRow, QString nameColor)
         this->colorTileBricks.insert(indexRow-1,nameColor);
     }
 //    qDebug()<<"setRowColor() count colors:"<<this->colorTileBricks.count();
+}
+
+void DiagramPillar::setRowColor(QList<QString> colorsTile)
+{
+    this->colorTileBricks.clear();
+    this->colorTileBricks.append(colorsTile);
 }
 
 void DiagramPillar::setRowColorAll(QString nameColor)
@@ -231,6 +249,7 @@ QList<QGraphicsRectItem*> DiagramPillar::update()
         return graphicItem;
     if(this->graphicTileBottom!=NULL)
     {
+        this->updateColorBottom();
         this->setPosGraphicTileBottom(this->x,this->y);
         graphicItem.append(this->graphicTileBottom);
     }
@@ -418,6 +437,17 @@ void DiagramPillar::setPosGraphicTileBricks(int x, int y)
     }
 }
 
+void DiagramPillar::updateColorBottom()
+{
+    QList<SettingItem::COLOR_BRICK*> bottomColor=this->settingItem->colorBrick(SettingItem::COLOR_BRICK_PILLAR_BOTTOM);
+    if(bottomColor.isEmpty())
+        return;
+    if(this->insert[(int)this->side]>0)
+        this->graphicTileBottom->setBrush(QBrush(bottomColor.at(0)->image1.scaled(this->tileBottomWidth,
+                                                                                  this->tileBottomHeight)));
+    else this->graphicTileBottom->setBrush(QBrush(bottomColor.at(0)->image2.scaled(this->tileBottomWidth,
+                                                                                   this->tileBottomHeight)));
+}
 
 void DiagramPillar::setPosGraphicTileBottom(int x, int y)
 {
