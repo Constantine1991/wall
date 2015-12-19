@@ -17,7 +17,7 @@ PropertiesWallWindow::PropertiesWallWindow(QWidget *parent) :
     ui->widget->graphicWall.setSizeTileBrick(40,30);
     ui->widget->graphicWall.setSizeTileBottom(100,20);
     ui->widget->graphicWall.setSizeTileTop(100,20);
-    ui->widget->graphicWall.setPos(200,400);
+    ui->widget->graphicWall.setPos(180,350);
 }
 
 PropertiesWallWindow::~PropertiesWallWindow()
@@ -64,129 +64,44 @@ void PropertiesWallWindow::drawPillar()
 
 void PropertiesWallWindow::SetPropertiesWall(GraphicsWallItem *item, SettingItem *itemSetting,GraphicsPillarItem *itemPillar,bool fundament)
 {
-    this->itemSetting=itemSetting;
-//    this->itemPillar=itemPillar;
-//    this->drawPillar();
-    ui->widget->graphicWall.setSettingItem(this->itemSetting);
-    this->setColorComboBox(ui->comboBox_4,this->itemSetting->colorBrick(SettingItem::COLOR_BRICK_WALL_TOP));
-    this->setColorComboBox(ui->comboBox,this->itemSetting->colorBrick(SettingItem::COLOR_BRICK_WALL_BIG));
-    this->setColorComboBox(ui->comboBox_2,this->itemSetting->colorBrick(SettingItem::COLOR_BRICK_WALL_BIG));
-    this->setColorComboBox(ui->comboBox_3,this->itemSetting->colorBrick(SettingItem::COLOR_BRICK_WALL_BIG));
 
-    /*ui->widget->setSetting(itemSetting);
-    ui->widget->setHeightPillar(itemPillar->height());
-    ui->widget->setTopPillar(itemPillar->isTop(),itemPillar->topColor());
-    ui->widget->setPazzlePillar(itemPillar->isPazzle(),itemPillar->colorPazzle(0),itemPillar->colorPazzle(1));
-    ui->widget->setColorListPillar(itemPillar->colorListRow());
-    this->wall=item;
     this->itemSetting=itemSetting;
     this->itemPillar=itemPillar;
+    this->wall=item;
+    this->drawPillar();
 
-    qDebug()<<this->wall->isGirthRail();
+    ui->widget->graphicWall.setSettingItem(this->itemSetting);
+    ui->widget->graphicWall.setHeight(this->wall->height());
+    ui->widget->graphicWall.setWidth(this->wall->width());
+    ui->widget->graphicWall.setTop(this->wall->isTop());
+    ui->widget->graphicWall.setColorTop(this->wall->colorTop());
+    ui->widget->graphicWall.setBootom(this->wall->isGirthRail());
+    ui->widget->graphicWall.setPazzle(this->wall->isPazzle());
+    if(this->wall->isPazzle())
+        ui->widget->graphicWall.setColorPazzle(this->wall->colorPazzle(0),this->wall->colorPazzle(1));
+    else ui->widget->graphicWall.setColorRow(this->wall->colorListRow());
+    ui->widget->draw(DiagramViewFrontItem::ITEM_PILLAR_WALL);
+
+    this->setColorComboBox(ui->comboBox_4,this->itemSetting->colorBrick(SettingItem::COLOR_BRICK_WALL_TOP));
+    this->setCurrentTextComboBox(ui->comboBox_4,this->wall->colorTop());
+    this->setColorComboBox(ui->comboBox,this->itemSetting->colorBrick(SettingItem::COLOR_BRICK_WALL_BIG));
+    this->setCurrentTextComboBox(ui->comboBox,this->wall->colorRow(0));
+    this->setColorComboBox(ui->comboBox_2,this->itemSetting->colorBrick(SettingItem::COLOR_BRICK_WALL_BIG));
+    this->setCurrentTextComboBox(ui->comboBox_2,this->wall->colorPazzle(0));
+    this->setColorComboBox(ui->comboBox_3,this->itemSetting->colorBrick(SettingItem::COLOR_BRICK_WALL_BIG));
+    this->setCurrentTextComboBox(ui->comboBox_3,this->wall->colorPazzle(1));
 
     ui->checkBox_5->setChecked(this->wall->isGirthRail()|| !fundament);
     ui->lineEdit_2->setText(QString::number(this->wall->height()));
     ui->lineEdit->setText(QString::number(this->wall->width()));
     ui->checkBox_3->setChecked(this->wall->isTop());
     ui->comboBox_4->setEnabled(this->wall->isTop());
-
     ui->checkBox_4->setChecked(this->wall->isPazzle());
     ui->comboBox_2->setEnabled(this->wall->isPazzle());
     ui->comboBox_3->setEnabled(this->wall->isPazzle());
     ui->spinBox->setEnabled(!this->wall->isPazzle());
     ui->comboBox->setEnabled(!this->wall->isPazzle());
     ui->checkBox->setEnabled(!this->wall->isPazzle());
-
-    ui->comboBox->setFocusPolicy(Qt::NoFocus);
-    int size = ui->comboBox ->style()->pixelMetric(QStyle::PM_IconViewIconSize);
-    QPixmap pixmap(size,size-5);
-    int con=0;
-    foreach (COLOR* color,this->itemSetting->color) {
-        ui->comboBox ->addItem(color->caption);
-        ui->comboBox_2->addItem(color->caption);
-        ui->comboBox_3->addItem(color->caption);
-        ui->comboBox_4->addItem(color->caption);
-        ui->comboBox_5->addItem(color->caption);
-        ui->comboBox_6->addItem(color->caption);
-        ui->comboBox_7->addItem(color->caption);
-        pixmap.fill(color->color);
-
-        QRect rBorder(0,0,size,size);
-        QPainter p(&pixmap);
-        QPen pen(Qt::lightGray, 1, Qt::SolidLine);
-        p.setPen(pen);
-        p.drawRect(rBorder);
-
-        ui->comboBox->setItemData(con, pixmap, Qt::DecorationRole);
-        ui->comboBox_2->setItemData(con, pixmap, Qt::DecorationRole);
-        ui->comboBox_3->setItemData(con, pixmap, Qt::DecorationRole);
-        ui->comboBox_4->setItemData(con, pixmap, Qt::DecorationRole);
-        ui->comboBox_5->setItemData(con, pixmap, Qt::DecorationRole);
-        ui->comboBox_6->setItemData(con, pixmap, Qt::DecorationRole);
-        ui->comboBox_7->setItemData(con, pixmap, Qt::DecorationRole);
-        con=con+1;
-    }
-    ui->widget->setGraphicsWall(this->wall->width(),this->wall->height());
-    ui->widget->setEnableTopWall(this->wall->isTop(),this->wall->colorTop().color);
-    ui->widget->setEnableColorPazzle(this->wall->isPazzle(),this->wall->colorPazzle(0).color,
-                                     this->wall->colorPazzle(1).color);
-    for(int i=0;i<this->wall->countColorRow();i++)
-        ui->widget->setColorRowWall(i+1,this->wall->colorRow(i).color);
-    if(ui->widget->countRow()==0)
-        ui->spinBox->setMaximum(0);
-    else{
-        ui->spinBox->setMaximum(ui->widget->countRow());
-        ui->spinBox->setMinimum(1);
-        ui->spinBox->setSingleStep(1);
-    }
-    foreach(COLOR *color,this->itemSetting->color)
-    {
-        if(this->wall->isTop())
-            if(this->wall->colorTop()==*color)
-                ui->comboBox_4->setCurrentIndex(this->itemSetting->color.indexOf(color));
-        if(this->wall->isPazzle())
-        {
-            if(this->wall->colorPazzle(0)==*color)
-                ui->comboBox_2->setCurrentIndex(this->itemSetting->color.indexOf(color));
-            if(this->wall->colorPazzle(1)==*color)
-                ui->comboBox_3->setCurrentIndex(this->itemSetting->color.indexOf(color));
-        }else
-            if(!this->wall->isEmptyColorRow())
-                if(this->wall->colorRow(0)==*color)
-                    ui->comboBox->setCurrentIndex(this->itemSetting->color.indexOf(color));
-    }
-    switch(this->wall->isDecoreid())
-    {
-        case 0:{
-            ui->radioButton_4->setChecked(true);
-            ui->widget->setEnableDecoreit(false,QColor(),false,QColor(),false,QColor());
-            break;
-        }
-        case 1:{
-            foreach(COLOR *color,this->itemSetting->color)
-                if(*color==this->wall->colorDecoreid())
-                    ui->comboBox_5->setCurrentIndex(this->itemSetting->color.indexOf(color));
-            ui->widget->setEnableDecoreit(true,this->wall->colorDecoreid().color,false,QColor(),false,QColor());
-            ui->radioButton->setChecked(true);
-            break;
-        }
-        case 2:{
-            foreach(COLOR *color,this->itemSetting->color)
-                if(*color==this->wall->colorDecoreid())
-                    ui->comboBox_6->setCurrentIndex(this->itemSetting->color.indexOf(color));
-            ui->widget->setEnableDecoreit(false,QColor(),true,this->wall->colorDecoreid().color,false,QColor());
-            ui->radioButton_2->setChecked(true);
-            break;
-        }
-        case 3:{
-            foreach(COLOR *color,this->itemSetting->color)
-                if(*color==this->wall->colorDecoreid())
-                    ui->comboBox_7->setCurrentIndex(this->itemSetting->color.indexOf(color));
-            ui->widget->setEnableDecoreit(false,QColor(),false,QColor(),true,this->wall->colorDecoreid().color);
-            ui->radioButton_3->setChecked(true);
-            break;
-        }
-    }*/
 }
 
 void PropertiesWallWindow::on_pushButton_4_clicked()
@@ -234,11 +149,11 @@ void PropertiesWallWindow::on_lineEdit_2_textChanged(const QString &arg1)
         ui->lineEdit_2->setText(QString::number(this->itemSetting->heightBrickR));
         return;
     }
-//    if(arg1.toInt()>this->itemPillar->height())
-//    {
-//        ui->lineEdit_2->setText(QString::number(this->itemPillar->height()));
-//        return;
-//    }
+    if(arg1.toInt()>this->itemPillar->height())
+    {
+        ui->lineEdit_2->setText(QString::number(this->itemPillar->height()));
+        return;
+    }
     ui->widget->graphicWall.setHeight(arg1.toInt());
     ui->widget->draw(DiagramViewFrontItem::ITEM_PILLAR_WALL);
     this->changeRowWall();
@@ -257,12 +172,17 @@ void PropertiesWallWindow::on_spinBox_valueChanged(int arg1)
     this->setCurrentTextComboBox(ui->comboBox,ui->widget->graphicWall.colorRow(arg1));
 }
 
-void PropertiesWallWindow::on_comboBox_currentIndexChanged(int index)
+void PropertiesWallWindow::on_comboBox_activated(const QString &arg1)
 {
     if(!ui->checkBox->isChecked())
         ui->widget->graphicWall.setColorRow(ui->spinBox->value(),ui->comboBox->currentText());
     else ui->widget->graphicWall.setColorRowAll(ui->comboBox->currentText());
     ui->widget->draw(DiagramViewFrontItem::ITEM_PILLAR_WALL);
+}
+
+void PropertiesWallWindow::on_comboBox_currentIndexChanged(int index)
+{
+
 }
 
 void PropertiesWallWindow::on_checkBox_clicked()
@@ -276,14 +196,14 @@ void PropertiesWallWindow::on_checkBox_clicked()
 
 void PropertiesWallWindow::on_checkBox_4_clicked()
 {
-//    ui->comboBox_2->setEnabled(ui->checkBox_4->isChecked());
-//    ui->comboBox_3->setEnabled(ui->checkBox_4->isChecked());
-//    ui->spinBox->setEnabled(!ui->checkBox_4->isChecked());
-//    ui->comboBox->setEnabled(!ui->checkBox_4->isChecked());
-//    ui->checkBox->setEnabled(!ui->checkBox_4->isChecked());
-      ui->widget->graphicWall.setPazzle(ui->checkBox_4);
-      ui->widget->graphicWall.setColorPazzle(ui->comboBox_2->currentText(),ui->comboBox_3->currentText());
-      ui->widget->draw(DiagramViewFrontItem::ITEM_PILLAR_WALL);
+    ui->comboBox_2->setEnabled(ui->checkBox_4->isChecked());
+    ui->comboBox_3->setEnabled(ui->checkBox_4->isChecked());
+    ui->spinBox->setEnabled(!ui->checkBox_4->isChecked());
+    ui->comboBox->setEnabled(!ui->checkBox_4->isChecked());
+    ui->checkBox->setEnabled(!ui->checkBox_4->isChecked());
+    ui->widget->graphicWall.setPazzle(ui->checkBox_4);
+    ui->widget->graphicWall.setColorPazzle(ui->comboBox_2->currentText(),ui->comboBox_3->currentText());
+    ui->widget->draw(DiagramViewFrontItem::ITEM_PILLAR_WALL);
 }
 
 void PropertiesWallWindow::on_comboBox_2_currentIndexChanged(int index)
@@ -314,29 +234,32 @@ void PropertiesWallWindow::on_comboBox_4_activated(int index)
 
 void PropertiesWallWindow::saveSetting()
 {
-    /*if((ui->lineEdit_2->text().toInt()<this->itemSetting->heightBrickR)||
+    if((ui->lineEdit_2->text().toInt()<this->itemSetting->heightBrickR)||
        (ui->lineEdit_2->text().toInt()<this->itemSetting->minWidthBrickR))
         return;
     this->wall->setHeight(ui->lineEdit_2->text().toInt());
+    qDebug()<<QString::fromLocal8Bit("Высота:")<<this->wall->height();
     this->wall->setWidth(ui->lineEdit->text().toInt());
+    qDebug()<<QString::fromLocal8Bit("Ширина:")<<this->wall->width();
     this->wall->setTop(ui->checkBox_3->isChecked());
+    qDebug()<<QString::fromLocal8Bit("Крышка полотна:")<<this->wall->isTop();
     if(this->wall->isTop())
-        this->wall->setColorTop(*this->itemSetting->color.at(ui->comboBox_4->currentIndex()));
+        this->wall->setColorTop(ui->comboBox_4->currentText());
+    qDebug()<<QString::fromLocal8Bit("Цвет крышки полотна:")<<this->wall->colorTop();
     this->wall->setGirthRail(ui->checkBox_5->isChecked());
+    qDebug()<<QString::fromLocal8Bit("Ригель:")<<this->wall->isGirthRail();
     this->wall->setPazzle(ui->checkBox_4->isChecked());
+     qDebug()<<QString::fromLocal8Bit("Цвет пазл:")<<this->wall->isPazzle();
     this->wall->clearColorRow();
     if(this->wall->isPazzle())
     {
-        this->wall->setColorPazzle(0,*this->itemSetting->color.at(ui->comboBox_2->currentIndex()));
-        this->wall->setColorPazzle(1,*this->itemSetting->color.at(ui->comboBox_3->currentIndex()));
-    }else
-    {
-        foreach(QColor qcolor,ui->widget->getColorAllRow())
-            foreach(COLOR *color,this->itemSetting->color)
-                if(color->color==qcolor)
-                    this->wall->addColorRow(*color);
-    }
-    if(ui->radioButton_4->isChecked())
+        this->wall->setColorPazzle(0,ui->comboBox_2->currentText());
+        this->wall->setColorPazzle(1,ui->comboBox_3->currentText());
+        qDebug()<<QString::fromLocal8Bit("Цвет пазла №1:")<<this->wall->colorPazzle(0);
+        qDebug()<<QString::fromLocal8Bit("Цвет пазла №2:")<<this->wall->colorPazzle(1);
+    }else this->wall->setColorRowList(ui->widget->graphicWall.colorRow());
+    qDebug()<<QString::fromLocal8Bit("Кол-во цветных рядов:")<<this->wall->colorListRow().count();
+   /* if(ui->radioButton_4->isChecked())
         this->wall->setDecoreid(0);
     if(ui->radioButton->isChecked())
     {
@@ -414,3 +337,5 @@ void PropertiesWallWindow::on_checkBox_5_clicked()
     ui->widget->graphicWall.setBootom(ui->checkBox_5->isChecked());
     ui->widget->draw(DiagramViewFrontItem::ITEM_PILLAR_WALL);
 }
+
+

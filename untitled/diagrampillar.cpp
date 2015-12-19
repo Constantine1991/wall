@@ -405,11 +405,12 @@ void DiagramPillar::updateColorsTileBricks()
     else
     {
         qDebug()<<"updateColorsTileBricks() count colors:"<<this->colorTileBricks.count();
-        for(int i=0;i<this->row();i++)
+        for(int i=0;i<this->colorTileBricks.count();i++)
             this->setRowColor(i+1,
                               this->settingItem->colorBrick(SettingItem::COLOR_BRICK_PILLAR_BIG,this->colorTileBricks.at(i)),
                               this->settingItem->colorBrick(SettingItem::COLOR_BRICK_PILLAR_SMALL,this->colorTileBricks.at(i)));
     }
+    qDebug()<<"finish updateColorsTileBricks";
 }
 
 

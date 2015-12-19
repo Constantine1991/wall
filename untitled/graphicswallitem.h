@@ -8,6 +8,7 @@
 #include <QPen>
 #include <QMenu>
 #include <QList>
+#include <QString>
 #include "propertiesitem.h"
 
 class GraphicsWallItem:public QGraphicsLineItem
@@ -29,7 +30,7 @@ public:
     int width();
     void setTop(bool top);
     bool isTop();
-    void setColorTop(QString color);
+    void setColorTop(QString nameColor);
     QString colorTop();
     void setPazzle(bool pazzle);
     bool isPazzle();
@@ -58,8 +59,9 @@ private:
     void updatePosText();
     int wallHeight;
     int wallWidth;
+    QString WallcolorTop;
     bool wallTop;
-    QString wallColorTop;
+    QString nameColorTop;
     bool wallPazzle;
     QString wallColorPazzle[2];
     QList<QString> wallColorRow;

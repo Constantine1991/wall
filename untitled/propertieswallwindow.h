@@ -63,6 +63,10 @@ private slots:
 
     void on_checkBox_5_clicked();
 
+    void on_comboBox_activated(int index);
+
+    void on_comboBox_activated(const QString &arg1);
+
 protected:
     void closeEvent(QCloseEvent *event);
 

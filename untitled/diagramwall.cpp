@@ -13,6 +13,10 @@ DiagramWall::DiagramWall()
 DiagramWall::~DiagramWall()
 {
     this->clearTileBricks();
+    if(this->graphicsTops!=NULL)
+        delete this->graphicsTops;
+    if(this->graphicsBottom!=NULL)
+        delete this->graphicsBottom;
 }
 
 void DiagramWall::setSettingItem(SettingItem *settingItem)
@@ -135,6 +139,11 @@ QString DiagramWall::colorRow(int indexRow)
     return this->colorsBricks.at(indexRow-1);
 }
 
+QList<QString> DiagramWall::colorRow()
+{
+    return this->colorsBricks;
+}
+
 void DiagramWall::setColorRow(int indexRow, QString nameColor)
 {
     if(this->colorsBricks.isEmpty())
@@ -154,6 +163,7 @@ void DiagramWall::setColorRowAll(QString nameColor)
     this->colorsBricks.clear();
     for(int i=0;i<this->row();i++)
         this->colorsBricks.append(nameColor);
+    this->pazzle=false;
 }
 
 void DiagramWall::setColorRow(QList<QString> colors)

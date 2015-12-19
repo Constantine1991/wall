@@ -13,6 +13,9 @@ GraphicsWallItem::GraphicsWallItem(QMenu *menuItem, QGraphicsItem *parent, QGrap
     this->wallDecoreid=0;
     this->wallGirthRail=false;
     this->wallTop=false;
+    this->setColorTop(QString::fromLocal8Bit(""));
+    this->setColorPazzle(0,QString::fromLocal8Bit(""));
+    this->setColorPazzle(1,QString::fromLocal8Bit(""));
 }
 
 void GraphicsWallItem::setText(QString caption)
@@ -94,14 +97,15 @@ bool GraphicsWallItem::isTop()
     return this->wallTop;
 }
 
-void GraphicsWallItem::setColorTop(QString color)
+void GraphicsWallItem::setColorTop(QString nameColor)
 {
-    this->wallColorTop=color;
+    qDebug()<<"setColorTop:"<<nameColor;
+    this->nameColorTop=nameColor;
 }
 
 QString GraphicsWallItem::colorTop()
 {
-    return this->wallColorTop;
+    return this->nameColorTop;
 }
 
 void GraphicsWallItem::setPazzle(bool pazzle)
@@ -148,6 +152,8 @@ void GraphicsWallItem::setColorRowList(QList<QString> colorList)
 
 QString GraphicsWallItem::colorRow(int row)
 {
+    if(this->wallColorRow.isEmpty())
+        return QString("");
     return this->wallColorRow.at(row);
 }
 
