@@ -973,7 +973,7 @@ void DiagramView::AppendBrickColorPazzle(QList<COLORBRICK*> *colorBrick,int coun
 
 void DiagramView::PrintContract()
 {
-   /*Calculate calc(this->itemSetting);
+   Calculate calc(this->itemSetting);
    FENCE allFence;
    COLUMN allColumn;
    QList<COLORBRICK*> colorBrick[6];
@@ -1001,10 +1001,10 @@ void DiagramView::PrintContract()
                 {
                     allFence.count_cover+=tmpFence.count_cover;
                     this->AppendBrickColorPazzle(&colorBrick[2],tmpFence.count_cover,
-                                                 wall->colorTop().caption);
+                                                 wall->colorTop());
                     int residue=wall->width()-tmpFence.count_cover*this->itemSetting->widthWallTop;
                     if(residue>(this->itemSetting->minWidthBrickR/2))
-                        residueTopWall.insertMulti(wall->colorTop().caption,residue);
+                        residueTopWall.insertMulti(wall->colorTop(),residue);
 
                 }
                 if(tmpFence.count_brick==0)
@@ -1020,21 +1020,21 @@ void DiagramView::PrintContract()
                 {
                     COLORBRICKWALL colorBrickW=calc.colorBrickWall(wall->width(),wall->height());
                     this->AppendBrickColorPazzle(&colorBrick[0],colorBrickW.colorBrickBigWall.at(0),
-                                                 wall->colorPazzle(0).caption);
+                                                 wall->colorPazzle(0));
                     this->AppendBrickColorPazzle(&colorBrick[1],colorBrickW.colorBrickSmallWall.at(0),
-                                                 wall->colorPazzle(0).caption);
+                                                 wall->colorPazzle(0));
                     this->AppendBrickColorPazzle(&colorBrick[0],colorBrickW.colorBrickBigWall.at(1),
-                                                 wall->colorPazzle(1).caption);
+                                                 wall->colorPazzle(1));
                     this->AppendBrickColorPazzle(&colorBrick[1],colorBrickW.colorBrickSmallWall.at(1),
-                                                 wall->colorPazzle(1).caption);
+                                                 wall->colorPazzle(1));
                 }else{
                     COLORBRICKWALL colorBrickW=calc.colorListBrickWall(wall->width(),wall->height());
                     for(int i=0;i<wall->colorListRow().count();i++)
                     {
                         this->AppendBrickColorPazzle(&colorBrick[0],colorBrickW.colorBrickBigWall.at(i),
-                                                     wall->colorRow(i).caption);
+                                                     wall->colorRow(i));
                         this->AppendBrickColorPazzle(&colorBrick[1],colorBrickW.colorBrickSmallWall.at(i),
-                                                     wall->colorRow(i).caption);
+                                                     wall->colorRow(i));
                     }
                 }
                 break;
@@ -1059,27 +1059,27 @@ void DiagramView::PrintContract()
                 if(pillar->isTop())
                 {
                     countTop+=1;
-                    this->AppendBrickColorPazzle(&colorBrick[3],1,pillar->topColor().caption);
+                    this->AppendBrickColorPazzle(&colorBrick[3],1,pillar->topColor());
                 }
                 if(pillar->isPazzle())
                 {
                     COLORBRICKPILLAR colorBrickPillar=calc.colorBrickPillar(pillar->height(),side);
                     this->AppendBrickColorPazzle(&colorBrick[4],colorBrickPillar.colorBrickBigWall.at(0),
-                                                 pillar->colorPazzle(0).caption);
+                                                 pillar->colorPazzle(0));
                     this->AppendBrickColorPazzle(&colorBrick[5],colorBrickPillar.colorBrickSmallWall.at(0),
-                                                 pillar->colorPazzle(0).caption);
+                                                 pillar->colorPazzle(0));
                     this->AppendBrickColorPazzle(&colorBrick[4],colorBrickPillar.colorBrickBigWall.at(1),
-                                                 pillar->colorPazzle(1).caption);
+                                                 pillar->colorPazzle(1));
                     this->AppendBrickColorPazzle(&colorBrick[5],colorBrickPillar.colorBrickSmallWall.at(1),
-                                                 pillar->colorPazzle(1).caption);
+                                                 pillar->colorPazzle(1));
                 }else{
                     COLORBRICKPILLAR colorBrickPillar=calc.colorListBrickPillar(pillar->height(),side);
                     for(int i=0;i<pillar->colorListRow().count();i++)
                     {
                         this->AppendBrickColorPazzle(&colorBrick[4],colorBrickPillar.colorBrickBigWall.at(i),
-                                                     pillar->colorRow(i).caption);
+                                                     pillar->colorRow(i));
                         this->AppendBrickColorPazzle(&colorBrick[5],colorBrickPillar.colorBrickSmallWall.at(i),
-                                                     pillar->colorRow(i).caption);
+                                                     pillar->colorRow(i));
                     }
                 }
                 break;
@@ -1140,7 +1140,7 @@ void DiagramView::PrintContract()
                                      calc.GetCountCoverOnPallet(allFence.count_cover)+
                                      calc.GetCountBaseOnPallet(countBasePillar[0]+countBasePillar[1]+
                                                                countBasePillar[2]+countBasePillar[3]+
-                                                               countBasePillar[4])));*/
+                                                               countBasePillar[4])));
 }
 
 
