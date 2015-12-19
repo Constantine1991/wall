@@ -18,6 +18,8 @@ PropertiesWallWindow::PropertiesWallWindow(QWidget *parent) :
     ui->widget->graphicWall.setSizeTileBottom(100,20);
     ui->widget->graphicWall.setSizeTileTop(100,20);
     ui->widget->graphicWall.setPos(180,350);
+    ui->widget->showText(true);
+    ui->widget->setPosText(75,330,30);
 }
 
 PropertiesWallWindow::~PropertiesWallWindow()
@@ -276,8 +278,8 @@ void PropertiesWallWindow::saveSetting()
     {
         this->wall->setDecoreid(3);
         this->wall->setColorDecoreid(*this->itemSetting->color.at(ui->comboBox_7->currentIndex()));
-    }
-    emit this->closeProperties(ITEM_WALL,ui->checkBox_2->isChecked());*/
+    }*/
+    emit this->closeProperties(SettingItem::ITEM_WALL,ui->checkBox_2->isChecked());
 }
 
 void PropertiesWallWindow::closeEvent(QCloseEvent *event)

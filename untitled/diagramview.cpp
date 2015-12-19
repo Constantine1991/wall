@@ -1177,7 +1177,7 @@ void DiagramView::closeProperties(SettingItem::TYPEITEM itemType,bool all)
                                                         p.count_brick_angle_3+p.count_brick_angle_4)));
             }
         }
-    }/*
+    }
     if(itemType==SettingItem::ITEM_WALL)
     {
         GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(this->itemGraphicsChange);
@@ -1197,7 +1197,7 @@ void DiagramView::closeProperties(SettingItem::TYPEITEM itemType,bool all)
                 changeWall->setText(QString(QString::number(f.count_brick)+" | "+QString::number(f.count_brick_dob)));
             }
         }
-    }*/
+    }
 }
 
 void DiagramView::collidingGroup(QPointF point)

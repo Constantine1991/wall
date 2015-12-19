@@ -15,6 +15,8 @@ PropertiesPillarWindow::PropertiesPillarWindow(QWidget *parent) :
     ui->widget->setRectScene(480,550);
     ui->widget->graphicPillar.setPos(225,550);
     ui->widget->graphicPillar.showSide(DiagramPillar::FRONT);
+    ui->widget->showText(true);
+    ui->widget->setPosText(200,450,50);
 }
 
 PropertiesPillarWindow::~PropertiesPillarWindow()
