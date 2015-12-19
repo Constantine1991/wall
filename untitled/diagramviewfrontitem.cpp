@@ -27,11 +27,17 @@ void DiagramViewFrontItem::draw(DiagramViewFrontItem::DRAWITEM drawItem)
 { 
     if(!this->scene->items().isEmpty())
         this->scene->items().clear();
-    if(drawItem==DiagramViewFrontItem::ITEM_PILLAR)
+    if(drawItem==DiagramViewFrontItem::ITEM_PILLAR || drawItem==DiagramViewFrontItem::ITEM_PILLAR_WALL)
     {
         this->resizeRectScene(this->scene->sceneRect().width(),this->graphicPillar.boundingRectHeight());
         this->graphicPillar.setPos(this->graphicPillar.pos().x(),this->scene->sceneRect().height());
         foreach(QGraphicsRectItem *item,this->graphicPillar.update())
+            this->scene->addItem(item);
+    }
+    if(drawItem==DiagramViewFrontItem::ITEM_WALL || drawItem==DiagramViewFrontItem::ITEM_PILLAR_WALL)
+    {
+        this->resizeRectScene(this->graphicWall.boundingRectWidth(),this->scene->sceneRect().height());
+        foreach(QGraphicsRectItem *item,this->graphicWall.update())
             this->scene->addItem(item);
     }
 }
@@ -43,5 +49,5 @@ void DiagramViewFrontItem::resizeRectScene(int width, int height)
     else this->scene->setSceneRect(0,0,this->scene->sceneRect().width(),this->heightScene);
     if(this->scene->sceneRect().width()<width)
         this->scene->setSceneRect(0,0,width,this->scene->sceneRect().height());
-    else this->scene->setSceneRect(0,0,width,this->scene->sceneRect().height());
+    else this->scene->setSceneRect(0,0,this->widthScene,this->scene->sceneRect().height());
 }

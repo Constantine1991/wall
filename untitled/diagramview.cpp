@@ -1151,8 +1151,8 @@ void DiagramView::setSettingItem(SettingItem *itemSetting)
 
 void DiagramView::closeProperties(SettingItem::TYPEITEM itemType,bool all)
 {
-    /*Calculate calc(this->itemSetting);
-    if(itemType==ITEM_PILLAR)
+    Calculate calc(this->itemSetting);
+    if(itemType==SettingItem::ITEM_PILLAR)
     {
         GraphicsPillarItem *changePillar=qgraphicsitem_cast<GraphicsPillarItem*>(this->itemGraphicsChange);
         int insert[]={changePillar->heightSide(GraphicsPillarItem::SIDE_FRONT),0,
@@ -1177,8 +1177,8 @@ void DiagramView::closeProperties(SettingItem::TYPEITEM itemType,bool all)
                                                         p.count_brick_angle_3+p.count_brick_angle_4)));
             }
         }
-    }
-    if(itemType==ITEM_WALL)
+    }/*
+    if(itemType==SettingItem::ITEM_WALL)
     {
         GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(this->itemGraphicsChange);
         FENCE f=calc.GetCountOnFence(wall->width(),wall->height(),false);
@@ -1390,13 +1390,13 @@ void DiagramView::mouseDoubleClickEvent(QMouseEvent *event)
             GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(this->itemGraphicsChange);
             PillarWindow->SetPropertiesPillar(pillar,this->itemSetting,this->Fundament);
             PillarWindow->show();
-        }/*
+        }
         if(itemGraphics.at(0)->type()==GraphicsWallItem::Type)
         {
             this->itemGraphicsChange=itemGraphics.at(0);
             GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(this->itemGraphicsChange);
-            QGraphicsItem *wallPillar=this->itemToScene(ITEM_PILLAR,wall->line().p1());
-            QGraphicsItem *wallPillar2=this->itemToScene(ITEM_PILLAR,wall->line().p2());
+            QGraphicsItem *wallPillar=this->itemToScene(SettingItem::ITEM_PILLAR,wall->line().p1());
+            QGraphicsItem *wallPillar2=this->itemToScene(SettingItem::ITEM_PILLAR,wall->line().p2());
             if(wallPillar!=NULL && wallPillar2!=NULL)
             {
                 GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(wallPillar);
@@ -1405,12 +1405,12 @@ void DiagramView::mouseDoubleClickEvent(QMouseEvent *event)
                    (pillar2->height()>=this->itemSetting->heightBrickAngle))
                 {
                     PropertiesWallWindow *wallWindow=new PropertiesWallWindow(this);
-                    connect(wallWindow,SIGNAL(closeProperties(TYPEITEM,bool)),this,SLOT(closeProperties(TYPEITEM,bool)));
+                    connect(wallWindow,SIGNAL(closeProperties(SettingItem::TYPEITEM,bool)),this,SLOT(closeProperties(SettingItem::TYPEITEM,bool)));
                     wallWindow->SetPropertiesWall(wall,this->itemSetting,pillar,this->Fundament);
                     wallWindow->show();
                 }
             }
-        }*/
+        }
     }
 
     QGraphicsView::mouseDoubleClickEvent(event);

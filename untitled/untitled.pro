@@ -45,7 +45,8 @@ SOURCES += \
     diagrampillar.cpp \
     diagrambrick.cpp \
     settingcolor.cpp \
-    diagramviewfrontitem.cpp
+    diagramviewfrontitem.cpp \
+    diagramwall.cpp
 
 HEADERS  += \
     settingswindow.h \
@@ -79,7 +80,8 @@ HEADERS  += \
     diagrampillar.h \
     diagrambrick.h \
     settingcolor.h \
-    diagramviewfrontitem.h
+    diagramviewfrontitem.h \
+    diagramwall.h
 
 FORMS    += \
     settingswindow.ui \

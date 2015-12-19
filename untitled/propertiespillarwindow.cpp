@@ -256,7 +256,7 @@ void PropertiesPillarWindow::saveSetting()
             this->Pillar->setColorRow(ui->widget->graphicPillar.rowColor());
             qDebug()<<QString::fromLocal8Bit("Количество цветов:")<<this->Pillar->colorListRow().count();
         }
-        //emit this->closeProperties(ITEM_PILLAR,ui->checkBox_4->isChecked());
+        emit this->closeProperties(SettingItem::ITEM_PILLAR,ui->checkBox_4->isChecked());
     }
 }
 

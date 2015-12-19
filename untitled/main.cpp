@@ -1,10 +1,15 @@
 #include <QApplication>
 #include "mainwindow.h"
-
+#include "propertieswallwindow.h"
+#include "QDebug"
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-    MainWindow w;
+//    MainWindow w;
+    SettingItem setting;
+    setting.load();
+    PropertiesWallWindow w;
+    w.SetPropertiesWall(NULL,&setting,NULL);
     w.showMaximized();
     return a.exec();
 }

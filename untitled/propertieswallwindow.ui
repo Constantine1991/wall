@@ -574,7 +574,7 @@
 блокам</string>
     </property>
    </widget>
-   <widget class="DiagramViewWall" name="widget" native="true">
+   <widget class="DiagramViewFrontItem" name="widget" native="true">
     <property name="geometry">
      <rect>
       <x>0</x>
@@ -752,9 +752,9 @@
  </widget>
  <customwidgets>
   <customwidget>
-   <class>DiagramViewWall</class>
+   <class>DiagramViewFrontItem</class>
    <extends>QWidget</extends>
-   <header>diagramviewwall.h</header>
+   <header>diagramviewfrontitem.h</header>
    <container>1</container>
   </customwidget>
  </customwidgets>

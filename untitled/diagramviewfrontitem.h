@@ -3,6 +3,7 @@
 #include <QGraphicsView>
 #include <QGraphicsScene>
 #include "diagrampillar.h"
+#include "diagramwall.h"
 
 class DiagramViewFrontItem:public QGraphicsView
 {
@@ -14,6 +15,7 @@ public:
         ITEM_NONE           = 0
     };
     DiagramPillar graphicPillar;
+    DiagramWall graphicWall;
     DiagramViewFrontItem(QWidget *parent=0);
     ~DiagramViewFrontItem();
     void setRectScene(int w,int h);

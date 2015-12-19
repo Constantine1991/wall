@@ -7,6 +7,7 @@ DiagramPillar::DiagramPillar()
     this->graphicTileBottom=NULL;
     this->settingItem=NULL;
     this->enablePazzle=false;
+    this->height=0;
 }
 
 DiagramPillar::~DiagramPillar()
@@ -155,7 +156,9 @@ int DiagramPillar::row()
 
 int DiagramPillar::boundingRectHeight()
 {
-    return this->tileBottomHeight+this->row()*this->tileBrickHeight+this->tileTopHeight*2+40;
+    if(this->height!=0)
+        return this->tileBottomHeight+this->row()*this->tileBrickHeight+this->tileTopHeight*2+40;
+    return 0;
 }
 
 QString DiagramPillar::rowColor(int indexRow)

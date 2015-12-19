@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <Qt/qmessagebox.h>
 #include <QDir>
+#include <QComboBox>
 #include "propertiesitem.h"
 #include "graphicspillaritem.h"
 
@@ -60,11 +61,16 @@ private slots:
 
     void on_radioButton_4_clicked();
 
+    void on_checkBox_5_clicked();
+
 protected:
     void closeEvent(QCloseEvent *event);
 
 private:
     void saveSetting();
+    void setCurrentTextComboBox(QComboBox *comboBox,QString text);
+    void setColorComboBox(QComboBox *comboBox,QList<SettingItem::COLOR_BRICK*> listColor);
+    void drawPillar();
     Ui::PropertiesWallWindow *ui;
     GraphicsWallItem *wall;
     SettingItem *itemSetting;
