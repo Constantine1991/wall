@@ -1,4 +1,5 @@
 #include "title.h"
+#include "QDebug"
 
 Title::Title()
 {
@@ -67,52 +68,54 @@ void Title::show()
 
 void Title::hide()
 {
+    qDebug()<<"-------------START TITLE:HIDE-------------------";
     if(this->lableTop!=NULL)
     {
         this->scene->removeItem(this->lableTop);
-        delete this->lableTop;
+        //delete this->lableTop;
         this->lableTop=NULL;
     }
     if(this->labelRight!=NULL)
     {
         this->scene->removeItem(this->labelRight);
-        delete this->labelRight;
+        //delete this->labelRight;
         this->labelRight=NULL;
     }
     if(this->pillar!=NULL)
     {
         this->scene->removeItem(this->pillar);
-        delete this->pillar;
+        //delete this->pillar;
         this->pillar=NULL;
     }
     if(this->labelPillar1!=NULL)
     {
         this->scene->removeItem(this->labelPillar1);
-        delete this->labelPillar1;
+       // delete this->labelPillar1;
         this->labelPillar1=NULL;
     }
     if(this->labelPillar2!=NULL)
     {
         this->scene->removeItem(this->labelPillar2);
-        delete this->labelPillar2;
+        //delete this->labelPillar2;
         this->labelPillar2=NULL;
     }
     if(this->wall!=NULL)
     {
         this->scene->removeItem(this->wall);
-        delete this->wall;
+        //delete this->wall;
         this->wall=NULL;
     }
     if(this->labelWall1!=NULL)
     {
         this->scene->removeItem(this->labelWall1);
-        delete this->labelWall1;
+       // delete this->labelWall1;
         this->labelWall1=NULL;
     }
     if(this->labelWall2!=NULL)
     {
         this->scene->removeItem(this->labelWall2);
-        delete this->labelWall2;
+        //delete this->labelWall2;
         this->labelWall2=NULL;
     }
+    qDebug()<<"-------------FINISH TITLE:HIDE-------------------";
 }

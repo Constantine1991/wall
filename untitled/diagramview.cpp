@@ -33,7 +33,7 @@ DiagramView::DiagramView(QWidget *parent):QGraphicsView(parent)
 
 DiagramView::~DiagramView()
 {
-    //this->itemScene.RemoveAll();
+    this->ClearScene();
 }
 /*-----------------------------------------private------------------------------------------*/
 
@@ -83,6 +83,7 @@ QGraphicsItem* DiagramView::AppendItem(SettingItem::TYPEITEM typeItem, QPointF p
             PillarItem->setPosition(point);
             this->objectBackUp.append(PillarItem);
             this->pDiagramScene->addItem(PillarItem);
+            qDebug()<<"Add Pillar to Scene"<<PillarItem;
             return PillarItem;
         }
         case SettingItem::ITEM_WALL:{
@@ -97,6 +98,7 @@ QGraphicsItem* DiagramView::AppendItem(SettingItem::TYPEITEM typeItem, QPointF p
                 pillar1->addWall(wall,true);
                 pillar2->addWall(wall,false);
                 this->pDiagramScene->addItem(wall);
+                qDebug()<<"Add Wall to Scene"<<wall;
             }
             this->pDiagramScene->removeItem(this->lineWall);
             delete this->lineWall;
@@ -214,26 +216,29 @@ void DiagramView::Delete_Item()
 {
     if(!this->pDiagramScene->selectedItems().isEmpty())
     {
+        qDebug()<<"START DELETE_ITEM COUNT_ITEM_SCENE:"<<this->pDiagramScene->items().count();
         foreach(QGraphicsItem *parentItem,this->pDiagramScene->selectedItems())
         {
             foreach(GroupItem *group,this->listGroup)
                 if(group->isItem(parentItem))
                 {
+                    qDebug()<<"Start Delete_item Group";
                     QList<QGraphicsItem *> items=group->items();
                     foreach(QGraphicsItem *item,items)
                     {
                         if(parentItem==item)
                             continue;
-                        foreach(QGraphicsItem *childItem,item->childItems())
+                        /*foreach(QGraphicsItem *childItem,item->childItems())
                         {
                             this->pDiagramScene->removeItem(childItem);
                             delete childItem;
-                        }
+                        }*/
                         this->pDiagramScene->removeItem(item);
-                        delete item;
+                        //delete item;
                     }
                     this->listGroup.removeAt(this->listGroup.indexOf(group));
                     delete group;
+                    qDebug()<<"Finish Delete_item Group";
                     break;
                 }
             if(parentItem->type()==GraphicsPillarItem::Type)
@@ -256,14 +261,16 @@ void DiagramView::Delete_Item()
                 if(pillar2!=NULL)
                     pillar2->removeWall(wall);
             }
-            foreach(QGraphicsItem *childItem,parentItem->childItems())
+           /* foreach(QGraphicsItem *childItem,parentItem->childItems())
             {
                 this->pDiagramScene->removeItem(childItem);
                 delete childItem;
-            }
+            }*/
             this->pDiagramScene->removeItem(parentItem);
-            delete parentItem;
+//            if(parentItem!=NULL)
+//                delete parentItem;
         }
+        qDebug()<<"FINISH DELETE_ITEM COUNT_ITEM_SCENE:"<<this->pDiagramScene->items().count();
     }
 }
 
@@ -415,25 +422,34 @@ void DiagramView::setTypeItem(SettingItem::TYPEITEM type, int interval)
 
 void DiagramView::ClearScene()
 {
+    qDebug()<<"-----------------START ClearScene--------------";
+    qDebug()<<"ListGroup count group:"<<this->listGroup.count();
+    qDebug()<<"ObjectBackUp count Item:"<<this->objectBackUp.count();
+    qDebug()<<"Scene count Item:"<<this->pDiagramScene->items().count();
+    qDebug()<<"------------------------------------------------";
+    foreach(QGraphicsItem *item,this->pDiagramScene->items())
+        this->pDiagramScene->removeItem(item);
     foreach(GroupItem *group,this->listGroup)
-        delete group;
+    {
+        foreach(QGraphicsItem *item,group->items())
+            if(item!=NULL)
+                delete item;
+        if(group!=NULL)
+            delete group;
+    }
     this->listGroup.clear();
-   /* foreach(QGraphicsItem *item,this->objectBackUp)
-        delete item;*/
     if(!this->objectBackUp.isEmpty())
         this->objectBackUp.clear();
-    foreach(QGraphicsItem *item,this->pDiagramScene->items())
-    {
-        foreach(QGraphicsItem *child,item->childItems())
-            delete child;
-        delete item;
-    }
-    this->pDiagramScene->clear();
+    qDebug()<<"-----------------FINISH ClearScene--------------";
+    qDebug()<<"ListGroup count group:"<<this->listGroup.count();
+    qDebug()<<"ObjectBackUp count Item:"<<this->objectBackUp.count();
+    qDebug()<<"Scene count Item:"<<this->pDiagramScene->items().count();
+    qDebug()<<"------------------------------------------------";
 }
 
 void DiagramView::savePillar(QDomDocument *document,QDomElement *parent, GraphicsPillarItem *pillar)
 {
-    /*QDomElement object=document->createElement("Object");
+    QDomElement object=document->createElement("Object");
     object.setAttribute("type",pillar->type());
     QDomElement point=document->createElement("Point");
     point.setAttribute("x",pillar->pos().x());
@@ -457,42 +473,38 @@ void DiagramView::savePillar(QDomDocument *document,QDomElement *parent, Graphic
     QDomElement top=document->createElement("Top");
     top.setAttribute("enable",pillar->isTop());
     QDomElement color=document->createElement("color");
-    color.setAttribute("caption",pillar->topColor().caption);
-    color.setAttribute("name",pillar->topColor().color.name());
+    color.setAttribute("caption",pillar->topColor());
     top.appendChild(color);
     object.appendChild(top);
     QDomElement pazzle=document->createElement("Pazzle");
     pazzle.setAttribute("enable",pillar->isPazzle());
     color=document->createElement("color");
     color.setAttribute("id",0);
-    color.setAttribute("caption",pillar->colorPazzle(0).caption);
-    color.setAttribute("name",pillar->colorPazzle(0).color.name());
+    color.setAttribute("caption",pillar->colorPazzle(0));
     pazzle.appendChild(color);
     color=document->createElement("color");
     color.setAttribute("id",1);
-    color.setAttribute("caption",pillar->colorPazzle(1).caption);
-    color.setAttribute("name",pillar->colorPazzle(1).color.name());
+    color.setAttribute("caption",pillar->colorPazzle(1));
     pazzle.appendChild(color);
     object.appendChild(pazzle);
     QDomElement colorRow=document->createElement("ColorRow");
     colorRow.setAttribute("empty",pillar->colorListRow().isEmpty());
-    foreach(COLOR c,pillar->colorListRow())
+    foreach(QString c,pillar->colorListRow())
     {
         color=document->createElement("color");
-        color.setAttribute("caption",c.caption);
-        color.setAttribute("name",c.color.name());
+        color.setAttribute("caption",c);
         colorRow.appendChild(color);
     }
     object.appendChild(colorRow);
     QDomElement bottomType=document->createElement("Bottom");
     bottomType.setAttribute("type",pillar->isBottomTypeEnable());
     object.appendChild(bottomType);
-    parent->appendChild(object);*/
+    parent->appendChild(object);
 }
 
 void DiagramView::SaveDiagramScene(QString nameFile)
 {
-   /* QDomDocument document;
+    QDomDocument document;
     QDomElement root=document.createElement("data");
     document.appendChild(root);
     QDomElement f=document.createElement("Fundament");
@@ -592,40 +604,36 @@ void DiagramView::SaveDiagramScene(QString nameFile)
             QDomElement top=document.createElement("Top");
             top.setAttribute("enable",wall->isTop());
             QDomElement color=document.createElement("color");
-            color.setAttribute("caption",wall->colorTop().caption);
-            color.setAttribute("name",wall->colorTop().color.name());
+            color.setAttribute("caption",wall->colorTop());
             top.appendChild(color);
             object.appendChild(top);
             QDomElement pazzle=document.createElement("Pazzle");
             pazzle.setAttribute("enable",wall->isPazzle());
             color=document.createElement("color");
-            color.setAttribute("caption",wall->colorPazzle(0).caption);
-            color.setAttribute("name",wall->colorPazzle(0).color.name());
+            color.setAttribute("caption",wall->colorPazzle(0));
             color.setAttribute("id",0);
             pazzle.appendChild(color);
             color=document.createElement("color");
-            color.setAttribute("caption",wall->colorPazzle(1).caption);
-            color.setAttribute("name",wall->colorPazzle(1).color.name());
+            color.setAttribute("caption",wall->colorPazzle(1));
             color.setAttribute("id",1);
             pazzle.appendChild(color);
             object.appendChild(pazzle);
             QDomElement colorRow=document.createElement("ColorRow");
             colorRow.setAttribute("empty",wall->colorListRow().isEmpty());
-            foreach(COLOR c,wall->colorListRow())
+            foreach(QString c,wall->colorListRow())
             {
                 color=document.createElement("color");
-                color.setAttribute("caption",c.caption);
-                color.setAttribute("name",c.color.name());
+                color.setAttribute("caption",c);
                 colorRow.appendChild(color);
             }
             object.appendChild(colorRow);
-            QDomElement decoreit=document.createElement("Decoreit");
+            /*QDomElement decoreit=document.createElement("Decoreit");
             decoreit.setAttribute("enable",wall->isDecoreid());
             color=document.createElement("color");
             color.setAttribute("caption",wall->colorDecoreid().caption);
             color.setAttribute("name",wall->colorDecoreid().color.name());
             decoreit.appendChild(color);
-            object.appendChild(decoreit);
+            object.appendChild(decoreit);*/
             QDomElement girthRail=document.createElement("GirthRail");
             girthRail.setAttribute("enable",wall->isGirthRail());
             object.appendChild(girthRail);
@@ -637,12 +645,12 @@ void DiagramView::SaveDiagramScene(QString nameFile)
         return;
     QTextStream outFile(&saveFile);
     outFile<<document.toString();
-    saveFile.close();*/
+    saveFile.close();
 }
 
 void DiagramView::loadPillar(QXmlStreamReader *xml, GraphicsPillarItem *pillar)
 {
-   /* while(!(xml->isEndElement()&&xml->name()=="Object"))
+    while(!(xml->isEndElement()&&xml->name()=="Object"))
     {
         if(xml->isStartElement())
         {
@@ -667,8 +675,7 @@ void DiagramView::loadPillar(QXmlStreamReader *xml, GraphicsPillarItem *pillar)
                 while(!(xml->isEndElement()&&xml->name()=="Top"))
                 {
                     if(xml->isStartElement()&&xml->name()=="color")
-                        pillar->setTopColor(COLOR(QColor(xml->attributes().value("name").toString()),
-                                                         xml->attributes().value("caption").toString()));
+                        pillar->setTopColor(xml->attributes().value("caption").toString());
                     xml->readNext();
                 }
             }
@@ -679,8 +686,7 @@ void DiagramView::loadPillar(QXmlStreamReader *xml, GraphicsPillarItem *pillar)
                 {
                     if(xml->isStartElement()&&xml->name()=="color")
                         pillar->setColorPazzle(xml->attributes().value("id").toString().toInt(),
-                                              COLOR(QColor(xml->attributes().value("name").toString()),
-                                                           xml->attributes().value("caption").toString()));
+                                               xml->attributes().value("caption").toString());
                     xml->readNext();
                 }
             }
@@ -691,8 +697,7 @@ void DiagramView::loadPillar(QXmlStreamReader *xml, GraphicsPillarItem *pillar)
                     while(!(xml->isEndElement()&&xml->name()=="ColorRow"))
                     {
                         if(xml->isStartElement()&&xml->name()=="color")
-                            pillar->addColorRow(COLOR(QColor(xml->attributes().value("name").toString()),
-                                                      xml->attributes().value("caption").toString()));
+                            pillar->addColorRow(xml->attributes().value("caption").toString());
                         xml->readNext();
                     }
             }
@@ -707,12 +712,12 @@ void DiagramView::loadPillar(QXmlStreamReader *xml, GraphicsPillarItem *pillar)
     COLUMN p=calc.GetCountOnColumn(pillar->height(),insert,4);
     pillar->setText(QString(QString::number(p.count_brick_angle)+" | "+
                             QString::number(p.count_brick_angle_1+p.count_brick_angle_2+
-                                            p.count_brick_angle_3+p.count_brick_angle_4)));*/
+                                            p.count_brick_angle_3+p.count_brick_angle_4)));
 }
 
 bool DiagramView::LoadDiagramScene(QString nameFile)
 {
-   /* this->ClearScene();
+    this->ClearScene();
     QFile loadFile(nameFile);
     if(!loadFile.open(QIODevice::ReadOnly|QIODevice::Text))
         return false;
@@ -731,7 +736,8 @@ bool DiagramView::LoadDiagramScene(QString nameFile)
                 switch (xml.attributes().value("type").toString().toInt())
                 {
                     case GraphicsPillarItem::Type:{
-                        GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(this->AppendItem(ITEM_PILLAR,QPointF(0,0)));
+                        GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(this->AppendItem(SettingItem::ITEM_PILLAR,
+                                                                                                            QPointF(0,0)));
                         this->loadPillar(&xml,pillar);
                         break;
                     }
@@ -747,7 +753,8 @@ bool DiagramView::LoadDiagramScene(QString nameFile)
                                                                          xml.attributes().value("y1").toString().toFloat(),
                                                                          xml.attributes().value("x2").toString().toFloat(),
                                                                          xml.attributes().value("y2").toString().toFloat());
-                                    wall=qgraphicsitem_cast<GraphicsWallItem*>(this->AppendItem(ITEM_WALL,QPointF(0,0)));
+                                    wall=qgraphicsitem_cast<GraphicsWallItem*>(this->AppendItem(SettingItem::ITEM_WALL,
+                                                                                                QPointF(0,0)));
                                 }
                                 if(xml.name()=="Height")
                                     wall->setHeight(xml.attributes().value("value").toString().toInt());
@@ -759,8 +766,7 @@ bool DiagramView::LoadDiagramScene(QString nameFile)
                                     while(!(xml.isEndElement()&&xml.name()=="Top"))
                                     {
                                         if(xml.isStartElement()&&xml.name()=="color")
-                                            wall->setColorTop(COLOR(QColor(xml.attributes().value("name").toString()),
-                                                                    xml.attributes().value("caption").toString()));
+                                            wall->setColorTop(xml.attributes().value("caption").toString());
                                         xml.readNext();
                                     }
                                 }
@@ -771,8 +777,7 @@ bool DiagramView::LoadDiagramScene(QString nameFile)
                                     {
                                         if(xml.isStartElement()&&xml.name()=="color")
                                             wall->setColorPazzle(xml.attributes().value("id").toString().toInt(),
-                                                                 COLOR(QColor(xml.attributes().value("name").toString()),
-                                                                       xml.attributes().value("caption").toString()));
+                                                                 xml.attributes().value("caption").toString());
                                         xml.readNext();
                                     }
                                 }
@@ -783,12 +788,11 @@ bool DiagramView::LoadDiagramScene(QString nameFile)
                                         while(!(xml.isEndElement()&&xml.name()=="ColorRow"))
                                         {
                                             if(xml.isStartElement()&&xml.name()=="color")
-                                                wall->addColorRow(COLOR(QColor(xml.attributes().value("name").toString()),
-                                                                        xml.attributes().value("caption").toString()));
+                                                wall->addColorRow(xml.attributes().value("caption").toString());
                                             xml.readNext();
                                         }
                                 }
-                                if(xml.name()=="Decoreit")
+                                /*if(xml.name()=="Decoreit")
                                 {
                                     wall->setDecoreid(xml.attributes().value("enable").toString().toInt());
                                     while(!(xml.isEndElement()&&xml.name()=="Decoreit"))
@@ -798,7 +802,7 @@ bool DiagramView::LoadDiagramScene(QString nameFile)
                                                                          xml.attributes().value("caption").toString()));
                                         xml.readNext();
                                     }
-                                }
+                                }*/
                                 if(xml.name()=="GirthRail")
                                     wall->setGirthRail((bool)xml.attributes().value("enable").toString().toInt());
                             }
@@ -840,7 +844,7 @@ bool DiagramView::LoadDiagramScene(QString nameFile)
                                     xml.readNext();
                                 }
                                 if(this->group->types().isEmpty())
-                                    this->AppendItem(ITEM_WICKET,QPointF(0,0));
+                                    this->AppendItem(SettingItem::ITEM_WICKET,QPointF(0,0));
                                 else this->group->addGroup(GroupItem::ITEM_WICKET,QString::number(this->widthGroup),
                                                            this->MenuItem,this->pDiagramScene);
                                 break;
@@ -853,7 +857,7 @@ bool DiagramView::LoadDiagramScene(QString nameFile)
                                     xml.readNext();
                                 }
                                 if(this->group->types().isEmpty())
-                                    this->AppendItem(ITEM_GATE_A,QPointF(0,0));
+                                    this->AppendItem(SettingItem::ITEM_GATE_A,QPointF(0,0));
                                 else this->group->addGroup(GroupItem::ITEM_GATE1,QString::number(this->widthGroup),
                                                            this->MenuItem,this->pDiagramScene);
                                 break;
@@ -866,7 +870,7 @@ bool DiagramView::LoadDiagramScene(QString nameFile)
                                     xml.readNext();
                                 }
                                 if(this->group->types().isEmpty())
-                                    this->AppendItem(ITEM_GATE_B,QPointF(0,0));
+                                    this->AppendItem(SettingItem::ITEM_GATE_B,QPointF(0,0));
                                 else this->group->addGroup(GroupItem::ITEM_GATE2,QString::number(this->widthGroup),
                                                            this->MenuItem,this->pDiagramScene);
                                 break;
@@ -885,7 +889,7 @@ bool DiagramView::LoadDiagramScene(QString nameFile)
                     GraphicsPillarItem *p2=qgraphicsitem_cast<GraphicsPillarItem*>(this->group->items().at(i));
                     p2->setGraphicsPillarItem(p1);
                 }
-               // this->listGroup.append(group);
+                this->listGroup.append(group);//----
             }
         }
         xml.readNext();
@@ -909,7 +913,7 @@ bool DiagramView::LoadDiagramScene(QString nameFile)
         pillar->clearBackUp();
         pillar->setPosition(pos);
     }
-    return true;*/
+    return true;
 }
 
 void DiagramView::PrintDiagram()
@@ -921,12 +925,13 @@ void DiagramView::PrintDiagram()
         return;
     }
     this->pDiagramScene->setBackgroundBrush(QBrush(Qt::lightGray, Qt::NoBrush));
-    this->title.show();
-    this->pDiagramScene->clearSelection();
+
     QString fileName = QFileDialog::getSaveFileName(this, "Export PDF",
                                                 QString(), "*.pdf");
     if(!fileName.isEmpty())
     {
+        this->title.show();
+        this->pDiagramScene->clearSelection();
         QPrinter printer(QPrinter::HighResolution);
         printer.setPageSize(QPrinter::A4);
         printer.setPaperSize(QSize(210,297),QPrinter::Millimeter);
@@ -946,8 +951,10 @@ void DiagramView::PrintDiagram()
                 this->scene()->render(&p,QRectF(left,top,2000,2000),QRectF(left,top,2000,2000));
                 newPage=true;
             }
+         this->title.hide();
+        QMessageBox::about(this,QString::fromLocal8Bit("Сообщение!"),
+                           QString::fromLocal8Bit("Схема чертежа, успешно сохранена."));
     }
-    this->title.hide();
     this->pDiagramScene->setBackgroundBrush(QBrush(Qt::lightGray, Qt::CrossPattern));
 }
 
@@ -1141,6 +1148,8 @@ void DiagramView::PrintContract()
                                      calc.GetCountBaseOnPallet(countBasePillar[0]+countBasePillar[1]+
                                                                countBasePillar[2]+countBasePillar[3]+
                                                                countBasePillar[4])));
+    QMessageBox::about(this,QString::fromLocal8Bit("Сообщение!"),
+                       QString::fromLocal8Bit("Договор, успешно сгенерирован."));
 }
 
 
