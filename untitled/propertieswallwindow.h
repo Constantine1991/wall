@@ -5,6 +5,8 @@
 #include <Qt/qmessagebox.h>
 #include <QDir>
 #include <QComboBox>
+#include <QColorDialog>
+#include <QColor>
 #include "propertiesitem.h"
 #include "graphicspillaritem.h"
 
@@ -30,15 +32,10 @@ private slots:
 
     void on_spinBox_valueChanged(int arg1);
 
-    void on_comboBox_currentIndexChanged(int index);
 
     void on_checkBox_clicked();
 
     void on_checkBox_4_clicked();
-
-    void on_comboBox_2_currentIndexChanged(int index);
-
-    void on_comboBox_3_currentIndexChanged(int index);
 
     void on_comboBox_2_activated(int index);
 
@@ -49,21 +46,17 @@ private slots:
 
     void on_radioButton_clicked();
 
-    void on_comboBox_5_activated(int index);
-
     void on_radioButton_2_clicked();
 
-    void on_comboBox_6_activated(int index);
-
     void on_radioButton_3_clicked();
-
-    void on_comboBox_7_activated(int index);
 
     void on_radioButton_4_clicked();
 
     void on_checkBox_5_clicked();
 
     void on_comboBox_activated(const QString &arg1);
+
+    void on_pushButton_clicked();
 
 protected:
     void closeEvent(QCloseEvent *event);
@@ -79,6 +72,7 @@ private:
     GraphicsPillarItem *itemPillar;
     void changeRowWall();
     bool saveFlag;
+    QColor colorDecoreit;
 };
 
 #endif // PROPERTIESWALLWINDOW_H

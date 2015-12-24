@@ -12,6 +12,13 @@ MainWindow::MainWindow(QWidget *parent) :
     this->nameFile="";
     this->saveFlag=false;
     ////////////////////////
+    ui->mainToolBar->addAction(QPixmap("button\\1.png"),QString::fromLocal8Bit("Выравнивание по осям"),
+                               this,SLOT(action_aligment_length_item()));
+    ui->mainToolBar->addAction(QPixmap("button\\2.png"),QString::fromLocal8Bit("Изменить угол"),
+                               this,SLOT(action_aligment_angle_item()));
+    ui->mainToolBar->addAction(QPixmap("button\\3_1.png"),QString::fromLocal8Bit("Блокировка сцены"),
+                               this,SLOT(action_locking_item_scene()));
+    ///////////////////////
     QPixmap pixmap(250, 250);
     pixmap.fill(Qt::transparent);
     QPainter painter(&pixmap);
@@ -275,30 +282,35 @@ void MainWindow::on_action_8_activated()
     this->close();
 }
 
-void MainWindow::on_pushButton_8_clicked()
-{
-
-}
-
 void MainWindow::on_checkBox_2_clicked()
 {
     ui->widget->setFundament(ui->checkBox_2->isChecked());
 }
 
-void MainWindow::on_pushButton_6_clicked()
+void MainWindow::action_aligment_length_item()
 {
     this->resetPushButton();
     this->resetPushButton_2();
-    GraphicsSizeWall *sizeWall=new GraphicsSizeWall(ui->widget);
+    GraphicsSizeWall *sizeWall=new GraphicsSizeWall(ui->widget,GraphicsSizeWall::ALIGNMENT_LENGTH,this);
     sizeWall->show();
 }
 
-void MainWindow::on_pushButton_7_clicked()
+void MainWindow::action_aligment_angle_item()
+{
+    this->resetPushButton();
+    this->resetPushButton_2();
+    GraphicsSizeWall *sizeWall=new GraphicsSizeWall(ui->widget,GraphicsSizeWall::ALIGNMENT_ANGLE,this);
+    sizeWall->show();
+}
+
+void MainWindow::action_locking_item_scene()
 {
     this->resetPushButton();
     this->resetPushButton_2();
     ui->widget->setLockingScene(!ui->widget->locking());
-    ui->pushButton_7->setChecked(ui->widget->locking());
+    if(ui->widget->locking())
+        ui->mainToolBar->actions().at(2)->setIcon(QPixmap("button\\3_2.png"));
+    else ui->mainToolBar->actions().at(2)->setIcon(QPixmap("button\\3_1.png"));
     ui->pushButton->setEnabled(!ui->widget->locking());
     ui->pushButton_2->setEnabled(!ui->widget->locking());
     ui->pushButton_3->setEnabled(!ui->widget->locking());

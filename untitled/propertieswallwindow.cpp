@@ -20,6 +20,7 @@ PropertiesWallWindow::PropertiesWallWindow(QWidget *parent) :
     ui->widget->graphicWall.setPos(180,350);
     ui->widget->showText(true);
     ui->widget->setPosText(75,330,30);
+    this->colorDecoreit=Qt::white;
 }
 
 PropertiesWallWindow::~PropertiesWallWindow()
@@ -74,6 +75,7 @@ void PropertiesWallWindow::SetPropertiesWall(GraphicsWallItem *item, SettingItem
 
     ui->widget->graphicWall.setSettingItem(this->itemSetting);
     ui->widget->graphicWall.setHeight(this->wall->height());
+    ui->widget->graphicWall.setMaxHeight(this->itemPillar->height());
     ui->widget->graphicWall.setWidth(this->wall->width());
     ui->widget->graphicWall.setTop(this->wall->isTop());
     ui->widget->graphicWall.setColorTop(this->wall->colorTop());
@@ -83,6 +85,9 @@ void PropertiesWallWindow::SetPropertiesWall(GraphicsWallItem *item, SettingItem
         ui->widget->graphicWall.setColorPazzle(this->wall->colorPazzle(0),this->wall->colorPazzle(1));
     else ui->widget->graphicWall.setColorRow(this->wall->colorListRow());
     ui->widget->draw(DiagramViewFrontItem::ITEM_PILLAR_WALL);
+    ui->widget->graphicWall.setDecoreit(this->wall->isDecoreid());
+    ui->widget->graphicWall.setColorDecoreit(QBrush(QColor(this->wall->colorDecoreid())));
+    this->colorDecoreit=QColor(this->wall->colorDecoreid());
 
     this->setColorComboBox(ui->comboBox_4,this->itemSetting->colorBrick(SettingItem::COLOR_BRICK_WALL_TOP));
     this->setCurrentTextComboBox(ui->comboBox_4,this->wall->colorTop());
@@ -104,6 +109,25 @@ void PropertiesWallWindow::SetPropertiesWall(GraphicsWallItem *item, SettingItem
     ui->spinBox->setEnabled(!this->wall->isPazzle());
     ui->comboBox->setEnabled(!this->wall->isPazzle());
     ui->checkBox->setEnabled(!this->wall->isPazzle());
+    switch(this->wall->isDecoreid())
+    {
+        case 1:{
+            ui->radioButton_4->setChecked(true);
+            break;
+        }
+        case 2:{
+            ui->radioButton->setChecked(true);
+            break;
+        }
+        case 3:{
+            ui->radioButton_2->setChecked(true);
+            break;
+        }
+        case 4:{
+            ui->radioButton_3->setChecked(true);
+            break;
+        }
+    }
 }
 
 void PropertiesWallWindow::on_pushButton_4_clicked()
@@ -182,11 +206,6 @@ void PropertiesWallWindow::on_comboBox_activated(const QString &arg1)
     ui->widget->draw(DiagramViewFrontItem::ITEM_PILLAR_WALL);
 }
 
-void PropertiesWallWindow::on_comboBox_currentIndexChanged(int index)
-{
-
-}
-
 void PropertiesWallWindow::on_checkBox_clicked()
 {
     if(ui->checkBox->isChecked())
@@ -206,14 +225,6 @@ void PropertiesWallWindow::on_checkBox_4_clicked()
     ui->widget->graphicWall.setPazzle(ui->checkBox_4);
     ui->widget->graphicWall.setColorPazzle(ui->comboBox_2->currentText(),ui->comboBox_3->currentText());
     ui->widget->draw(DiagramViewFrontItem::ITEM_PILLAR_WALL);
-}
-
-void PropertiesWallWindow::on_comboBox_2_currentIndexChanged(int index)
-{
-}
-
-void PropertiesWallWindow::on_comboBox_3_currentIndexChanged(int index)
-{
 }
 
 void PropertiesWallWindow::on_comboBox_2_activated(int index)
@@ -236,8 +247,7 @@ void PropertiesWallWindow::on_comboBox_4_activated(int index)
 
 void PropertiesWallWindow::saveSetting()
 {
-    if((ui->lineEdit_2->text().toInt()<this->itemSetting->heightBrickR)||
-       (ui->lineEdit_2->text().toInt()<this->itemSetting->minWidthBrickR))
+    if(ui->lineEdit_2->text().toInt()<this->itemSetting->heightBrickR)
         return;
     this->wall->setHeight(ui->lineEdit_2->text().toInt());
     qDebug()<<QString::fromLocal8Bit("Высота:")<<this->wall->height();
@@ -261,24 +271,23 @@ void PropertiesWallWindow::saveSetting()
         qDebug()<<QString::fromLocal8Bit("Цвет пазла №2:")<<this->wall->colorPazzle(1);
     }else this->wall->setColorRowList(ui->widget->graphicWall.colorRow());
     qDebug()<<QString::fromLocal8Bit("Кол-во цветных рядов:")<<this->wall->colorListRow().count();
-   /* if(ui->radioButton_4->isChecked())
-        this->wall->setDecoreid(0);
+    if(ui->radioButton_4->isChecked())
+        this->wall->setDecoreid(1);
     if(ui->radioButton->isChecked())
     {
-        this->wall->setDecoreid(1);
-        this->wall->setColorDecoreid(*this->itemSetting->color.at(ui->comboBox_5->currentIndex()));
+        this->wall->setDecoreid(2);
+        this->wall->setColorDecoreid(this->colorDecoreit.name());
     }
     if(ui->radioButton_2->isChecked())
     {
-        this->wall->setDecoreid(2);
-        this->wall->setColorDecoreid(*this->itemSetting->color.at(ui->comboBox_6->currentIndex()));
-        qDebug()<<this->itemSetting->color.at(ui->comboBox_6->currentIndex())->caption;
+        this->wall->setDecoreid(4);
+        this->wall->setColorDecoreid(this->colorDecoreit.name());
     }
     if(ui->radioButton_3->isChecked())
     {
         this->wall->setDecoreid(3);
-        this->wall->setColorDecoreid(*this->itemSetting->color.at(ui->comboBox_7->currentIndex()));
-    }*/
+        this->wall->setColorDecoreid(this->colorDecoreit.name());
+    }
     emit this->closeProperties(SettingItem::ITEM_WALL,ui->checkBox_2->isChecked());
 }
 
@@ -301,37 +310,30 @@ void PropertiesWallWindow::on_pushButton_5_clicked()
 
 void PropertiesWallWindow::on_radioButton_clicked()
 {
-//    ui->widget->setEnableDecoreit(true,this->itemSetting->color.at(ui->comboBox_5->currentIndex())->color,false,QColor(),false,QColor());
-}
-
-void PropertiesWallWindow::on_comboBox_5_activated(int index)
-{
-//    ui->widget->setEnableDecoreit(ui->radioButton->isChecked(),this->itemSetting->color.at(index)->color,false,QColor(),false,QColor());
+    ui->widget->graphicWall.setDecoreit(DiagramWall::DECORIET_CRAFT);
+    ui->widget->graphicWall.setColorDecoreit(QBrush(this->colorDecoreit));
+    ui->widget->draw(DiagramViewFrontItem::ITEM_PILLAR_WALL);
 }
 
 void PropertiesWallWindow::on_radioButton_2_clicked()
 {
-//    ui->widget->setEnableDecoreit(false,QColor(),true,this->itemSetting->color.at(ui->comboBox_6->currentIndex())->color,false,QColor());
-}
-
-void PropertiesWallWindow::on_comboBox_6_activated(int index)
-{
-//   ui->widget->setEnableDecoreit(false,QColor(),ui->radioButton_2->isChecked(),this->itemSetting->color.at(index)->color,false,QColor());
+    ui->widget->graphicWall.setDecoreit(DiagramWall::DECORIET_FORGED);
+    ui->widget->graphicWall.setColorDecoreit(QBrush(this->colorDecoreit));
+    ui->widget->draw(DiagramViewFrontItem::ITEM_PILLAR_WALL);
 }
 
 void PropertiesWallWindow::on_radioButton_3_clicked()
 {
-//    ui->widget->setEnableDecoreit(false,QColor(),false,QColor(),true,this->itemSetting->color.at(ui->comboBox_7->currentIndex())->color);
-}
-
-void PropertiesWallWindow::on_comboBox_7_activated(int index)
-{
-//    ui->widget->setEnableDecoreit(false,QColor(),false,QColor(),ui->radioButton_3->isChecked(),this->itemSetting->color.at(index)->color);
+    ui->widget->graphicWall.setDecoreit(DiagramWall::DECORIET_METALL);
+    ui->widget->graphicWall.setColorDecoreit(QBrush(this->colorDecoreit));
+    ui->widget->draw(DiagramViewFrontItem::ITEM_PILLAR_WALL);
 }
 
 void PropertiesWallWindow::on_radioButton_4_clicked()
 {
-//    ui->widget->setEnableDecoreit(false,QColor(),false,QColor(),false,QColor());
+    ui->widget->graphicWall.setDecoreit(DiagramWall::DECORIET_BRICK);
+    ui->widget->draw(DiagramViewFrontItem::ITEM_PILLAR_WALL);
+
 }
 
 void PropertiesWallWindow::on_checkBox_5_clicked()
@@ -341,3 +343,11 @@ void PropertiesWallWindow::on_checkBox_5_clicked()
 }
 
 
+
+void PropertiesWallWindow::on_pushButton_clicked()
+{
+    this->colorDecoreit=QColorDialog::getColor(Qt::white,this);
+    if(this->colorDecoreit.isValid())
+        ui->widget->graphicWall.setColorDecoreit(QBrush(this->colorDecoreit));
+    ui->widget->draw(DiagramViewFrontItem::ITEM_PILLAR_WALL);
+}

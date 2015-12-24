@@ -48,13 +48,15 @@ private slots:
 
     void on_action_8_activated();
 
-    void on_pushButton_8_clicked();
     void isTypeComponent(SettingItem::TYPEITEM type,int width);
+
     void on_checkBox_2_clicked();
 
-    void on_pushButton_6_clicked();
+    void action_aligment_length_item();
 
-    void on_pushButton_7_clicked();
+    void action_aligment_angle_item();
+
+    void action_locking_item_scene();
 protected:
     void closeEvent(QCloseEvent *event);
 private:

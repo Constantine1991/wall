@@ -83,7 +83,6 @@ QGraphicsItem* DiagramView::AppendItem(SettingItem::TYPEITEM typeItem, QPointF p
             PillarItem->setPosition(point);
             this->objectBackUp.append(PillarItem);
             this->pDiagramScene->addItem(PillarItem);
-            qDebug()<<"Add Pillar to Scene"<<PillarItem;
             return PillarItem;
         }
         case SettingItem::ITEM_WALL:{
@@ -98,7 +97,6 @@ QGraphicsItem* DiagramView::AppendItem(SettingItem::TYPEITEM typeItem, QPointF p
                 pillar1->addWall(wall,true);
                 pillar2->addWall(wall,false);
                 this->pDiagramScene->addItem(wall);
-                qDebug()<<"Add Wall to Scene"<<wall;
             }
             this->pDiagramScene->removeItem(this->lineWall);
             delete this->lineWall;
@@ -627,13 +625,12 @@ void DiagramView::SaveDiagramScene(QString nameFile)
                 colorRow.appendChild(color);
             }
             object.appendChild(colorRow);
-            /*QDomElement decoreit=document.createElement("Decoreit");
+            QDomElement decoreit=document.createElement("Decoreit");
             decoreit.setAttribute("enable",wall->isDecoreid());
             color=document.createElement("color");
-            color.setAttribute("caption",wall->colorDecoreid().caption);
-            color.setAttribute("name",wall->colorDecoreid().color.name());
+            color.setAttribute("name",wall->colorDecoreid());
             decoreit.appendChild(color);
-            object.appendChild(decoreit);*/
+            object.appendChild(decoreit);
             QDomElement girthRail=document.createElement("GirthRail");
             girthRail.setAttribute("enable",wall->isGirthRail());
             object.appendChild(girthRail);
@@ -792,17 +789,16 @@ bool DiagramView::LoadDiagramScene(QString nameFile)
                                             xml.readNext();
                                         }
                                 }
-                                /*if(xml.name()=="Decoreit")
+                                if(xml.name()=="Decoreit")
                                 {
                                     wall->setDecoreid(xml.attributes().value("enable").toString().toInt());
                                     while(!(xml.isEndElement()&&xml.name()=="Decoreit"))
                                     {
                                         if(xml.isStartElement()&&xml.name()=="color")
-                                            wall->setColorDecoreid(COLOR(QColor(xml.attributes().value("name").toString()),
-                                                                         xml.attributes().value("caption").toString()));
+                                            wall->setColorDecoreid(xml.attributes().value("name").toString());
                                         xml.readNext();
                                     }
-                                }*/
+                                }
                                 if(xml.name()=="GirthRail")
                                     wall->setGirthRail((bool)xml.attributes().value("enable").toString().toInt());
                             }
@@ -1598,7 +1594,7 @@ void DiagramView::alignmentWall(int width, GraphicsPillarItem *pillar1, Graphics
     pillar2->setPosition(point);
 }*/
 
-void DiagramView::alignmentSelectedWall(int width)
+void DiagramView::alignmentAngelSelectedWall(int angle)
 {
     if(this->pDiagramScene->selectedItems().isEmpty())
         return;
@@ -1606,8 +1602,23 @@ void DiagramView::alignmentSelectedWall(int width)
         foreach(QGraphicsItem *item,this->pDiagramScene->selectedItems())
             if(group->isItem(item))
                 return;
-    this->alignment.alignmentAnglePillar(width,this->pDiagramScene->selectedItems());
-    //this->alignment.alignmentLengthPillar(width,this->pDiagramScene->selectedItems());
+    this->alignment.alignmentAnglePillar(angle,this->pDiagramScene->selectedItems());
+}
+
+void DiagramView::alignmentLengthSelectedItem(int length)
+{
+    if(this->pDiagramScene->selectedItems().isEmpty())
+        return;
+    foreach(GroupItem *group,this->listGroup)
+        foreach(QGraphicsItem *item,this->pDiagramScene->selectedItems())
+            if(group->isItem(item))
+                return;
+    QList<QGraphicsItem*> items;
+    foreach(QGraphicsItem *selectedItem,this->pDiagramScene->selectedItems())
+        if(selectedItem->type()==GraphicsPillarItem::Type)
+            items.append(selectedItem);
+    this->alignment.setScene(this->pDiagramScene);
+    this->alignment.alignmentLengthPillar(length,items);
 }
 
 void DiagramView::setLockingScene(bool lock)

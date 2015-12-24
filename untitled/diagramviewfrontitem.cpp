@@ -63,6 +63,8 @@ void DiagramViewFrontItem::draw(DiagramViewFrontItem::DRAWITEM drawItem)
         this->resizeRectScene(this->graphicWall.boundingRectWidth(),this->scene->sceneRect().height());
         foreach(QGraphicsRectItem *item,this->graphicWall.update())
             this->scene->addItem(item);
+        foreach(QGraphicsPolygonItem *item,this->graphicWall.decoreitItem())
+            this->scene->addItem(item);
     }
 }
 

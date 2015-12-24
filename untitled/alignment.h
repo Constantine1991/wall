@@ -3,41 +3,32 @@
 #include <QGraphicsItem>
 #include <QGraphicsScene>
 #include <QList>
+#include <QGraphicsItemGroup>
 #include "graphicspillaritem.h"
 
 class Alignment
 {
 public:
     void setScene(QGraphicsScene *scene);
-    void alignmentLengthPillar(int length,QList<QGraphicsItem*> items);
+    void alignmentLengthPillar(int length, QList<QGraphicsItem *> aligmentItem);
     void alignmentAnglePillar(int angle, QList<QGraphicsItem*> listItem);
 private:
-    struct subVertex{
-        subVertex(){
-            this->sub=NULL;
-            this->angle=0;
-        }
-        subVertex(GraphicsPillarItem *sub,float angle){
-            this->sub=sub;
-            this->angle=angle;
-        }
-        GraphicsPillarItem *sub;
-        float angle;
+    struct Child{
+        QGraphicsItem *child;
+        float angleChildToParent;
     };
-    struct firstVertex{
-        firstVertex(){
-            this->first=NULL;
-            this->child.clear();
-        }
-        GraphicsPillarItem *first;
-        QList<subVertex> child;
+    struct Parent{
+        QGraphicsItem *parent;
+        QList<Child*> listChild;
     };
-    QList<firstVertex> changePosPillar;
+    QList<Alignment::Parent*> parentItem;
     QGraphicsScene *scene;
-    QList<QGraphicsItem*> itemScene;
-    void appendVertex(GraphicsPillarItem *parentPillar);
     float normalVector2D(QPointF vector2d);
     QPointF rotatePoint(QPointF center, QPointF point,float angle);
+    float anglePointToPoint(QPointF p1,QPointF p2);
+    bool coliding(QGraphicsItem *wallItem, QGraphicsItem *pillarItem);
+    QList<Alignment::Child*> childToParent(QGraphicsItem *parent, QList<QGraphicsItem *> selectedItem);
+    void av(QGraphicsItem *parent,QList<QGraphicsItem*> selectedItem);
 };
 
 #endif // ALIGNMENT_H

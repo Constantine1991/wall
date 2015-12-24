@@ -101,7 +101,8 @@ public:
     void SaveSettingItem();
     SettingItem *LoadSettingItem();
     void setFundament(bool Fundament);
-    void alignmentSelectedWall(int width);//Выравнивание длинны стен
+    void alignmentAngelSelectedWall(int angle);//Выравнивание длинны стен
+    void alignmentLengthSelectedItem(int length);
     void setLockingScene(bool lock);//Блокирование сцены на перетаскивание объектов
     bool locking();//Блокирована ли сцена
     bool pillarBottom;

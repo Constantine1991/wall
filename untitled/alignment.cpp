@@ -54,6 +54,8 @@ void Alignment::alignmentAnglePillar(int angle,QList<QGraphicsItem *> listItem)
                 }
         }
     }
+    if(listPillar.isEmpty())
+        return;
     //// Какой столб ближе к ночалу координат
     if(this->normalVector2D(listPillar.first()->centre())>this->normalVector2D(listPillar.last()->centre()))
     {
@@ -96,44 +98,122 @@ void Alignment::alignmentAnglePillar(int angle,QList<QGraphicsItem *> listItem)
     //// Выравнивание столбов в одну линию
     for(int i=0;i<step-1;i++)
     {
-        listPillar.at(i+1)->setPosition(this->rotatePoint(center,QPointF(center.x()-(distance.at(i)+a),center.y()),angle));
+        listPillar.at(i+1)->setPosition(this->rotatePoint(center,QPointF(center.x()-(distance.at(i)+a),
+                                                                         center.y()),angle));
         a+=distance.at(i);
     }
 }
 
-void Alignment::appendVertex(GraphicsPillarItem *parentPillar)
+float Alignment::anglePointToPoint(QPointF p1, QPointF p2)
 {
-  /*  Alignment::firstVertex parent;
-    parent.first=parentPillar;
-    this->changePosPillar.append(parent);
-    QList<GraphicsWallItem*> wallPillar=parentPillar->itemsWall();
-    foreach(Alignment::firstVertex firstPillar,this->changePosPillar)
-    {
-        foreach(GraphicsWallItem *wall,wallPillar)
-            if(firstPillar.first->collidesWithItem(wall))
-                wallPillar.removeAt(wallPillar.indexOf(wall));
-    }
-    if(!wallPillar.isEmpty())
-        foreach(QGraphicsItem *item,this->itemScene)
-        {
-            GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(item);
-            foreach(GraphicsWallItem *wall,wallPillar)
-                if()
-        }*/
+    float angle=::atan2(p1.y()-p2.y(),p1.x()-p2.x())/PI*180;
+    angle=angle<0?angle+360:angle;
+    return angle;
 }
 
-void Alignment::alignmentLengthPillar(int length, QList<QGraphicsItem *> items)
+bool Alignment::coliding(QGraphicsItem *wallItem, QGraphicsItem *pillarItem)
 {
-    if(items.isEmpty())
-        return;
-    foreach(QGraphicsItem *item,items)
+    GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(pillarItem);
+    GraphicsWallItem *wall=qgraphicsitem_cast<GraphicsWallItem*>(wallItem);
+    if(((pillar->centre().x()+pillar->boundingRect().width()/2)>=wall->line().p1().x())&&
+       ((pillar->centre().x()-pillar->boundingRect().width()/2)<=wall->line().p1().x())&&
+       ((pillar->centre().y()+pillar->boundingRect().height()/2)>=wall->line().p1().y())&&
+       ((pillar->centre().y()-pillar->boundingRect().height()/2)<=wall->line().p1().y()))
+        return true;
+    if(((pillar->centre().x()+pillar->boundingRect().width()/2)>=wall->line().p2().x())&&
+       ((pillar->centre().x()-pillar->boundingRect().width()/2)<=wall->line().p2().x())&&
+       ((pillar->centre().y()+pillar->boundingRect().height()/2)>=wall->line().p2().y())&&
+       ((pillar->centre().y()-pillar->boundingRect().height()/2)<=wall->line().p2().y()))
+        return true;
+    return false;
+}
+
+QList<Alignment::Child*> Alignment::childToParent(QGraphicsItem *item,QList<QGraphicsItem*> selectedItem)
+{
+    GraphicsPillarItem *parentPillar=qgraphicsitem_cast<GraphicsPillarItem*>(item);
+    QList<Alignment::Child*> listChild;
+    foreach(GraphicsWallItem *itemWall,parentPillar->itemsWall())
     {
-        if(item->type()!=GraphicsPillarItem::Type)
-            items.removeAt(items.indexOf(item));
-        item->setSelected(false);
+        foreach(QGraphicsItem *selected,selectedItem)
+            if(this->coliding(itemWall,selected))
+            {
+                bool appendChild=true;
+                foreach(Alignment::Parent *parent,this->parentItem)
+                {
+                    if(parent->parent==selected)
+                    {
+                        appendChild=false;
+                        break;
+                    }
+                    foreach(Alignment::Child *child,parent->listChild)
+                        if(child->child==selected)
+                        {
+                            appendChild=false;
+                            break;
+                        }
+                }
+                if(appendChild)
+                {
+                    Alignment::Child *append=new Alignment::Child;
+                    append->child=selected;
+                    append->angleChildToParent=this->anglePointToPoint(item->pos(),selected->pos());
+                    listChild.append(append);
+                }
+            }
     }
-    if(items.isEmpty())
+    return listChild;
+
+}
+
+void Alignment::av(QGraphicsItem *parent, QList<QGraphicsItem *> selectedItem)
+{
+    QList<Alignment::Child*> appendChildToParent=this->childToParent(parent,selectedItem);
+    if(appendChildToParent.isEmpty())
         return;
-    this->itemScene=items;
-    this->appendVertex(qgraphicsitem_cast<GraphicsPillarItem*>(items.first()));
+    Alignment::Parent *appendParent=new Alignment::Parent;
+    appendParent->parent=parent;
+    appendParent->listChild.append(appendChildToParent);
+    this->parentItem.append(appendParent);
+    foreach(Alignment::Child *child,appendChildToParent)
+        this->av(child->child,selectedItem);
+}
+
+void Alignment::alignmentLengthPillar(int length,QList<QGraphicsItem*> aligmentItem)
+{
+    if(aligmentItem.isEmpty())
+        return;
+    Alignment::Parent *parent=new Alignment::Parent;
+    parent->parent=aligmentItem.at(0);
+    this->parentItem.append(parent);
+    this->av(aligmentItem.at(0),aligmentItem);
+    if(this->parentItem.count()==1)
+        return;
+//    for(int i=0;i<parentItem.count();i++)
+//    {
+//        QString caption=QString::fromLocal8Bit("Родитель ")+QString::number(i)+"("+QString::number(parentItem.at(i)->parent->pos().x())+
+//                        ","+QString::number(parentItem.at(i)->parent->pos().y())+"):";
+//        foreach(Alignment::Child *child,parentItem.at(i)->listChild)
+//            caption+="("+QString::number(child->child->pos().x())+","+QString::number(child->child->pos().y())+
+//                    "):"+QString::number(child->angleChildToParent)+",";
+//        GraphicsPillarItem *p=qgraphicsitem_cast<GraphicsPillarItem*>(parentItem.at(i)->parent);
+//        p->setText(caption);
+//        qDebug()<<"Parent:"<<i<<" Count Child:"<<this->parentItem.at(i)->listChild.count();
+//    }
+//    QGraphicsItemGroup *group=new QGraphicsItemGroup;
+//    this->scene->addItem(group);
+//    foreach(QGraphicsItem *item,aligmentItem)
+//        group->addToGroup(item);
+//    qDebug()<<"boundiingRect:"<<group->boundingRect();
+//    foreach(QGraphicsItem *item,aligmentItem)
+//        group->removeFromGroup(item);
+
+    foreach(Alignment::Parent *parent,parentItem)
+        foreach(Alignment::Child *child,parent->listChild)
+        {
+            GraphicsPillarItem *pillar=qgraphicsitem_cast<GraphicsPillarItem*>(child->child);
+            pillar->setPosition(this->rotatePoint(parent->parent->pos(),QPointF(parent->parent->pos().x()-length,
+                                                                                 parent->parent->pos().y()),
+                                                  child->angleChildToParent));
+        }
+
 }

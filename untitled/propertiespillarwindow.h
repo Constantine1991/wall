@@ -27,15 +27,9 @@ signals:
 private slots:
     void on_pushButton_clicked();
 
-    void on_pushButton_3_clicked();
-
-    void on_comboBox_activated(const QString &arg1);
-
     void on_comboBox_activated(int index);
 
     void on_lineEdit_textChanged(const QString &arg1);
-
-    void on_lineEdit_2_textChanged(const QString &arg1);
 
     void on_lineEdit_3_textChanged(const QString &arg1);
 
@@ -56,11 +50,7 @@ private slots:
     void on_comboBox_5_activated(int index);
     void on_pushButton_2_clicked();
 
-    void on_checkBox_2_clicked();
-
     void on_checkBox_6_clicked();
-
-    void on_lineEdit_3_textEdited(const QString &arg1);
 
 protected:
     void closeEvent(QCloseEvent *event);

@@ -108,15 +108,6 @@ void PropertiesPillarWindow::on_pushButton_clicked()
     this->close();
 }
 
-void PropertiesPillarWindow::on_pushButton_3_clicked()
-{
-}
-
-void PropertiesPillarWindow::on_comboBox_activated(const QString &arg1)
-{
-
-}
-
 void PropertiesPillarWindow::on_comboBox_activated(int index)
 {
     this->Pillar->setHeightSide(this->lastIndexCheckBox,ui->lineEdit_3->text().toInt());
@@ -138,10 +129,6 @@ void PropertiesPillarWindow::on_lineEdit_textChanged(const QString &arg1)
         ui->spinBox->setSingleStep(1);
     }else ui->spinBox->setMaximum(0);
     ui->widget->draw(DiagramViewFrontItem::ITEM_PILLAR);
-}
-
-void PropertiesPillarWindow::on_lineEdit_2_textChanged(const QString &arg1)
-{
 }
 
 void PropertiesPillarWindow::on_lineEdit_3_textChanged(const QString &arg1)
@@ -279,19 +266,9 @@ void PropertiesPillarWindow::on_pushButton_2_clicked()
     this->close();
 }
 
-void PropertiesPillarWindow::on_checkBox_2_clicked()
-{
-
-}
-
 void PropertiesPillarWindow::on_checkBox_6_clicked()
 {
     ui->comboBox_6->setEnabled(ui->checkBox_6->isChecked());
     ui->widget->graphicPillar.setBottom(ui->checkBox_6->isChecked());
     ui->widget->draw(DiagramViewFrontItem::ITEM_PILLAR);
-}
-
-void PropertiesPillarWindow::on_lineEdit_3_textEdited(const QString &arg1)
-{
-
 }

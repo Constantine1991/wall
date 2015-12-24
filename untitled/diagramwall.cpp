@@ -8,6 +8,7 @@ DiagramWall::DiagramWall()
     this->graphicsTops=NULL;
     this->graphicsBottom=NULL;
     this->settingItem=NULL;
+    this->decoreit=DiagramWall::DECORIET_BRICK;
 }
 
 DiagramWall::~DiagramWall()
@@ -17,6 +18,7 @@ DiagramWall::~DiagramWall()
         delete this->graphicsTops;
     if(this->graphicsBottom!=NULL)
         delete this->graphicsBottom;
+    this->clearDecoreit();
 }
 
 void DiagramWall::setSettingItem(SettingItem *settingItem)
@@ -42,6 +44,11 @@ void DiagramWall::setHeight(int height)
             qDebug()<<i;
             this->colorsBricks.removeLast();
         }
+}
+
+void DiagramWall::setMaxHeight(int height)
+{
+    this->maxHeight=height;
 }
 
 void DiagramWall::setWidth(int width)
@@ -183,6 +190,40 @@ void DiagramWall::setColorPazzle(QString nameColor1, QString nameColor2)
     this->nameColorPazzle2=nameColor2;
 }
 
+void DiagramWall::setDecoreit(DiagramWall::DECOREIT decoreit)
+{
+    this->decoreit=decoreit;
+}
+
+void DiagramWall::setDecoreit(int decoreit)
+{
+    switch(decoreit)
+    {
+       case 1:{
+            this->decoreit=DiagramWall::DECORIET_BRICK;
+            break;
+       }
+       case 2:{
+         this->decoreit=DiagramWall::DECORIET_CRAFT;
+         break;
+       }
+       case 3:{
+          this->decoreit=DiagramWall::DECORIET_METALL;
+          break;
+       }
+       case 4:{
+          this->decoreit=DiagramWall::DECORIET_FORGED;
+          break;
+       }
+       default:break;
+    }
+}
+
+void DiagramWall::setColorDecoreit(QBrush color)
+{
+    this->colorDecoreit=color;
+}
+
 QList<QGraphicsRectItem *> DiagramWall::update()
 {
     QList<QGraphicsRectItem *> tiles;
@@ -200,6 +241,15 @@ QList<QGraphicsRectItem *> DiagramWall::update()
         this->updateBottom();
         tiles.append(this->graphicsBottom);
     }
+    return tiles;
+}
+
+QList<QGraphicsPolygonItem *> DiagramWall::decoreitItem()
+{
+    QList<QGraphicsPolygonItem*> tiles;
+    this->updateDecoreit();
+    if(!this->graphicsDecoreit.isEmpty() && !this->graphicBricks.isEmpty())
+        return this->graphicsDecoreit;
     return tiles;
 }
 
@@ -381,4 +431,98 @@ void DiagramWall::updateBottom()
     if(!color.isEmpty())
         this->graphicsBottom->setBrush(QBrush(color.first()->image1.scaled(width,
                                                                            this->sizeTileBottom.height())));
+}
+
+void DiagramWall::clearDecoreit()
+{
+    if(this->graphicsDecoreit.isEmpty())
+        return;
+    foreach(QGraphicsPolygonItem *item,this->graphicsDecoreit)
+        if(item!=NULL)
+            delete item;
+    this->graphicsDecoreit.clear();
+}
+
+void DiagramWall::updateDecoreit()
+{
+    this->clearDecoreit();
+    Calculate calc(this->settingItem);
+    int offsetY=this->pos_y-(this->sizeTileBottom.height()+calc.rowBrickBigWall(this->height)*
+                             this->sizeTileBrick.height());
+    if(this->graphicsTops!=NULL)
+        offsetY-=this->sizeTileTop.height();
+    int offsetX=this->pos_x;
+
+    int heightDecoriet = calc.rowBrickBigWall(this->maxHeight)*this->sizeTileBrick.height()-
+                         calc.rowBrickBigWall(this->height)*this->sizeTileBrick.height();
+    offsetY-=heightDecoriet;
+    if(heightDecoriet==0)
+        return;
+    if(this->decoreit==DiagramWall::DECORIET_BRICK)
+        return;
+    if(this->decoreit==DiagramWall::DECORIET_CRAFT)
+    {
+        QPolygonF polygon;
+        polygon<<QPointF(5,0)<<QPointF(0,5)<<QPointF(0,heightDecoriet)<<QPointF(10,heightDecoriet)<<QPointF(10,5);
+        int count=calc.colBrickBigWall(this->width)*this->sizeTileBrick.width()/10;
+        for(int i=0;i<count;i++)
+        {
+            QGraphicsPolygonItem *itemGraphics=new QGraphicsPolygonItem(polygon);
+            itemGraphics->setBrush(this->colorDecoreit);
+            itemGraphics->setPen(QPen(Qt::black, 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+            itemGraphics->setPos(offsetX,offsetY);
+            this->graphicsDecoreit.append(itemGraphics);
+            offsetX+=10;
+        }
+    }
+    if(this->decoreit==DiagramWall::DECORIET_FORGED)
+    {
+       /* QGraphicsRectItem *left=new QGraphicsRectItem();
+        left->setBrush(QBrush(this->colorD2));
+        left->setPen(QPen(Qt::black, 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+        left->setRect(x,dy,10,heightD);
+        this->GraphicsSceneWall->addItem(left);
+        x+=10;
+        QGraphicsLineItem *topLine=new QGraphicsLineItem();
+        topLine->setPen(QPen(Qt::black, 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+        topLine->setLine(x,dy+70,x+this->widthWall,dy+70);
+        this->GraphicsSceneWall->addItem(topLine);
+        QGraphicsLineItem *centreLine=new QGraphicsLineItem();
+        centreLine->setPen(QPen(Qt::black, 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+        centreLine->setLine(x,dy+40,x+this->widthWall,dy+40);
+        this->GraphicsSceneWall->addItem(centreLine);
+        QGraphicsLineItem *bottomLine=new QGraphicsLineItem();
+        bottomLine->setPen(QPen(Qt::black, 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+        bottomLine->setLine(x,dy+10,x+this->widthWall,dy+10);
+        this->GraphicsSceneWall->addItem(bottomLine);*/
+        QPolygonF polygon;
+        polygon<<QPointF(5,0)<<QPointF(0,5)<<QPointF(2.5,5)<<QPointF(2.5,heightDecoriet)<<
+                 QPointF(7.5,heightDecoriet)<<QPointF(7.5,5)<<QPointF(10,5);
+        int count=calc.colBrickBigWall(this->width)*this->sizeTileBrick.width()/10;
+        for(int i=0;i<count;i++)
+        {
+            QGraphicsPolygonItem *itemGraphics=new QGraphicsPolygonItem(polygon);
+            itemGraphics->setBrush(this->colorDecoreit);
+            itemGraphics->setPen(QPen(Qt::black, 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+            itemGraphics->setPos(offsetX,offsetY);
+            this->graphicsDecoreit.append(itemGraphics);
+            offsetX+=10;
+        }
+    }
+    if(this->decoreit==DiagramWall::DECORIET_METALL)
+    {
+        QPolygonF polygon;
+        polygon<<QPointF(0,0)<<QPointF(10,0)<<QPointF(10,heightDecoriet)<<
+                 QPointF(0,heightDecoriet);
+        int count=calc.colBrickBigWall(this->width)*this->sizeTileBrick.width()/10;
+        for(int i=0;i<count;i++)
+        {
+            QGraphicsPolygonItem *itemGraphics=new QGraphicsPolygonItem(polygon);
+            itemGraphics->setBrush(this->colorDecoreit);
+            itemGraphics->setPen(QPen(Qt::black, 1, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
+            itemGraphics->setPos(offsetX,offsetY);
+            this->graphicsDecoreit.append(itemGraphics);
+            offsetX+=10;
+        }
+    }
 }

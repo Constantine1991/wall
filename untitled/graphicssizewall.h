@@ -13,7 +13,11 @@ class GraphicsSizeWall : public QDialog
     Q_OBJECT
     
 public:
-    explicit GraphicsSizeWall(DiagramView *diagramView,QWidget *parent = 0);
+    enum AlignmentType{
+        ALIGNMENT_ANGLE     = 1,
+        ALIGNMENT_LENGTH    = 2
+    };
+    explicit GraphicsSizeWall(DiagramView *diagramView,AlignmentType type,QWidget *parent = 0);
     ~GraphicsSizeWall();
     
 private slots:
@@ -24,6 +28,7 @@ private slots:
 private:
     Ui::GraphicsSizeWall *ui;
     DiagramView *diagramView;
+    GraphicsSizeWall::AlignmentType type;
 };
 
 #endif // GRAPHICSSIZEWALL_H
