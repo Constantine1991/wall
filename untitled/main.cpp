@@ -13,8 +13,8 @@ int main(int argc, char *argv[])
     w.showMaximized();
     return a.exec();
 }
-
-/*#include <QApplication>
+/*
+#include <QApplication>
 #include "activationwindow.h"
 #include "mainwindow.h"
 

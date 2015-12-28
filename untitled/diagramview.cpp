@@ -86,11 +86,11 @@ QGraphicsItem* DiagramView::AppendItem(SettingItem::TYPEITEM typeItem, QPointF p
             return PillarItem;
         }
         case SettingItem::ITEM_WALL:{
-            GraphicsWallItem *wall=new GraphicsWallItem(this->MenuItem);
             QGraphicsItem *item1=this->itemToScene(SettingItem::ITEM_PILLAR,this->lineWall->line().p1());
             QGraphicsItem *item2=this->itemToScene(SettingItem::ITEM_PILLAR,this->lineWall->line().p2());
-            if(item1!=NULL && item2!=NULL)
+            if(item1!=NULL && item2!=NULL && item1!=item2)
             {
+                GraphicsWallItem *wall=new GraphicsWallItem(this->MenuItem);
                 GraphicsPillarItem *pillar1=qgraphicsitem_cast<GraphicsPillarItem*>(item1);
                 GraphicsPillarItem *pillar2=qgraphicsitem_cast<GraphicsPillarItem*>(item2);
                 wall->setLinePoint(pillar1->centre(),pillar2->centre());
@@ -99,9 +99,9 @@ QGraphicsItem* DiagramView::AppendItem(SettingItem::TYPEITEM typeItem, QPointF p
                 this->pDiagramScene->addItem(wall);
             }
             this->pDiagramScene->removeItem(this->lineWall);
-            delete this->lineWall;
+            //delete this->lineWall;
             this->lineWall=NULL;
-            return wall;
+            return NULL;
         }
         case SettingItem::ITEM_GATE_A:{
             group=new GroupItem();
@@ -1270,6 +1270,8 @@ void DiagramView::mousePressEvent(QMouseEvent *event)
         this->AppendItem(SettingItem::ITEM_PILLAR,this->mapToScene(event->pos()));
     if(this->typeITEM==SettingItem::ITEM_WALL)
     {
+        if(this->itemToScene(SettingItem::ITEM_PILLAR,this->mapToScene(event->pos()))==NULL)
+            return;
         this->lineWall=new QGraphicsLineItem(QLineF(this->mapToScene(event->pos()),this->mapToScene(event->pos())));
         this->lineWall->setPen(QPen(Qt::black, 2, Qt::SolidLine, Qt::SquareCap, Qt::MiterJoin));
         this->lineWall->setFlag(QGraphicsItem::ItemIsSelectable,true);
@@ -1337,6 +1339,7 @@ void DiagramView::mouseReleaseEvent(QMouseEvent *event)
 {
     if(event->button()!=Qt::LeftButton)
         return;
+    QApplication::restoreOverrideCursor();
     if(!this->pDiagramScene->selectedItems().isEmpty())
         if(this->pDiagramScene->selectedItems().at(0)->type()==GraphicsPillarItem::Type)
         {
@@ -1346,8 +1349,11 @@ void DiagramView::mouseReleaseEvent(QMouseEvent *event)
     this->mousePrees=false;
     if(this->typeITEM==SettingItem::ITEM_WALL)
     {
+        if(this->lineWall==NULL)
+            return;
         this->lineWall->setLine(QLineF(this->lineWall->line().p1(),this->mapToScene(event->pos())));
         this->AppendItem(SettingItem::ITEM_WALL,QPointF(0,0));
+        qDebug()<<"Mouse Release";
     }
     if(this->typeITEM==SettingItem::ITEM_FILLING)
     {
@@ -1375,15 +1381,14 @@ void DiagramView::mouseReleaseEvent(QMouseEvent *event)
         delete this->RectA;
         this->RectA=NULL;
     }
-    QApplication::restoreOverrideCursor();
     QGraphicsView::mouseReleaseEvent(event);
 }
 
 void DiagramView::mouseDoubleClickEvent(QMouseEvent *event)
 {
-    if(event->button()!=Qt::LeftButton)
+    if(event->button()!=Qt::LeftButton || this->typeITEM!=SettingItem::ITEM_NONE)
         return;
-    QList<QGraphicsItem*>itemGraphics=this->pDiagramScene->items(this->mapToScene(event->pos()));
+   /* QList<QGraphicsItem*>itemGraphics=this->pDiagramScene->items(this->mapToScene(event->pos()));
     if(!itemGraphics.isEmpty())
     {
         if(itemGraphics.at(0)->type()==GraphicsPillarItem::Type)
@@ -1416,8 +1421,7 @@ void DiagramView::mouseDoubleClickEvent(QMouseEvent *event)
                 }
             }
         }
-    }
-
+    }*/
     QGraphicsView::mouseDoubleClickEvent(event);
 }
 
